@@ -1,0 +1,638 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Relicario 316</title>
+<meta name="description" content="Relicario 316: caja de regalo premium de PVC espumado y couché 90 g, 7.8 × 8.2 × 4 cm. Explórala en 3D.">
+<meta property="og:title" content="Relicario 316">
+<meta property="og:description" content="Caja de regalo premium. Gírala, ábrela y personalízala en 3D.">
+<meta name="theme-color" content="#161618">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: el visor 3D es el héroe; debajo, argumentos de venta en una columna editorial con fichas técnicas en mono. */
+:root{
+  --bg:#ecece9; --surface:#f8f8f6; --ink:#161618; --muted:#5b5b61; --line:#d2d1cd;
+  --accent:#6d1f2b; --accent-ink:#ffffff; --stage-a:#ffffff; --stage-b:#cfcfcb;
+  --display:"Cinzel", "Trajan Pro", Georgia, serif;
+  --body:"Instrument Sans", "Segoe UI", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Consolas, monospace;
+  color-scheme:light;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#121214; --surface:#1b1b1e; --ink:#ecebe7; --muted:#a4a4aa; --line:#2e2e33;
+  --accent:#c9737f; --accent-ink:#1a0d10; --stage-a:#3b3b3f; --stage-b:#141416; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#121214; --surface:#1b1b1e; --ink:#ecebe7; --muted:#a4a4aa; --line:#2e2e33;
+  --accent:#c9737f; --accent-ink:#1a0d10; --stage-a:#3b3b3f; --stage-b:#141416; color-scheme:dark }
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{background:var(--bg)}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;margin:0}
+.wrap{max-width:1240px;margin:0 auto;padding-inline:clamp(16px,4vw,40px)}
+h1,h2,h3{font-family:var(--display);font-weight:600;text-wrap:balance;margin:0;letter-spacing:.02em}
+p{margin:0}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px 40px;padding-block:36px 24px}
+header.top h1{font-size:clamp(40px,7vw,76px);line-height:1;letter-spacing:.08em}
+header.top h1 span{color:var(--accent)}
+header.top .lead{max-width:52ch;color:var(--muted);font-size:17px}
+
+/* Visor */
+.viewer{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:0;border:1px solid var(--line);background:var(--surface)}
+.stage{position:relative;min-height:560px;background:radial-gradient(120% 90% at 50% 30%,var(--stage-a) 0%,var(--stage-b) 100%);overflow:hidden;touch-action:none}
+.stage canvas{display:block;width:100%;height:100%;position:absolute;inset:0;cursor:grab}
+.stage canvas:active{cursor:grabbing}
+.stage .hud{position:absolute;left:16px;bottom:14px;right:16px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;pointer-events:none;font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.06em}
+.stage .hud b{color:var(--ink);font-weight:500}
+.stage .msg{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--mono);font-size:13px;color:var(--muted)}
+.scale{position:absolute;top:14px;left:16px;font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.08em;pointer-events:none}
+.scale i{display:block;width:78px;height:6px;margin-bottom:4px;background:repeating-linear-gradient(90deg,var(--ink) 0 7.8px,transparent 7.8px 15.6px);border:1px solid var(--ink)}
+
+.panel{border-left:1px solid var(--line);padding:20px;display:flex;flex-direction:column;gap:22px;min-width:0}
+.group{display:flex;flex-direction:column;gap:10px}
+.group h3{font-family:var(--mono);font-weight:500;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.btns{display:flex;flex-wrap:wrap;gap:6px}
+.btn{font:500 13px/1 var(--body);color:var(--ink);background:transparent;border:1px solid var(--line);padding:9px 11px;cursor:pointer;border-radius:2px;transition:background .15s,border-color .15s}
+.btn:hover{border-color:var(--ink)}
+.btn[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);width:100%;padding:12px;font-weight:600}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn:focus-visible,.sw:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.row2 .btn{width:100%}
+.swatches{display:flex;gap:8px;flex-wrap:wrap}
+.sw{width:30px;height:30px;border-radius:50%;border:1px solid var(--line);cursor:pointer;padding:0;position:relative}
+.sw[aria-pressed="true"]::after{content:"";position:absolute;inset:-5px;border:1.5px solid var(--ink);border-radius:50%}
+label.fl{font-size:12px;color:var(--muted)}
+input[type=text]{width:100%;font:500 14px var(--mono);letter-spacing:.08em;text-transform:uppercase;padding:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:2px}
+
+/* Specs */
+.specs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border:1px solid var(--line);border-top:0;background:var(--surface);margin:0}
+.specs div{padding:16px 18px;border-right:1px solid var(--line);min-width:0}
+.specs div:last-child{border-right:0}
+.specs dt{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.specs dd{margin:6px 0 0;font-family:var(--mono);font-size:15px;font-variant-numeric:tabular-nums}
+
+section{padding-block:80px 0}
+.sec-head{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:24px 60px;align-items:end;margin-bottom:40px}
+.sec-head h2{font-size:clamp(28px,4vw,44px);line-height:1.1}
+.sec-head p{color:var(--muted);max-width:60ch}
+
+.benefits{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:0;border-top:1px solid var(--ink)}
+.benefit{padding:22px 22px 26px 0;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:10px;min-width:0}
+.benefit h3{font-size:19px}
+.benefit p{color:var(--muted);font-size:15px}
+.benefit .tag{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--accent);text-transform:uppercase}
+
+.anatomy{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:40px;align-items:center}
+.anatomy .fig{background:var(--surface);border:1px solid var(--line);padding:20px;overflow-x:auto}
+.anatomy svg{display:block;width:100%;min-width:480px;height:auto}
+.anatomy ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:18px}
+.anatomy li{display:grid;grid-template-columns:90px minmax(0,1fr);gap:14px;border-top:1px solid var(--line);padding-top:14px}
+.anatomy li b{font-family:var(--mono);font-weight:500;font-size:12px;letter-spacing:.08em;color:var(--accent)}
+.anatomy li p{color:var(--muted);font-size:15px}
+.anatomy li strong{color:var(--ink);font-weight:600;display:block;margin-bottom:2px}
+
+.uses{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.use{background:var(--surface);border:1px solid var(--line);padding:20px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.use h3{font-size:18px}
+.use p{color:var(--muted);font-size:14.5px;flex:1}
+.use .meta{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;color:var(--muted)}
+.use .btn{align-self:flex-start}
+
+.program{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:40px 60px}
+.bignum{font-family:var(--display);font-size:clamp(44px,7vw,84px);line-height:1;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.bignum small{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase;margin-top:10px}
+.calc{margin-top:28px;display:flex;flex-direction:column;gap:0;border-top:1px solid var(--line)}
+.calc div{display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:13px;font-variant-numeric:tabular-nums}
+.calc span:first-child{color:var(--muted)}
+ol.steps{list-style:none;counter-reset:s;margin:0;padding:0;display:flex;flex-direction:column}
+ol.steps li{counter-increment:s;display:grid;grid-template-columns:48px minmax(0,1fr);gap:16px;padding:18px 0;border-top:1px solid var(--line)}
+ol.steps li::before{content:counter(s,decimal-leading-zero);font-family:var(--mono);font-size:13px;color:var(--accent);padding-top:3px}
+ol.steps h3{font-family:var(--body);font-weight:600;font-size:16px;letter-spacing:0}
+ol.steps p{color:var(--muted);font-size:15px;margin-top:4px}
+
+.closing{margin-block:90px 60px;padding:48px clamp(20px,5vw,60px);background:var(--ink);color:var(--surface);display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:24px 60px;align-items:end}
+.closing h2{font-size:clamp(26px,3.6vw,40px);line-height:1.15}
+.closing p{opacity:.78}
+footer{padding-block:0 40px;font-family:var(--mono);font-size:11.5px;color:var(--muted);letter-spacing:.06em}
+
+@media (max-width:900px){
+  .viewer{grid-template-columns:1fr}
+  .panel{border-left:0;border-top:1px solid var(--line)}
+  .stage{min-height:380px}
+  .stage .hud span:last-child{display:none}
+  .specs{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .specs div{border-bottom:1px solid var(--line)}
+  .sec-head,.anatomy,.program,.closing{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="eyebrow">Caja de regalo premium · 7.8 × 8.2 × 4 cm</p>
+      <h1>Relicario <span>316</span></h1>
+    </div>
+    <p class="lead">Una caja tipo cajón que se siente como parte del regalo. Estructura rígida de PVC espumado, forro de couché autoadherible de 90 g y un interior que se adapta a joyería, dulces o piezas delicadas.</p>
+  </header>
+
+  <div class="viewer" id="visor">
+    <div class="stage" id="stage">
+      <div class="msg" id="stage-msg">Cargando visor 3D…</div>
+      <div class="scale"><i></i>7.8 CM</div>
+      <div class="hud"><span>Vista: <b id="hud-view">Tres cuartos</b> · <b id="hud-state">Cerrada</b></span><span>Arrastra para girar · rueda o pellizca para acercar</span></div>
+    </div>
+    <aside class="panel">
+      <div class="group">
+        <h3>Vistas cerradas</h3>
+        <div class="btns" id="views">
+          <button class="btn" data-view="hero" aria-pressed="true">3/4</button>
+          <button class="btn" data-view="front" aria-pressed="false">Frontal</button>
+          <button class="btn" data-view="side" aria-pressed="false">Lateral</button>
+          <button class="btn" data-view="top" aria-pressed="false">Superior</button>
+          <button class="btn" data-view="bottom" aria-pressed="false">Inferior</button>
+        </div>
+      </div>
+      <div class="group">
+        <h3>Apertura</h3>
+        <button class="btn primary" id="b-interior">Ver interior</button>
+        <div class="row2">
+          <button class="btn" id="b-toggle" aria-pressed="false">Abrir cajón</button>
+          <button class="btn" id="b-cycle" aria-pressed="false">Animar ciclo</button>
+        </div>
+        <button class="btn" id="b-spin" aria-pressed="false">Giro 360°</button>
+      </div>
+      <div class="group">
+        <h3>Relleno interior</h3>
+        <div class="btns" id="fills">
+          <button class="btn" data-fill="cushion" aria-pressed="true">Cojín de terciopelo</button>
+          <button class="btn" data-fill="dividers" aria-pressed="false">Separadores</button>
+          <button class="btn" data-fill="tissue" aria-pressed="false">Papel seda</button>
+          <button class="btn" data-fill="empty" aria-pressed="false">Vacío</button>
+        </div>
+        <label class="fl">Terciopelo</label>
+        <div class="swatches" id="velvets">
+          <button class="sw" data-c="#161416" style="background:#161416" aria-label="Negro" aria-pressed="true"></button>
+          <button class="sw" data-c="#5c1622" style="background:#5c1622" aria-label="Burdeos" aria-pressed="false"></button>
+          <button class="sw" data-c="#18223e" style="background:#18223e" aria-label="Azul noche" aria-pressed="false"></button>
+          <button class="sw" data-c="#c9b48e" style="background:#c9b48e" aria-label="Champán" aria-pressed="false"></button>
+        </div>
+      </div>
+      <div class="group">
+        <h3>Personalización</h3>
+        <label class="fl" for="brand">Texto de marca (lomo y tapa)</label>
+        <input type="text" id="brand" maxlength="16" value="316 S STEEL" autocomplete="off">
+        <label class="fl">Impresión</label>
+        <div class="btns" id="prints">
+          <button class="btn" data-print="blanco" aria-pressed="true">Blanco</button>
+          <button class="btn" data-print="negro" aria-pressed="false">Negro</button>
+          <button class="btn" data-print="marfil" aria-pressed="false">Marfil</button>
+        </div>
+      </div>
+    </aside>
+  </div>
+  <dl class="specs">
+    <div><dt>Medidas</dt><dd>7.8 × 8.2 × 4 cm</dd></div>
+    <div><dt>Estructura</dt><dd>PVC espumado</dd></div>
+    <div><dt>Forro</dt><dd>Couché 90 g/m²</dd></div>
+    <div><dt>Volumen ext.</dt><dd>255.8 cm³</dd></div>
+    <div><dt>Apertura</dt><dd>Cajón deslizable</dd></div>
+  </dl>
+
+  <section>
+    <div class="sec-head">
+      <h2>Lo que su cliente siente antes de ver el producto</h2>
+      <p>La caja es el primer contacto físico con su marca. Relicario está pensada para que ese momento se note: peso firme en la mano, un deslizamiento limpio y un interior que presenta la pieza como protagonista.</p>
+    </div>
+    <div class="benefits">
+      <div class="benefit"><span class="tag">Materiales</span><h3>Tacto premium</h3><p>El PVC espumado da rigidez sin peso excesivo. El couché de 90 g aporta una superficie suave y uniforme que reproduce negros profundos y líneas finas.</p></div>
+      <div class="benefit"><span class="tag">Construcción</span><h3>Protege lo que importa</h3><p>Paredes rígidas que no se arrugan ni se ablandan con la humedad como el cartón. La pieza llega intacta aunque la caja viaje en bolsa o mensajería.</p></div>
+      <div class="benefit"><span class="tag">Funcionalidad</span><h3>Abre sin esfuerzo</h3><p>El cajón corre dentro de la funda con holgura calibrada: sale con un dedo y se mantiene cerrado solo. Sin imanes ni piezas que fallen.</p></div>
+      <div class="benefit"><span class="tag">Personalización</span><h3>Su marca en seis caras</h3><p>Tapa, lomo, fondo y ambos frentes del cajón admiten logotipo, mensaje o ilustración. El relieve braille opcional añade un gesto que se recuerda.</p></div>
+      <div class="benefit"><span class="tag">Versatilidad</span><h3>Un formato, muchos productos</h3><p>Cambie el interior y cambia la categoría: cojín con ranura para anillos, separadores para bombones o papel seda para piezas sueltas.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <h2>Anatomía del material</h2>
+      <p>Cada pared es un sándwich de dos capas con funciones distintas. El núcleo aporta la estructura y el forro aporta la imagen.</p>
+    </div>
+    <div class="anatomy">
+      <div class="fig">
+        <svg viewBox="0 0 560 300" role="img" aria-label="Corte transversal de la pared de la caja">
+          <defs>
+            <pattern id="foam" width="18" height="14" patternUnits="userSpaceOnUse">
+              <rect width="18" height="14" fill="var(--surface)"/>
+              <circle cx="5" cy="4" r="2.4" fill="none" stroke="var(--muted)" stroke-width="0.8"/>
+              <circle cx="13" cy="10" r="3" fill="none" stroke="var(--muted)" stroke-width="0.8"/>
+              <circle cx="15" cy="3" r="1.2" fill="none" stroke="var(--muted)" stroke-width="0.8"/>
+            </pattern>
+          </defs>
+          <rect x="30" y="70" width="330" height="10" fill="var(--ink)"/>
+          <rect x="30" y="80" width="330" height="3" fill="var(--accent)"/>
+          <rect x="30" y="83" width="330" height="120" fill="url(#foam)" stroke="var(--ink)" stroke-width="1"/>
+          <rect x="30" y="203" width="330" height="3" fill="var(--accent)"/>
+          <rect x="30" y="206" width="330" height="8" fill="var(--muted)"/>
+          <g stroke="var(--ink)" stroke-width="1" fill="none">
+            <path d="M360 75 H400 L420 50 H440"/>
+            <path d="M360 82 H400 L420 100 H440"/>
+            <path d="M360 143 H440"/>
+            <path d="M360 210 H400 L420 240 H440"/>
+          </g>
+          <g font-family="IBM Plex Mono, monospace" font-size="12" fill="var(--ink)">
+            <text x="446" y="54">Couché 90 g</text>
+            <text x="446" y="104">Adhesivo</text>
+            <text x="446" y="147">PVC espumado</text>
+            <text x="446" y="244">Forro interior</text>
+          </g>
+          <g font-family="IBM Plex Mono, monospace" font-size="11" fill="var(--muted)">
+            <text x="30" y="250">EXTERIOR ↑   ·   INTERIOR ↓</text>
+            <text x="30" y="40">Corte de pared, sin escala</text>
+          </g>
+        </svg>
+      </div>
+      <ul>
+        <li><b>CAPA 1</b><p><strong>Couché autoadherible de 90 g</strong>Superficie de impresión con acabado suave. Admite selectivos, laminado mate o brillante y relieve.</p></li>
+        <li><b>CAPA 2</b><p><strong>Adhesivo permanente</strong>Une el forro al núcleo sin burbujas ni despegues en esquinas.</p></li>
+        <li><b>NÚCLEO</b><p><strong>PVC espumado</strong>Celda cerrada, rígida y ligera. No absorbe humedad y conserva ángulos rectos en el tiempo.</p></li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <h2>Un interior para cada categoría</h2>
+      <p>Pulse cualquier opción para verla montada en el visor.</p>
+    </div>
+    <div class="uses">
+      <div class="use"><h3>Joyería</h3><p>Cojín de terciopelo con ranura que sujeta anillos y aretes de pie, listos para la foto de apertura.</p><span class="meta">Anillos · aretes · dijes</span><button class="btn" data-demo="cushion">Ver en 3D</button></div>
+      <div class="use"><h3>Chocolatería</h3><p>Separadores en seis cavidades con capacillos. Cada pieza queda fija y no se roza durante el envío.</p><span class="meta">Bombones · trufas · confites</span><button class="btn" data-demo="dividers">Ver en 3D</button></div>
+      <div class="use"><h3>Piezas delicadas</h3><p>Papel seda que envuelve y amortigua. Ideal para cosmética de viaje, relojes pequeños o regalos corporativos.</p><span class="meta">Cosmética · accesorios · kits</span><button class="btn" data-demo="tissue">Ver en 3D</button></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="program">
+      <div>
+        <p class="eyebrow">Programa de producción</p>
+        <div class="bignum" style="margin-top:12px">10 000 000<small>unidades</small></div>
+        <div class="calc">
+          <div><span>Volumen exterior por caja</span><span>255.84 cm³</span></div>
+          <div><span>Volumen armado del pedido</span><span>2 558.4 m³</span></div>
+          <div><span>Superficie imprimible exterior</span><span>≈ 255 cm² / caja</span></div>
+        </div>
+      </div>
+      <ol class="steps">
+        <li><div><h3>Arte y troquel aprobados</h3><p>Ajustamos su logotipo, textos y colores sobre el troquel plano de funda y cajón.</p></div></li>
+        <li><div><h3>Muestra física</h3><p>Usted recibe la caja impresa y armada para validar color, tacto y deslizamiento.</p></div></li>
+        <li><div><h3>Preserie</h3><p>Un lote corto confirma tolerancias de corte y ajuste del cajón antes de escalar.</p></div></li>
+        <li><div><h3>Producción continua</h3><p>Control de calidad por lote en impresión, laminado, corte y armado.</p></div></li>
+        <li><div><h3>Entregas programadas</h3><p>Liberación por lotes según su calendario de ventas, para no inmovilizar almacén.</p></div></li>
+      </ol>
+    </div>
+  </section>
+
+  <div class="closing">
+    <h2>Una caja que su cliente conserva es publicidad que no vuelve a pagar.</h2>
+    <p>El siguiente paso es aprobar el arte y la muestra física. Con eso, Relicario 316 queda lista para producción a escala.</p>
+  </div>
+  <footer>Renders generados en tiempo real a partir de las medidas 7.8 × 8.2 × 4 cm. Colores de pantalla aproximados; la muestra física es la referencia de color.</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+(function(){
+const msg=document.getElementById('stage-msg');
+if(!window.THREE||!THREE.OrbitControls){msg.textContent='No se pudo cargar el visor 3D. Revise su conexión.';return;}
+const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const TAU=Math.PI*2;
+
+/* ---------- Dimensiones (cm) ---------- */
+const W=8.2,H=4,D=7.8,T=0.3,G=0.03,TT=0.2;
+const SL=W-T, SX=-T/2;                 // funda: x -4.1 .. 3.8
+const TY=H/2-T-G, TZ=D/2-T-G;          // medio alto y medio fondo del cajón
+const X0=-W/2+G, X1=SX+SL/2, TL=X1-X0, TCX=(X0+X1)/2;
+const IX0=X0+TT, ILEN=X1-IX0, ICX=(IX0+X1)/2, IZ=TZ-TT, YF=-TY+TT;
+const OPEN=6.3;
+
+/* ---------- Renderer ---------- */
+const stage=document.getElementById('stage');
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,preserveDrawingBuffer:true});
+const mobile=window.matchMedia('(max-width: 900px), (pointer: coarse)').matches;
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,mobile?1.5:2));
+renderer.setClearColor(0x000000,0);
+renderer.outputEncoding=THREE.sRGBEncoding;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.15;
+renderer.shadowMap.enabled=true;
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+stage.appendChild(renderer.domElement);
+msg.hidden=true;
+
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(30,1,0.5,300);
+camera.position.set(15,10,17);
+const controls=new THREE.OrbitControls(camera,renderer.domElement);
+controls.enableDamping=true;controls.dampingFactor=0.08;
+controls.enablePan=false;controls.minDistance=11;controls.maxDistance=60;
+controls.autoRotateSpeed=2.2;
+const maxAniso=renderer.capabilities.getMaxAnisotropy();
+
+/* ---------- Entorno de estudio ---------- */
+(function(){
+  const pm=new THREE.PMREMGenerator(renderer);
+  const env=new THREE.Scene();
+  env.add(new THREE.Mesh(new THREE.BoxGeometry(60,60,60),new THREE.MeshBasicMaterial({color:0x2a2a2c,side:THREE.BackSide})));
+  function soft(w,h,x,y,z,v){const m=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({color:new THREE.Color(v,v,v),side:THREE.DoubleSide}));m.position.set(x,y,z);m.lookAt(0,0,0);env.add(m);}
+  soft(26,14,0,24,6,4);soft(10,20,-24,6,10,2.2);soft(10,20,24,4,-6,1.6);soft(30,6,0,2,-26,1.2);
+  scene.environment=pm.fromScene(env,0.03).texture;
+})();
+scene.add(new THREE.HemisphereLight(0xffffff,0x9a9a96,0.35));
+const key=new THREE.DirectionalLight(0xffffff,1.35);
+key.position.set(6,14,9);key.castShadow=true;
+key.shadow.mapSize.set(mobile?1024:2048,mobile?1024:2048);
+Object.assign(key.shadow.camera,{left:-12,right:12,top:12,bottom:-12,near:1,far:40});
+key.shadow.bias=-0.0004;key.shadow.normalBias=0.03;
+scene.add(key);
+const rim=new THREE.DirectionalLight(0xffffff,0.45);rim.position.set(-8,6,-10);scene.add(rim);
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(200,200),new THREE.ShadowMaterial({opacity:0.2}));
+ground.rotation.x=-Math.PI/2;ground.position.y=-H/2-0.002;ground.receiveShadow=true;scene.add(ground);
+
+/* ---------- Utilidades de dibujo ---------- */
+const lin=h=>new THREE.Color(h).convertSRGBToLinear();
+function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function ctex(w,h,srgb){const c=document.createElement('canvas');c.width=w;c.height=h;const t=new THREE.CanvasTexture(c);if(srgb!==false)t.encoding=THREE.sRGBEncoding;t.anisotropy=maxAniso;return{c,t,x:c.getContext('2d')};}
+function grain(x,w,h,dark){const r=rng(7);for(let i=0;i<9000;i++){x.fillStyle=(r()<.5?'rgba(0,0,0,':'rgba(255,255,255,')+(dark?.05:.035)+')';x.fillRect(r()*w,r()*h,1.3,1.3);}}
+function spaced(x,text,cx,cy,font,sp,color){x.save();x.font=font;x.fillStyle=color;x.textBaseline='middle';const ch=[...text];const ws=ch.map(c=>x.measureText(c).width);const tot=ws.reduce((a,b)=>a+b,0)+sp*(ch.length-1);let px=cx-tot/2;ch.forEach((c,i)=>{x.fillText(c,px,cy);px+=ws[i]+sp;});x.restore();}
+function thorn(x,x1,y1,x2,y2,w){const a=Math.atan2(y2-y1,x2-x1)+Math.PI/2,c=Math.cos(a),s=Math.sin(a),mx=(x1+x2)/2,my=(y1+y2)/2;x.beginPath();x.moveTo(x1+c*w,y1+s*w);x.quadraticCurveTo(mx+c*w*.45,my+s*w*.45,x2,y2);x.quadraticCurveTo(mx-c*w*.45,my-s*w*.45,x1-c*w,y1-s*w);x.closePath();x.fill();}
+
+function sigil(x,cx,cy,s,ink){
+  const P=(a,b)=>[cx+a*s,cy+b*s];
+  x.save();x.strokeStyle=ink;x.fillStyle=ink;x.lineCap='round';x.lineJoin='round';
+  const line=(a,b,c,d,w)=>{x.lineWidth=w*s;x.beginPath();x.moveTo(...P(a,b));x.lineTo(...P(c,d));x.stroke();};
+  x.lineWidth=.055*s;x.beginPath();x.arc(...P(0,-.55),.17*s,0,TAU);x.stroke();
+  x.beginPath();x.arc(...P(0,-.55),.06*s,0,TAU);x.fill();
+  x.lineWidth=.05*s;x.beginPath();x.arc(...P(-.54,-.55),.2*s,-Math.PI*.42,Math.PI*.42);x.stroke();
+  x.beginPath();x.arc(...P(.54,-.55),.2*s,Math.PI*.58,Math.PI*1.42);x.stroke();
+  line(-.33,-.55,-.2,-.55,.035);line(.2,-.55,.33,-.55,.035);
+  line(0,-.38,0,-.18,.04);
+  x.lineWidth=.045*s;x.beginPath();x.moveTo(...P(-.5,-.18));x.lineTo(...P(.5,-.18));x.lineTo(...P(0,.72));x.closePath();x.stroke();
+  x.lineWidth=.02*s;x.beginPath();x.moveTo(...P(0,-.02));x.lineTo(...P(-.2,.34));x.lineTo(...P(.2,.34));x.closePath();x.stroke();
+  line(0,-.18,0,.72,.015);
+  const th=(a,b,c,d,w)=>thorn(x,...P(a,b),...P(c,d),w*s);
+  th(0,-.72,0,-1.08,.035);th(-.5,-.18,-.95,-.47,.032);th(.5,-.18,.95,-.47,.032);
+  th(0,.72,0,1.08,.032);th(-.25,.27,-.64,.52,.024);th(.25,.27,.64,.52,.024);
+  line(-.08,-.92,.08,-.92,.018);line(-.06,.9,.06,.9,.015);
+  x.beginPath();x.arc(...P(0,.16),.03*s,0,TAU);x.fill();
+  x.restore();
+}
+const BRAILLE={r:[1,2,3,5],e:[1,5],g:[1,2,4,5],a:[1],l:[1,2,3],o:[1,3,5]};
+function braille(x,word,x0,y0,sp,mode,p){
+  let cx=x0;for(const ch of word){(BRAILLE[ch]||[]).forEach(d=>{const px=cx+(d>3?sp:0),py=y0+((d-1)%3)*sp,r=sp*.34;
+    if(mode==='bump'){const g=x.createRadialGradient(px,py,0,px,py,r);g.addColorStop(0,'#fff');g.addColorStop(1,'#000');x.fillStyle=g;x.beginPath();x.arc(px,py,r,0,TAU);x.fill();}
+    else{x.fillStyle='rgba(0,0,0,.16)';x.beginPath();x.arc(px+1.5,py+2,r,0,TAU);x.fill();x.fillStyle=p.paper;x.beginPath();x.arc(px,py,r,0,TAU);x.fill();}
+  });cx+=sp*2.5;}
+}
+function filigree(x,px,py,a,len,depth,w,r){
+  const x2=px+Math.cos(a)*len,y2=py+Math.sin(a)*len,bend=(r()-.5)*.8;
+  x.lineWidth=w;x.beginPath();x.moveTo(px,py);x.quadraticCurveTo(px+Math.cos(a+bend)*len*.55,py+Math.sin(a+bend)*len*.55,x2,y2);x.stroke();
+  if(depth<=0){x.beginPath();x.arc(x2,y2,Math.max(1.4,w*1.3),0,TAU);x.fill();return;}
+  const s=.45+r()*.3;
+  filigree(x,x2,y2,a-s,len*(.62+r()*.12),depth-1,w*.72,r);
+  filigree(x,x2,y2,a+s*.85,len*(.58+r()*.12),depth-1,w*.72,r);
+}
+function rose(x,cx,cy,R,p){
+  x.save();
+  x.fillStyle=p.ink;x.beginPath();x.arc(cx,cy,R,0,TAU);x.fill();
+  x.strokeStyle=p.paper;x.fillStyle=p.paper;
+  const ring=(r,w)=>{x.lineWidth=w*R;x.beginPath();x.arc(cx,cy,r*R,0,TAU);x.stroke();};
+  ring(.88,.025);ring(.3,.03);
+  for(let i=0;i<12;i++){const a=i*TAU/12;x.lineWidth=.03*R;x.beginPath();x.moveTo(cx+Math.cos(a)*.3*R,cy+Math.sin(a)*.3*R);x.lineTo(cx+Math.cos(a)*.88*R,cy+Math.sin(a)*.88*R);x.stroke();}
+  for(let i=0;i<12;i++){const a=(i+.5)*TAU/12,px=cx+Math.cos(a)*.6*R,py=cy+Math.sin(a)*.6*R;
+    x.lineWidth=.022*R;x.beginPath();x.arc(px,py,.155*R,0,TAU);x.stroke();
+    for(let k=0;k<4;k++){const b=a+k*Math.PI/2;x.lineWidth=.012*R;x.beginPath();x.arc(px+Math.cos(b)*.06*R,py+Math.sin(b)*.06*R,.055*R,0,TAU);x.stroke();}
+    const qx=cx+Math.cos(a)*.38*R,qy=cy+Math.sin(a)*.38*R;x.beginPath();x.arc(qx,qy,.03*R,0,TAU);x.fill();
+  }
+  for(let i=0;i<24;i++){const a=i*TAU/24;x.beginPath();x.arc(cx+Math.cos(a)*.94*R,cy+Math.sin(a)*.94*R,.034*R,0,TAU);x.fill();}
+  x.beginPath();x.arc(cx,cy,.26*R,0,TAU);x.fill();
+  x.strokeStyle=p.ink;for(let k=0;k<6;k++){const b=k*TAU/6;x.lineWidth=.018*R;x.beginPath();x.arc(cx+Math.cos(b)*.12*R,cy+Math.sin(b)*.12*R,.1*R,0,TAU);x.stroke();}
+  x.fillStyle=p.ink;x.beginPath();x.arc(cx,cy,.045*R,0,TAU);x.fill();
+  x.lineWidth=.02*R;x.strokeStyle=p.ink;x.beginPath();x.arc(cx,cy,R*1.05,0,TAU);x.stroke();
+  x.restore();
+}
+
+/* ---------- Paletas de impresión ---------- */
+const PRINTS={
+  blanco:{paper:'#f4f3ef',ink:'#151515',dark:false},
+  negro:{paper:'#1a1a1c',ink:'#dcd8cf',dark:true},
+  marfil:{paper:'#ede4d3',ink:'#56161f',dark:false}
+};
+let print=PRINTS.blanco, brand='316 S STEEL';
+
+const lid=ctex(1024,933), lidBump=ctex(1024,933,false), front=ctex(1024,518), back=ctex(1024,518), bottom=ctex(1024,933), cap=ctex(1024,525);
+function drawAll(){
+  const disp='600 {s}px Cinzel, Georgia, serif', mono='500 {s}px "IBM Plex Mono", monospace';
+  const F=(t,s)=>t.replace('{s}',s);
+  let x=lid.x,w=1024,h=933;
+  x.fillStyle=print.paper;x.fillRect(0,0,w,h);grain(x,w,h,print.dark);
+  x.globalAlpha=.45;x.strokeStyle=print.ink;x.lineWidth=2;x.strokeRect(36,36,w-72,h-72);x.globalAlpha=1;
+  sigil(x,w*.47,h*.47,h*.29,print.ink);
+  braille(x,'regalo',w*.64,h*.11,16,'color',print);
+  spaced(x,brand,w/2,h*.87,F(disp,38),14,print.ink);
+  let b=lidBump.x;b.fillStyle='#000';b.fillRect(0,0,w,h);braille(b,'regalo',w*.64,h*.11,16,'bump');
+  x=front.x;w=1024;h=518;x.fillStyle=print.paper;x.fillRect(0,0,w,h);grain(x,w,h,print.dark);
+  spaced(x,brand,w/2,h/2,F(disp,66),30,print.ink);
+  x=back.x;x.fillStyle=print.paper;x.fillRect(0,0,w,h);grain(x,w,h,print.dark);
+  x.globalAlpha=.8;spaced(x,brand,w/2,h*.44,F(disp,34),16,print.ink);
+  x.fillStyle=print.ink;x.fillRect(w/2-60,h*.56,120,2);
+  spaced(x,'EDICIÓN RELICARIO',w/2,h*.64,F(mono,18),8,print.ink);x.globalAlpha=1;
+  x=bottom.x;w=1024;h=933;x.fillStyle=print.paper;x.fillRect(0,0,w,h);grain(x,w,h,print.dark);
+  spaced(x,'RELICARIO',w/2,h*.3,F(disp,44),16,print.ink);
+  spaced(x,'7.8 × 8.2 × 4 CM',w/2,h*.4,F(mono,30),4,print.ink);
+  x.globalAlpha=.75;spaced(x,'PVC ESPUMADO · COUCHÉ AUTOADHERIBLE 90 G/M²',w/2,h*.47,F(mono,18),2,print.ink);x.globalAlpha=1;
+  const r=rng(42);let bx=w/2-170;x.fillStyle=print.ink;while(bx<w/2+170){const bw=2+Math.floor(r()*4)*2;x.fillRect(bx,h*.56,bw,110);bx+=bw+2+Math.floor(r()*3)*2;}
+  spaced(x,'LOTE  ________',w/2,h*.74,F(mono,20),3,print.ink);
+  x=cap.x;w=1024;h=525;x.fillStyle=print.paper;x.fillRect(0,0,w,h);grain(x,w,h,print.dark);
+  x.strokeStyle=print.ink;x.fillStyle=print.ink;x.lineCap='round';
+  const rr=rng(11);
+  [[0,0,Math.PI/4],[w,0,Math.PI*3/4],[0,h,-Math.PI/4],[w,h,-Math.PI*3/4]].forEach(([px,py,a])=>filigree(x,px,py,a,h*.17,6,9,rr));
+  rose(x,w/2,h/2,h*.4,print);
+  x.globalAlpha=.5;x.lineWidth=2;x.strokeRect(22,22,w-44,h-44);x.globalAlpha=1;
+  [lid,lidBump,front,back,bottom,cap].forEach(o=>o.t.needsUpdate=true);
+}
+
+function noiseTex(size,base,amp,seed){const o=ctex(size,size,false);const r=rng(seed);const img=o.x.createImageData(size,size);for(let i=0;i<img.data.length;i+=4){const v=base+(r()-.5)*amp;img.data[i]=img.data[i+1]=img.data[i+2]=v;img.data[i+3]=255;}o.x.putImageData(img,0,0);o.t.wrapS=o.t.wrapT=THREE.RepeatWrapping;o.t.needsUpdate=true;return o.t;}
+const foamBump=noiseTex(256,128,120,3);foamBump.repeat.set(3,3);
+const velvetBump=noiseTex(256,128,90,5);velvetBump.repeat.set(6,6);
+
+/* ---------- Materiales ---------- */
+const couche={roughness:.4,metalness:0,clearcoat:.35,clearcoatRoughness:.35};
+const M={
+  lid:new THREE.MeshPhysicalMaterial(Object.assign({map:lid.t,bumpMap:lidBump.t,bumpScale:.05},couche)),
+  front:new THREE.MeshPhysicalMaterial(Object.assign({map:front.t},couche)),
+  back:new THREE.MeshPhysicalMaterial(Object.assign({map:back.t},couche)),
+  bottom:new THREE.MeshPhysicalMaterial(Object.assign({map:bottom.t},couche)),
+  cap:new THREE.MeshPhysicalMaterial(Object.assign({map:cap.t},couche)),
+  plain:new THREE.MeshPhysicalMaterial(Object.assign({color:lin(print.paper)},couche)),
+  inner:new THREE.MeshStandardMaterial({color:lin('#f2f1ed'),roughness:.62}),
+  foam:new THREE.MeshStandardMaterial({color:lin('#eeede8'),roughness:.85,bumpMap:foamBump,bumpScale:.02}),
+  velvet:new THREE.MeshStandardMaterial({color:lin('#161416'),roughness:1,bumpMap:velvetBump,bumpScale:.012}),
+  slit:new THREE.MeshStandardMaterial({color:0x050505,roughness:1}),
+  gold:new THREE.MeshPhysicalMaterial({color:lin('#d9b46c'),metalness:1,roughness:.2,clearcoat:.5}),
+  steel:new THREE.MeshPhysicalMaterial({color:lin('#d6d8da'),metalness:1,roughness:.14}),
+  gem:new THREE.MeshPhysicalMaterial({color:0xffffff,metalness:.2,roughness:0,clearcoat:1,envMapIntensity:2.5}),
+  cup:new THREE.MeshPhysicalMaterial({color:lin('#b4924f'),metalness:.6,roughness:.35,side:THREE.DoubleSide}),
+  tissue:new THREE.MeshStandardMaterial({color:lin('#f1e3df'),roughness:.9,side:THREE.DoubleSide})
+};
+
+function box(w,h,d,mats,x,y,z,parent){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mats);m.position.set(x,y,z);m.castShadow=m.receiveShadow=true;parent.add(m);return m;}
+const all=new THREE.Group();scene.add(all);
+
+/* Funda [px,nx,py,ny,pz,nz] */
+const sleeve=new THREE.Group();all.add(sleeve);
+const f=M.foam,i=M.inner,pl=M.plain;
+box(SL,T,D-2*T,[f,f,M.lid,i,i,i],SX,H/2-T/2,0,sleeve);
+box(SL,T,D-2*T,[f,f,i,M.bottom,i,i],SX,-H/2+T/2,0,sleeve);
+box(SL,H,T,[f,f,pl,pl,M.front,i],SX,0,D/2-T/2,sleeve);
+box(SL,H,T,[f,f,pl,pl,i,M.back],SX,0,-D/2+T/2,sleeve);
+
+/* Cajón */
+const tray=new THREE.Group();all.add(tray);
+box(TL,TT,2*TZ,i,TCX,-TY+TT/2,0,tray);
+[1,-1].forEach(s=>box(TL,2*TY-TT,TT,[i,i,f,i,i,i],TCX,TT/2,s*(TZ-TT/2),tray));
+box(TT,2*TY-TT,2*TZ-2*TT,[i,M.cap,f,i,i,i],X0+TT/2,TT/2,0,tray);
+box(T,H,D,[M.cap,i,pl,pl,pl,pl],X1+T/2,0,0,tray);
+
+/* Relleno: cojín */
+const fills={cushion:new THREE.Group(),dividers:new THREE.Group(),tissue:new THREE.Group()};
+Object.values(fills).forEach(g=>tray.add(g));
+(function(){
+  const bev=.28,lx=ILEN-.12-2*bev,lz=2*IZ-.12-2*bev,dep=.9,r=.25;
+  const s=new THREE.Shape();const hx=lx/2,hz=lz/2;
+  s.moveTo(-hx+r,-hz);s.lineTo(hx-r,-hz);s.quadraticCurveTo(hx,-hz,hx,-hz+r);s.lineTo(hx,hz-r);s.quadraticCurveTo(hx,hz,hx-r,hz);s.lineTo(-hx+r,hz);s.quadraticCurveTo(-hx,hz,-hx,hz-r);s.lineTo(-hx,-hz+r);s.quadraticCurveTo(-hx,-hz,-hx+r,-hz);
+  const g=new THREE.ExtrudeGeometry(s,{depth:dep,bevelEnabled:true,bevelThickness:bev,bevelSize:bev,bevelSegments:6,curveSegments:10});
+  g.rotateX(-Math.PI/2);g.center();
+  const hgt=dep+2*bev,top=YF+hgt;
+  const c=new THREE.Mesh(g,M.velvet);c.position.set(ICX,YF+hgt/2,0);c.castShadow=c.receiveShadow=true;fills.cushion.add(c);
+  const sl=new THREE.Mesh(new THREE.BoxGeometry(.09,.02,lz*.62),M.slit);sl.position.set(ICX-.6,top-.004,0);fills.cushion.add(sl);
+  const ring=new THREE.Mesh(new THREE.TorusGeometry(.62,.11,40,120),M.gold);ring.rotation.y=Math.PI/2;ring.position.set(ICX-.6,top+.3,0);ring.castShadow=true;fills.cushion.add(ring);
+  const gem=new THREE.Mesh(new THREE.OctahedronGeometry(.24,0),M.gem);gem.scale.set(1,1.25,1);gem.position.set(ICX-.6,top+.3+.62+.24,0);gem.castShadow=true;fills.cushion.add(gem);
+  const set=new THREE.Mesh(new THREE.CylinderGeometry(.13,.09,.14,24),M.gold);set.position.set(ICX-.6,top+.3+.66,0);fills.cushion.add(set);
+  [-1,1].forEach(z=>{const st=new THREE.Mesh(new THREE.SphereGeometry(.2,32,24),M.steel);st.position.set(ICX+1.9,top+.12,z*1.1);st.castShadow=true;fills.cushion.add(st);
+    const sl2=new THREE.Mesh(new THREE.BoxGeometry(.3,.015,.06),M.slit);sl2.position.set(ICX+1.9,top-.003,z*1.1);fills.cushion.add(sl2);});
+})();
+/* Relleno: separadores + bombones */
+(function(){
+  const hh=1.9,g=fills.dividers;
+  box(ILEN,hh,.1,i,ICX,YF+hh/2,0,g);
+  [-1,1].forEach(s=>box(.1,hh,2*IZ,i,ICX+s*ILEN/6,YF+hh/2,0,g));
+  const cols=['#3a2117','#6a3f26','#e6d8c0','#2b1a12','#8a5532','#3a2117'];let k=0;
+  [-1,0,1].forEach(cx=>[-1,1].forEach(cz=>{
+    const x=ICX+cx*ILEN/3,z=cz*IZ/2;
+    const cup=new THREE.Mesh(new THREE.CylinderGeometry(1.02,.82,.5,40,1,true),M.cup);cup.position.set(x,YF+.25,z);g.add(cup);
+    const tr=new THREE.Mesh(new THREE.SphereGeometry(.82,48,32),new THREE.MeshPhysicalMaterial({color:lin(cols[k++]),roughness:.55,clearcoat:.25}));
+    tr.scale.set(1,.82,1);tr.position.set(x,YF+.7,z);tr.castShadow=tr.receiveShadow=true;g.add(tr);
+  }));
+})();
+/* Relleno: papel seda */
+(function(){
+  const g=new THREE.PlaneGeometry(ILEN-.05,2*IZ-.05,80,70);g.rotateX(-Math.PI/2);
+  const p=g.attributes.position;
+  for(let n=0;n<p.count;n++){const x=p.getX(n),z=p.getZ(n);
+    const ex=Math.max(0,Math.abs(x)/(ILEN/2)-.82)/.18, ez=Math.max(0,Math.abs(z)/IZ-.82)/.18;
+    const y=.75+.26*Math.sin(x*2.1+z*.7)*Math.cos(z*1.7)+.1*Math.sin(x*5.3-z*3.1)+.06*Math.sin(x*11+z*7)+1.1*Math.pow(Math.max(ex,ez),2);
+    p.setY(n,y);}
+  g.computeVertexNormals();
+  const m=new THREE.Mesh(g,M.tissue);m.position.set(ICX,YF,0);m.castShadow=m.receiveShadow=true;fills.tissue.add(m);
+  const seal=new THREE.Mesh(new THREE.CylinderGeometry(.42,.42,.06,40),new THREE.MeshPhysicalMaterial({color:lin('#6d1f2b'),roughness:.35,clearcoat:.6}));
+  seal.position.set(ICX+.8,YF+1.02,.3);seal.rotation.z=.12;seal.castShadow=true;fills.tissue.add(seal);
+})();
+function setFill(name){Object.keys(fills).forEach(k=>fills[k].visible=(k===name));}
+setFill('cushion');
+
+drawAll();
+if(document.fonts&&document.fonts.load){Promise.all([document.fonts.load('600 40px Cinzel'),document.fonts.load('500 20px "IBM Plex Mono"')]).then(drawAll).catch(()=>{});}
+
+/* ---------- Cámara y animaciones ---------- */
+const VIEWS={
+  hero:{p:[15,10,17],t:[0,0,0],name:'Tres cuartos'},
+  front:{p:[0,1.2,25],t:[0,0,0],name:'Frontal'},
+  side:{p:[25,1.2,0],t:[0,0,0],name:'Lateral'},
+  top:{p:[0,25,0.02],t:[0,0,0],name:'Superior'},
+  bottom:{p:[0,-25,0.02],t:[0,0,0],name:'Inferior'},
+  interior:{p:[15,17,11],t:[4.2,-.8,0],name:'Interior'}
+};
+const ease=k=>k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2;
+let camTween=null,trayAnim=null,trayX=0,cycling=false,cycleTimer=null;
+function flyTo(v){
+  const t0=controls.target.clone(),t1=new THREE.Vector3(...v.t);
+  const s0=new THREE.Spherical().setFromVector3(camera.position.clone().sub(t0));
+  const s1=new THREE.Spherical().setFromVector3(new THREE.Vector3(...v.p).sub(t1));
+  let dth=s1.theta-s0.theta;if(dth>Math.PI)dth-=TAU;if(dth<-Math.PI)dth+=TAU;
+  camTween={t0,t1,s0,s1,dth,start:performance.now(),dur:reduce?1:1300};
+}
+function moveTray(to){trayAnim={from:trayX,to,start:performance.now(),dur:reduce?1:1500};updateState(to);}
+const hudView=document.getElementById('hud-view'),hudState=document.getElementById('hud-state'),bToggle=document.getElementById('b-toggle');
+function updateState(to){const open=to>0;hudState.textContent=open?'Abierta':'Cerrada';bToggle.textContent=open?'Cerrar cajón':'Abrir cajón';bToggle.setAttribute('aria-pressed',String(open));}
+function stopCycle(){cycling=false;clearTimeout(cycleTimer);document.getElementById('b-cycle').setAttribute('aria-pressed','false');}
+function pressed(groupSel,btn){document.querySelectorAll(groupSel+' [aria-pressed]').forEach(b=>b.setAttribute('aria-pressed',String(b===btn)));}
+
+document.querySelectorAll('#views [data-view]').forEach(b=>b.addEventListener('click',()=>{
+  stopCycle();const v=VIEWS[b.dataset.view];flyTo(v);hudView.textContent=v.name;pressed('#views',b);if(trayX>0||(trayAnim&&trayAnim.to>0))moveTray(0);
+}));
+function showInterior(){stopCycle();pressed('#views',null);flyTo(VIEWS.interior);hudView.textContent='Interior';moveTray(OPEN);}
+document.getElementById('b-interior').addEventListener('click',showInterior);
+bToggle.addEventListener('click',()=>{stopCycle();const target=(trayAnim?trayAnim.to:trayX)>0?0:OPEN;moveTray(target);});
+document.getElementById('b-cycle').addEventListener('click',e=>{
+  if(cycling){stopCycle();return;}
+  cycling=true;e.currentTarget.setAttribute('aria-pressed','true');
+  if(!camTween){pressed('#views',null);flyTo({p:[17,11,13],t:[2.5,-.4,0]});hudView.textContent='Animación';}
+  moveTray((trayAnim?trayAnim.to:trayX)>0?0:OPEN);
+});
+const bSpin=document.getElementById('b-spin');
+bSpin.addEventListener('click',()=>{controls.autoRotate=!controls.autoRotate;bSpin.setAttribute('aria-pressed',String(controls.autoRotate));});
+document.querySelectorAll('#fills [data-fill]').forEach(b=>b.addEventListener('click',()=>{setFill(b.dataset.fill);pressed('#fills',b);if(trayX===0&&!trayAnim)showInterior();}));
+document.querySelectorAll('#velvets .sw').forEach(b=>b.addEventListener('click',()=>{M.velvet.color.copy(lin(b.dataset.c));pressed('#velvets',b);}));
+document.querySelectorAll('#prints [data-print]').forEach(b=>b.addEventListener('click',()=>{print=PRINTS[b.dataset.print];M.plain.color.copy(lin(print.paper));drawAll();pressed('#prints',b);}));
+let bt;document.getElementById('brand').addEventListener('input',e=>{clearTimeout(bt);bt=setTimeout(()=>{brand=(e.target.value.trim()||'316 S STEEL').toUpperCase();drawAll();},120);});
+document.querySelectorAll('[data-demo]').forEach(b=>b.addEventListener('click',()=>{
+  const name=b.dataset.demo;setFill(name);pressed('#fills',document.querySelector('#fills [data-fill="'+name+'"]'));
+  showInterior();document.getElementById('visor').scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'});
+}));
+controls.addEventListener('start',()=>{camTween=null;hudView.textContent='Libre';pressed('#views',null);});
+
+/* ---------- Tamaño y bucle ---------- */
+function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
+new ResizeObserver(resize).observe(stage);resize();
+function loop(now){
+  requestAnimationFrame(loop);
+  if(camTween){const c=camTween,k=ease(Math.min(1,(now-c.start)/c.dur));
+    const t=c.t0.clone().lerp(c.t1,k);
+    const s=new THREE.Spherical(c.s0.radius+(c.s1.radius-c.s0.radius)*k,Math.min(Math.PI-.001,Math.max(.001,c.s0.phi+(c.s1.phi-c.s0.phi)*k)),c.s0.theta+c.dth*k);
+    camera.position.copy(t).add(new THREE.Vector3().setFromSpherical(s));controls.target.copy(t);
+    if(k>=1)camTween=null;}
+  if(trayAnim){const a=trayAnim,k=ease(Math.min(1,(now-a.start)/a.dur));trayX=a.from+(a.to-a.from)*k;
+    if(k>=1){trayX=a.to;trayAnim=null;if(cycling){cycleTimer=setTimeout(()=>{if(cycling)moveTray(trayX>0?0:OPEN);},1100);}}}
+  tray.position.x=trayX;
+  all.position.x=-trayX*.175;
+  controls.update();
+  ground.visible=camera.position.y>-H/2+.3;
+  renderer.render(scene,camera);
+}
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
