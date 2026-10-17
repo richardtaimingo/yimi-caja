@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+    color-scheme: dark;
+  }
+  body {
+    @apply bg-night font-sans text-paper antialiased;
+    font-feature-settings: "ss01", "cv11";
+  }
+  ::selection {
+    @apply bg-volt text-white;
+  }
+  :focus-visible {
+    @apply outline-none ring-2 ring-volt ring-offset-2 ring-offset-night;
+  }
+}
+
+@layer components {
+  .eyebrow {
+    @apply text-[0.68rem] font-medium uppercase tracking-[0.32em] text-paper/55;
+  }
+  /* Titulares de campaña: sans geométrica extendida, en mayúsculas. */
+  .display {
+    @apply font-display font-normal uppercase leading-[1.04] tracking-[0.01em];
+  }
+  /* Texto diminuto de póster (bloques de copy y etiquetas en las esquinas). */
+  .micro {
+    @apply text-[0.62rem] font-medium uppercase leading-[1.7] tracking-[0.2em] text-paper/55;
+  }
+  .btn-volt {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-volt font-semibold text-white shadow-glow transition-all duration-300 hover:bg-volt-soft active:scale-[0.98];
+  }
+  .btn-paper {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-paper font-semibold text-night transition-all duration-300 hover:bg-white active:scale-[0.98];
+  }
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-paper/25 font-semibold text-paper transition-all duration-300 hover:border-paper hover:bg-paper/[0.06] active:scale-[0.98];
+  }
+  /* Escenario de estudio con luz azul (fondo de las fotos de producto). */
+  .stage-blue {
+    background: radial-gradient(110% 85% at 50% 38%, #2A66F5 0%, #0F3BB5 26%, #071A55 56%, #03060E 100%);
+  }
+  .field {
+    @apply mt-2 block w-full rounded-2xl border border-paper/15 bg-paper/[0.04] px-4 py-3.5 text-paper placeholder:text-paper/35 transition focus:border-volt/70 focus:outline-none focus:ring-0;
+  }
+  .link-underline {
+    @apply relative after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-full after:origin-right after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:origin-left hover:after:scale-x-100;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
