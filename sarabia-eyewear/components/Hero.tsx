@@ -99,7 +99,8 @@ export function Hero() {
     <section
       id="top"
       ref={sectionRef}
-      className="relative sm:pb-4 sm:pt-4 lg:pt-5"
+      // El hero sube por detrás del encabezado (transparente arriba): la luz cubre la pantalla de borde a borde
+      className="relative -mt-[var(--chrome-h)]"
       onPointerMove={(e) => {
         if (e.pointerType !== "mouse" || reduced) return;
         tiltY.set((e.clientX / window.innerWidth - 0.5) * 9);
@@ -110,13 +111,14 @@ export function Hero() {
         tiltY.set(0);
       }}
     >
-      <div className="sm:mx-auto sm:max-w-[1360px] sm:px-6 lg:px-8">
-        {/* Móvil: panel a sangre con la altura exacta de la pantalla bajo el header (svh no cambia al
-            ocultarse la barra del navegador, así el CTA nunca queda cortado ni salta al hacer scroll). */}
-        <div className="relative isolate flex min-h-[34rem] flex-col overflow-hidden [contain:paint] max-sm:[height:calc(100svh-var(--chrome-h))] max-sm:max-h-[56rem] sm:min-h-[640px] sm:rounded-[2rem] sm:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.07),inset_0_1px_0_rgba(255,255,255,0.1)] lg:min-h-[min(780px,calc(100svh-var(--chrome-h)-2.5rem))]">
+      <div>
+        {/* A sangre en todos los tamaños. En móvil mide exactamente la pantalla (svh no cambia al ocultarse
+            la barra del navegador: el CTA nunca queda cortado ni salta al hacer scroll). */}
+        <div className="relative isolate flex min-h-[36rem] flex-col overflow-hidden [contain:paint] max-sm:h-[100svh] max-sm:max-h-[60rem] sm:min-h-[100svh] lg:min-h-[max(100svh,680px)]">
           <Atmosphere />
 
-          <div className="relative z-10 flex flex-1 flex-col px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-6 sm:px-10 sm:pb-10 sm:pt-10 lg:px-12 lg:pb-11 lg:pt-11">
+          {/* Contenido alineado con el logo (mismos márgenes que el contenedor del encabezado) */}
+          <div className="relative z-10 mx-auto flex w-full max-w-[1360px] flex-1 flex-col px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-[calc(var(--chrome-h)+1.5rem)] sm:px-6 sm:pb-12 sm:pt-[calc(var(--chrome-h)+2.5rem)] lg:px-8 lg:pb-14 lg:pt-[calc(var(--chrome-h)+3rem)]">
             {/* Titular, texto y selector */}
             <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between lg:gap-10">
               <div className="max-w-[36rem]">
@@ -131,7 +133,7 @@ export function Hero() {
                 </Stack>
               </div>
 
-              <div role="tablist" aria-label="¿Qué estás buscando?" className="glass grid h-12 w-full shrink-0 grid-cols-3 rounded-full p-1 sm:inline-grid sm:w-auto">
+              <div role="tablist" aria-label="¿Qué estás buscando?" className="glass grid h-12 w-full shrink-0 grid-cols-3 rounded-full p-1 sm:inline-grid sm:w-auto sm:self-start">
                 {ORDER.map((key) => {
                   const Icon = intents[key].icon;
                   const selected = key === active;
@@ -163,7 +165,7 @@ export function Hero() {
 
             {/* Escenario del producto: tamaño fijo, la foto cambia con crossfade sin mover el layout */}
             <div
-              className="relative my-3 min-h-[8.5rem] flex-1 touch-pan-y [container-type:size] [perspective:1200px] sm:my-6 sm:h-[22rem] sm:flex-none lg:absolute lg:left-[61%] lg:top-[48%] lg:my-0 lg:aspect-[16/8] lg:h-auto lg:w-[48%] lg:-translate-x-1/2 lg:-translate-y-1/2"
+              className="relative my-3 min-h-[8.5rem] flex-1 touch-pan-y [container-type:size] [perspective:1200px] sm:my-6 sm:h-[22rem] sm:flex-none lg:absolute lg:left-[61%] lg:top-[54%] lg:my-0 lg:aspect-[16/8] lg:h-auto lg:w-[48%] lg:-translate-x-1/2 lg:-translate-y-1/2"
               onMouseEnter={() => setHovering(true)}
               onMouseLeave={() => setHovering(false)}
             >
@@ -279,7 +281,7 @@ export function Hero() {
             </div>
           </div>
 
-          <p className="micro pointer-events-none absolute right-5 top-1/2 z-10 hidden -translate-y-1/2 rotate-180 text-paper/45 [writing-mode:vertical-rl] lg:block" aria-hidden>
+          <p className="micro pointer-events-none absolute right-5 top-[54%] z-10 hidden -translate-y-1/2 rotate-180 text-paper/45 [writing-mode:vertical-rl] lg:block" aria-hidden>
             Visión que define presencia
           </p>
         </div>
@@ -368,13 +370,18 @@ function IconButton({ label, onClick, large, children }: { label: string; onClic
   );
 }
 
-/** Iluminación de estudio en capas; la luz principal deriva muy lento con transform (GPU). */
+/**
+ * Iluminación de estudio en capas que cubre todo el hero: costados iluminados (nunca negros), luz
+ * principal que deriva muy lento con transform (GPU) y fundido inferior hacia la página, para que el
+ * hero no termine en un borde recto.
+ */
 function Atmosphere() {
   return (
     <div aria-hidden className="atmos pointer-events-none absolute inset-0 -z-10 overflow-hidden">
       <div className="atmos-key motion-safe:animate-drift [will-change:transform]" />
       <div className="absolute inset-0 bg-[linear-gradient(112deg,transparent_38%,rgba(134,168,255,0.07)_48%,transparent_60%)]" />
       <div className="absolute inset-0 opacity-[0.1] mix-blend-overlay" style={{ backgroundImage: GRAIN }} />
+      <div className="absolute inset-x-0 bottom-0 h-[24%] bg-[linear-gradient(to_bottom,rgba(3,5,11,0),rgba(3,5,11,0.65)_60%,#03050B)]" />
       <span className="display absolute left-[58%] top-[44%] hidden -translate-x-1/2 -translate-y-1/2 select-none whitespace-nowrap text-[12.5rem] leading-none text-white/[0.035] lg:block">
         Sarabia
       </span>
@@ -386,7 +393,9 @@ function Marquee() {
   const from = `Desde ${currency.format(Math.min(...products.map((p) => p.price)))}`;
   const items = ["Acetato de alta densidad", "Titanio aeroespacial", "Antirreflejante premium", "Blue Block", "Polarizado UV400", "Ajuste milimétrico", "Envíos rápidos", from];
   return (
-    <div className="mt-6 overflow-hidden border-y border-white/[0.07] py-4 sm:mt-8" aria-hidden>
+    // Líneas finas que se desvanecen en los extremos y texto con fundido lateral: sin cortes rectos
+    <div className="relative overflow-hidden py-4 [mask-image:linear-gradient(90deg,transparent,#000_12%,#000_88%,transparent)]" aria-hidden>
+      <span className="absolute inset-x-0 bottom-0 h-px bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.12),transparent)]" />
       <div className="flex w-max gap-10 whitespace-nowrap motion-safe:animate-marquee">
         {[...items, ...items].map((t, k) => (
           <span key={k} className="flex items-center gap-10 font-display text-[0.6875rem] uppercase tracking-[0.24em] text-paper/60">

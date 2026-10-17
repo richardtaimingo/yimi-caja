@@ -51,7 +51,7 @@ export function Header() {
   return (
     <>
       {/* Aviso superior: en móvil se oculta para dar la pantalla completa al hero */}
-      <div className="hidden border-b border-white/[0.06] bg-night text-paper/70 sm:block">
+      <div className="relative z-40 hidden border-b border-white/[0.06] text-paper/70 sm:block">
         <div className="container flex h-9 items-center justify-center gap-3 whitespace-nowrap text-[0.66rem] font-medium uppercase tracking-[0.18em]">
           <span>Envíos rápidos a todo México</span>
           <span className="h-1 w-1 rounded-full bg-volt-soft" aria-hidden />
@@ -66,7 +66,7 @@ export function Header() {
           "sticky top-0 z-40 border-b transition-[background-color,border-color,box-shadow] duration-300",
           scrolled
             ? "border-white/[0.06] bg-[linear-gradient(180deg,rgba(3,5,11,0.82),rgba(3,5,11,0.66))] shadow-[inset_0_-1px_0_rgba(134,168,255,0.06)] backdrop-blur-[18px] backdrop-saturate-150"
-            : "border-transparent bg-night",
+            : "border-transparent bg-transparent",
         )}
       >
         <div className="container flex h-16 items-center justify-between gap-3 sm:gap-6 md:h-[4.5rem]">

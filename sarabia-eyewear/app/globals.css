@@ -18,16 +18,16 @@
 @layer base {
   :root {
     /* Alto del encabezado fijo; el hero ocupa exactamente la pantalla restante. */
-    --chrome-h: 4rem; /* móvil: sólo la barra de 64 px (el aviso superior se oculta) */
+    --chrome-h: calc(4rem + 1px); /* móvil: barra de 64 px + su borde (el aviso superior se oculta) */
   }
   @media (min-width: 640px) {
     :root {
-      --chrome-h: 6.25rem; /* aviso 36 px + barra 64 px */
+      --chrome-h: calc(6.25rem + 2px); /* aviso 36 px + barra 64 px + bordes */
     }
   }
   @media (min-width: 768px) {
     :root {
-      --chrome-h: 6.75rem; /* aviso 36 px + barra 72 px */
+      --chrome-h: calc(6.75rem + 2px); /* aviso 36 px + barra 72 px + bordes */
     }
   }
 
@@ -123,24 +123,27 @@
       radial-gradient(45% 40% at 50% 42%, rgb(200 216 255 / 0.18), transparent 70%),
       radial-gradient(110% 85% at 50% 40%, #1e4bd0 0%, #12379c 30%, #0a1d5a 62%, #03050b 100%);
   }
-  /* Iluminación del hero en capas: base, relleno índigo, rebote cobalto, destello cian y viñeta. */
+  /* Iluminación del hero a sangre: base cobalto profundo (no negra), relleno índigo arriba, rebote
+     cobalto en ambos costados para que los bordes queden iluminados, destello cian y viñeta suave. */
   .atmos {
     background:
-      radial-gradient(120% 95% at 55% 45%, transparent 52%, rgb(2 3 8 / 0.78) 100%),
-      radial-gradient(38% 30% at 52% 104%, rgb(27 71 201 / 0.38), transparent 70%),
-      radial-gradient(34% 40% at 98% 92%, rgb(70 150 255 / 0.14), transparent 70%),
-      radial-gradient(60% 65% at 4% -6%, rgb(43 44 154 / 0.34), transparent 66%),
-      linear-gradient(180deg, #060c22 0%, #03050b 100%);
+      radial-gradient(140% 100% at 50% 42%, transparent 60%, rgb(2 3 8 / 0.42) 100%),
+      radial-gradient(70% 55% at 0% 0%, rgb(43 44 154 / 0.42), transparent 70%),
+      radial-gradient(60% 50% at 100% 82%, rgb(70 150 255 / 0.16), transparent 70%),
+      radial-gradient(45% 70% at 0% 55%, rgb(27 71 201 / 0.3), transparent 75%),
+      radial-gradient(45% 70% at 100% 40%, rgb(27 71 201 / 0.3), transparent 75%),
+      linear-gradient(180deg, #08153d 0%, #071134 40%, #050b22 78%, #03050b 100%);
   }
   /* Luz principal: halo cobalto con núcleo blanco frío. Deriva muy lento sólo con transform. */
   .atmos-key {
     position: absolute;
     inset: -20%;
-    /* Móvil: el panel es alto y angosto, así que las elipses son anchas para no formar una columna. */
+    /* Móvil: el hero es alto y angosto; las elipses son más anchas que la pantalla para que la luz
+       llegue a los costados en vez de formar una columna. */
     background:
-      radial-gradient(42% 16% at 50% 52%, rgb(200 216 255 / 0.26), transparent 70%),
-      radial-gradient(70% 26% at 50% 52%, rgb(27 71 201 / 0.78), transparent 72%),
-      radial-gradient(100% 44% at 50% 54%, rgb(11 36 112 / 0.72), transparent 75%);
+      radial-gradient(60% 16% at 50% 54%, rgb(200 216 255 / 0.26), transparent 70%),
+      radial-gradient(110% 28% at 50% 54%, rgb(27 71 201 / 0.8), transparent 72%),
+      radial-gradient(150% 50% at 50% 56%, rgb(11 36 112 / 0.75), transparent 75%);
   }
   @media (min-width: 1024px) {
     .atmos-key {
