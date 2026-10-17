@@ -176,8 +176,32 @@ def cutout(rgb, band=4):
             ys, xs = np.where(r)
             (left if xs.mean() < w / 2 else right).__ior__(r)
         if left.sum() > 0.04 * h * w and right.sum() > 0.04 * h * w:
-            lens_regions = [hull_mask(left, (h, w)), hull_mask(right, (h, w))]
+            outline = ndimage.binary_fill_holes(~np.isin(labels, list(border)))
+            lens_regions = refine_lenses([hull_mask(left, (h, w)), hull_mask(right, (h, w))], left | right, outline)
     return rgba, lens_regions
+
+
+def refine_lenses(hulls, holes, outline):
+    """Recupera la parte de la mica que tapa una varilla. Las micas son simétricas: la caja de cada una
+    abarca lo que se ve de ella y el reflejo de la otra; dentro de esa caja, la mica llega hasta el aro
+    (contorno exterior menos el grosor del aro), así se recuperan también las esquinas tapadas."""
+    h, w = outline.shape
+    depth = ndimage.distance_transform_edt(outline)
+    edge = holes & ~ndimage.binary_erosion(holes)
+    rim = np.percentile(depth[edge], 30)  # grosor típico del aro (orilla exterior → mica)
+    # Eje de simetría medido a la altura de las micas (las puntas de las varillas no cuentan)
+    rows = np.where((hulls[0] | hulls[1]).any(axis=1))[0]
+    band = outline[rows.min():rows.max() + 1]
+    cols = np.where(band.any(axis=0))[0]
+    axis = (cols.min() + cols.max()) / 2
+    src = np.clip(np.round(2 * axis - np.arange(w)).astype(int), 0, w - 1)
+    refined = []
+    for i, hull in enumerate(hulls):
+        ys, xs = np.where(hull | hulls[1 - i][:, src])
+        box = np.zeros_like(hull)
+        box[ys.min():ys.max() + 1, xs.min():xs.max() + 1] = True
+        refined.append(hull | (box & (depth > rim * 1.05)))
+    return refined
 
 
 def lens_geometry(rgba, lens_regions):
