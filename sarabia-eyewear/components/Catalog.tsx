@@ -93,7 +93,7 @@ export function Catalog() {
               {list.length} {list.length === 1 ? "modelo" : "modelos"}
             </span>
             {hasFilters && (
-              <button type="button" onClick={reset} className="inline-flex items-center gap-1.5 text-sm font-medium hover:text-sun">
+              <button type="button" onClick={reset} className="inline-flex items-center gap-1.5 text-sm font-medium hover:text-volt">
                 <RotateCcw className="h-3.5 w-3.5" /> Limpiar
               </button>
             )}
@@ -121,7 +121,7 @@ export function Catalog() {
           <div className="mt-6 rounded-3xl bg-night-2 p-10 text-center">
             <p className="font-semibold">No hay modelos con esa combinación.</p>
             <p className="mt-1 text-sm text-paper/55">Prueba otro estilo o pregúntanos: tenemos más modelos en tienda.</p>
-            <button type="button" onClick={reset} className="btn-sun mt-5 h-11 px-6 text-sm">
+            <button type="button" onClick={reset} className="btn-volt mt-5 h-11 px-6 text-sm">
               Ver todos
             </button>
           </div>
@@ -200,7 +200,7 @@ function ProductCard({ product, intent }: { product: Product; intent: Intent }) 
   return (
     <article className="group flex h-full flex-col">
       <div
-        className="relative aspect-[5/4] overflow-hidden rounded-3xl bg-[#EEE7DD] transition-colors duration-500 [perspective:900px] group-hover:bg-sun"
+        className="stage-blue relative aspect-[5/4] overflow-hidden rounded-3xl [perspective:900px]"
         onPointerMove={(e) => {
           if (e.pointerType !== "mouse") return;
           const r = e.currentTarget.getBoundingClientRect();
@@ -212,12 +212,14 @@ function ProductCard({ product, intent }: { product: Product; intent: Intent }) 
           tiltY.set(0);
         }}
       >
+        {/* Al pasar el cursor se enciende un segundo foco */}
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(65%_55%_at_50%_45%,rgba(140,180,255,0.45),transparent_70%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
         <div className="absolute left-4 top-4 z-10 flex flex-wrap gap-1.5">
           {product.badge && (
             <span
               className={clsx(
                 "rounded-full px-2.5 py-1 text-[0.68rem] font-semibold uppercase tracking-wide",
-                product.badge === "Edición limitada" ? "bg-sun text-night" : "bg-paper text-night",
+                product.badge === "Edición limitada" ? "bg-volt text-white" : "bg-paper text-night",
               )}
             >
               {product.badge}
@@ -247,7 +249,7 @@ function ProductCard({ product, intent }: { product: Product; intent: Intent }) 
                   product={product}
                   color={color}
                   sizes="(min-width: 1280px) 25vw, (min-width: 640px) 45vw, 90vw"
-                  className="h-auto max-h-full w-full object-contain drop-shadow-[0_22px_18px_rgba(21,21,20,0.28)]"
+                  className="h-auto max-h-full w-full object-contain drop-shadow-[0_24px_20px_rgba(0,0,0,0.55)]"
                 />
               </motion.div>
             </AnimatePresence>
@@ -271,7 +273,7 @@ function ProductCard({ product, intent }: { product: Product; intent: Intent }) 
 
       <div className="mt-4 flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h3 className="text-lg font-semibold tracking-tight">{product.name}</h3>
+          <h3 className="font-display text-base uppercase tracking-[0.06em]">{product.name}</h3>
           <p className="text-sm text-paper/55">{product.tagline}</p>
         </div>
         <p className="shrink-0 text-lg font-semibold">{currency.format(product.price)}</p>
@@ -320,7 +322,7 @@ function ProductCard({ product, intent }: { product: Product; intent: Intent }) 
           href={whatsappLink(message)}
           target="_blank"
           rel="noopener noreferrer"
-          className="btn-sun h-12 px-4 text-sm"
+          className="btn-volt h-12 px-4 text-sm"
           aria-label={`Comprar o personalizar ${product.name} en ${color.name} por WhatsApp`}
         >
           <MessageCircle className="h-4 w-4" /> Comprar / Personalizar por WhatsApp

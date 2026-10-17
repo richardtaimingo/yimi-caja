@@ -7,6 +7,7 @@ import { ArrowRight, ScanFace } from "lucide-react";
 import clsx from "clsx";
 import { products, type ProductPhoto } from "@/lib/products";
 import { framePhotos } from "@/lib/framePhotos";
+import { GRAIN } from "@/lib/textures";
 import { useShop } from "./ShopProvider";
 
 /**
@@ -26,49 +27,49 @@ const BEATS: Beat[] = [
   {
     chapter: 0,
     kicker: "I · Materia",
-    title: "Acetato que no se pinta: se lleva dentro.",
+    title: "Acetato que no se pinta: se lleva dentro",
     body: "Bloques de acetato de alta densidad, curados durante semanas y pulidos a mano. El carey atraviesa todo el material, así que nunca se descarapela.",
     until: 0.15,
   },
   {
     chapter: 0,
     kicker: "I · Materia",
-    title: "Titanio: casi no lo sientes.",
+    title: "Titanio: casi no lo sientes",
     body: "Metal libre de níquel y con memoria flexible: vuelve a su forma aunque lo dobles. Ligero de día completo.",
     until: 0.3,
   },
   {
     chapter: 1,
     kicker: "II · Micas",
-    title: "Mira a través.",
+    title: "Mira a través",
     body: "Afuera, todo borroso. A través de la mica, cada letra en su lugar: tallamos tu graduación con precisión de laboratorio.",
     until: 0.43,
   },
   {
     chapter: 1,
     kicker: "II · Micas",
-    title: "Adiós a los reflejos.",
+    title: "Adiós a los reflejos",
     body: "El antirreflejante multicapa elimina destellos de pantallas, faros y lámparas. Tus ojos se ven, y ven mejor.",
     until: 0.53,
   },
   {
     chapter: 1,
     kicker: "II · Micas",
-    title: "Luz azul, filtrada.",
+    title: "Luz azul, filtrada",
     body: "El filtro Blue Block corta la luz azul-violeta de las pantallas para jornadas largas sin fatiga visual.",
     until: 0.62,
   },
   {
     chapter: 2,
     kicker: "III · Medida",
-    title: "Hecho a tu medida.",
+    title: "Hecho a tu medida",
     body: "Alineamos el centro óptico de cada mica con tu pupila. Calibre, puente y varilla pensados para tu rostro, al milímetro.",
     until: 0.82,
   },
   {
     chapter: 3,
     kicker: "IV · Colección",
-    title: "Once formas de ver el mundo.",
+    title: "Once formas de ver el mundo",
     body: "Elige la tuya, pruébatela en vivo con tu cámara y pídela por WhatsApp.",
     until: 1.01,
   },
@@ -81,9 +82,8 @@ const CHAPTERS = [
   { n: "IV", label: "Colección", start: 0.82 },
 ];
 
-// Textura de grano editorial (SVG en línea).
-const GRAIN =
-  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E\")";
+// Bloque de luz azul del capítulo II (el mismo fondo se repite dentro de la mica para alinearse).
+const MICAS_BG = "radial-gradient(90% 80% at 62% 45%, #2A66F5 0%, #1446D8 35%, #0A2A8F 70%, #061A5C 100%)";
 
 function useIsMobile() {
   const [mobile, setMobile] = useState(false);
@@ -121,8 +121,8 @@ export function ArtOfSeeing() {
     window.scrollTo({ top, behavior: "smooth" });
   };
 
-  const onYellow = BEATS[beat].chapter === 1;
-  const yellowClip = useTransform(p, [0.27, 0.33, 0.6, 0.65], ["inset(0% 0% 0% 100%)", "inset(0% 0% 0% 0%)", "inset(0% 0% 0% 0%)", "inset(0% 100% 0% 0%)"]);
+  const onBlue = BEATS[beat].chapter === 1;
+  const blueClip = useTransform(p, [0.27, 0.33, 0.6, 0.65], ["inset(0% 0% 0% 100%)", "inset(0% 0% 0% 0%)", "inset(0% 0% 0% 0%)", "inset(0% 100% 0% 0%)"]);
 
   return (
     <section id="materiales" ref={ref} className="relative h-[640vh] bg-night" aria-label="El Arte de Ver Bien">
@@ -136,8 +136,8 @@ export function ArtOfSeeing() {
       </ol>
 
       <div className="sticky top-0 h-[100dvh] overflow-hidden [container-type:size]">
-        {/* Fondo amarillo que entra como el bloque de color del hero */}
-        <motion.div className="absolute inset-0 bg-sun" style={{ clipPath: yellowClip }} aria-hidden />
+        {/* Bloque de luz azul que barre la escena en el capítulo II */}
+        <motion.div className="absolute inset-0" style={{ clipPath: blueClip, backgroundImage: MICAS_BG }} aria-hidden />
         <div className="pointer-events-none absolute inset-0 opacity-[0.09] mix-blend-overlay" style={{ backgroundImage: GRAIN }} aria-hidden />
 
         <div aria-hidden>
@@ -148,8 +148,8 @@ export function ArtOfSeeing() {
         </div>
         <ColeccionScene p={p} mobile={mobile} />
 
-        <StoryText beat={beat} onYellow={onYellow} mobile={mobile} />
-        <ProgressRail p={p} beat={beat} onYellow={onYellow} onJump={jump} />
+        <StoryText beat={beat} onBlue={onBlue} mobile={mobile} />
+        <ProgressRail p={p} beat={beat} onBlue={onBlue} onJump={jump} />
       </div>
     </section>
   );
@@ -157,7 +157,7 @@ export function ArtOfSeeing() {
 
 /* ───────────────────────── Texto y navegación ───────────────────────── */
 
-function StoryText({ beat, onYellow, mobile }: { beat: number; onYellow: boolean; mobile: boolean }) {
+function StoryText({ beat, onBlue, mobile }: { beat: number; onBlue: boolean; mobile: boolean }) {
   const b = BEATS[beat];
   const isFinale = beat === BEATS.length - 1;
   return (
@@ -165,11 +165,11 @@ function StoryText({ beat, onYellow, mobile }: { beat: number; onYellow: boolean
       className={clsx(
         "pointer-events-none absolute z-30 transition-colors duration-500",
         mobile ? "inset-x-0 bottom-0 px-5 pb-6 pt-16" : "left-[max(7cqw,5.5rem)] top-1/2 w-[min(31cqw,440px)] -translate-y-1/2",
-        onYellow ? "text-night" : "text-paper",
+        onBlue ? "text-white" : "text-paper",
       )}
       style={
         mobile
-          ? { backgroundImage: `linear-gradient(to top, ${onYellow ? "#F6B40E" : "#120D10"} 55%, transparent)` }
+          ? { backgroundImage: `linear-gradient(to top, ${onBlue ? "#0A2B92" : "#04070E"} 55%, transparent)` }
           : undefined
       }
     >
@@ -177,11 +177,11 @@ function StoryText({ beat, onYellow, mobile }: { beat: number; onYellow: boolean
         <motion.div key={beat} initial="hidden" animate="show" exit="exit" className="pointer-events-auto">
           <motion.p
             variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0 }, exit: { opacity: 0 } }}
-            className={clsx("text-xs font-semibold uppercase tracking-[0.26em]", onYellow ? "text-night/60" : "text-sun")}
+            className="text-[0.68rem] font-semibold uppercase tracking-[0.3em] text-volt-ice"
           >
             {b.kicker}
           </motion.p>
-          <h2 className={clsx("display mt-3", mobile ? "text-[2.1rem]" : "text-[clamp(2.6rem,4.4cqw,4.6rem)]")}>
+          <h2 className={clsx("display mt-4 leading-[1.12]", mobile ? "text-[1.3rem]" : "text-[clamp(1.5rem,2.5cqw,2.6rem)]")}>
             {b.title.split(" ").map((word, i) => (
               <span key={i} className="inline-block overflow-hidden pb-[0.08em] align-top">
                 <motion.span
@@ -200,7 +200,7 @@ function StoryText({ beat, onYellow, mobile }: { beat: number; onYellow: boolean
           {/* En móvil el párrafo deja libre la esquina del botón flotante de WhatsApp */}
           <motion.p
             variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0, transition: { delay: 0.25 } }, exit: { opacity: 0 } }}
-            className={clsx("mt-4 max-w-md leading-relaxed", mobile ? "pr-14 text-sm" : "text-base", onYellow ? "text-night/75" : "text-paper/70")}
+            className={clsx("mt-4 max-w-md leading-relaxed", mobile ? "pr-14 text-sm" : "text-base", onBlue ? "text-white/80" : "text-paper/70")}
           >
             {b.body}
           </motion.p>
@@ -218,7 +218,7 @@ function FinaleCtas() {
       variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0, transition: { delay: 0.4 } }, exit: { opacity: 0 } }}
       className="mt-6 flex flex-wrap gap-3"
     >
-      <a href="#catalogo" className="btn-sun h-12 px-6 text-sm">
+      <a href="#catalogo" className="btn-volt h-12 px-6 text-sm">
         Ver catálogo <ArrowRight className="h-4 w-4" />
       </a>
       <button type="button" onClick={() => openTryOn("costa", "carey-g15")} className="btn-outline h-12 px-6 text-sm">
@@ -228,15 +228,15 @@ function FinaleCtas() {
   );
 }
 
-function ProgressRail({ p, beat, onYellow, onJump }: { p: MotionValue<number>; beat: number; onYellow: boolean; onJump: (s: number) => void }) {
+function ProgressRail({ p, beat, onBlue, onJump }: { p: MotionValue<number>; beat: number; onBlue: boolean; onJump: (s: number) => void }) {
   const chapter = BEATS[beat].chapter;
   const fill = useTransform(p, [0, 1], ["0%", "100%"]);
   return (
     <>
       {/* Escritorio: riel vertical */}
       <nav className="pointer-events-auto absolute left-5 top-1/2 z-30 hidden -translate-y-1/2 lg:block" aria-label="Capítulos">
-        <div className={clsx("relative flex flex-col gap-5 border-l pl-3", onYellow ? "border-night/20" : "border-paper/15")}>
-          <motion.span className={clsx("absolute -left-px top-0 w-px", onYellow ? "bg-night" : "bg-sun")} style={{ height: fill }} />
+        <div className={clsx("relative flex flex-col gap-5 border-l pl-3", onBlue ? "border-white/25" : "border-paper/15")}>
+          <motion.span className={clsx("absolute -left-px top-0 w-px", onBlue ? "bg-white" : "bg-volt")} style={{ height: fill }} />
           {CHAPTERS.map((c, i) => (
             <button
               key={c.n}
@@ -244,10 +244,10 @@ function ProgressRail({ p, beat, onYellow, onJump }: { p: MotionValue<number>; b
               onClick={() => onJump(c.start)}
               className={clsx(
                 "flex items-baseline gap-2 text-left transition-colors",
-                i === chapter ? (onYellow ? "text-night" : "text-paper") : onYellow ? "text-night/40 hover:text-night/70" : "text-paper/35 hover:text-paper/70",
+                i === chapter ? (onBlue ? "text-white" : "text-paper") : onBlue ? "text-white/45 hover:text-white/80" : "text-paper/35 hover:text-paper/70",
               )}
             >
-              <span className="font-display text-lg font-black italic" title={c.label}>
+              <span className="font-display text-[0.7rem]" title={c.label}>
                 {c.n}
               </span>
               <span className="sr-only">{c.label}</span>
@@ -258,18 +258,18 @@ function ProgressRail({ p, beat, onYellow, onJump }: { p: MotionValue<number>; b
       {/* Móvil: segmentos arriba */}
       <div className="absolute inset-x-5 top-[4.75rem] z-30 flex gap-1.5 lg:hidden">
         {CHAPTERS.map((c, i) => (
-          <Segment key={c.n} p={p} a={c.start} b={CHAPTERS[i + 1]?.start ?? 1} onYellow={onYellow} />
+          <Segment key={c.n} p={p} a={c.start} b={CHAPTERS[i + 1]?.start ?? 1} onBlue={onBlue} />
         ))}
       </div>
     </>
   );
 }
 
-function Segment({ p, a, b, onYellow }: { p: MotionValue<number>; a: number; b: number; onYellow: boolean }) {
+function Segment({ p, a, b, onBlue }: { p: MotionValue<number>; a: number; b: number; onBlue: boolean }) {
   const scaleX = useTransform(p, [a, b], [0, 1]);
   return (
-    <div className={clsx("h-[3px] flex-1 overflow-hidden rounded-full", onYellow ? "bg-night/15" : "bg-paper/15")}>
-      <motion.div className={clsx("h-full origin-left rounded-full", onYellow ? "bg-night" : "bg-sun")} style={{ scaleX }} />
+    <div className={clsx("h-[3px] flex-1 overflow-hidden rounded-full", onBlue ? "bg-white/20" : "bg-paper/15")}>
+      <motion.div className={clsx("h-full origin-left rounded-full", onBlue ? "bg-white" : "bg-volt")} style={{ scaleX }} />
     </div>
   );
 }
@@ -289,8 +289,8 @@ function Numeral({ p, n, a, b, dark }: { p: MotionValue<number>; n: string; a: n
   const y = useTransform(p, [a, b], ["6cqh", "-6cqh"]);
   return (
     <motion.span
-      className="display pointer-events-none absolute bottom-[-4cqh] right-[2cqw] select-none text-[42cqh] italic leading-none text-transparent"
-      style={{ opacity, y, WebkitTextStroke: `1.5px ${dark ? "rgba(18,13,16,0.16)" : "rgba(246,241,234,0.09)"}` }}
+      className="display pointer-events-none absolute bottom-[-2cqh] right-[2cqw] select-none text-[34cqh] leading-none text-transparent"
+      style={{ opacity, y, WebkitTextStroke: `1.5px ${dark ? "rgba(255,255,255,0.16)" : "rgba(233,239,249,0.07)"}` }}
     >
       {n}
     </motion.span>
@@ -318,6 +318,11 @@ function ShinyFrame({ photo, sheen, className, style, priority }: { photo: Produ
       />
     </div>
   );
+}
+
+/** El "%" de la sans extendida parece "0/o": se compone con la sans de texto. */
+function Pct() {
+  return <span className="ml-0.5 font-sans font-light">%</span>;
 }
 
 /** Número que cuenta con el scroll (actualiza el texto sin re-render). */
@@ -357,20 +362,20 @@ function MateriaScene({ p, mobile }: { p: MotionValue<number>; mobile: boolean }
 
   return (
     <motion.div className="absolute inset-0" style={{ opacity: scene }}>
-      {/* Palabra gigante en serif contorneada, deslizada por el scroll */}
+      {/* Palabra gigante contorneada, deslizada por el scroll */}
       <motion.div className="absolute left-0 top-[14cqh] whitespace-nowrap lg:top-[10cqh]" style={{ x: wordX }}>
         <div className="relative">
-          <motion.span className="display block text-[30cqh] italic text-transparent" style={{ opacity: acetateWord, WebkitTextStroke: "1.5px rgba(246,241,234,0.16)" }}>
+          <motion.span className="display block text-[22cqh] text-transparent" style={{ opacity: acetateWord, WebkitTextStroke: "1.5px rgba(233,239,249,0.14)" }}>
             acetato · acetato · acetato
           </motion.span>
-          <motion.span className="display absolute left-0 top-0 block text-[30cqh] italic text-transparent" style={{ opacity: titaniumWord, WebkitTextStroke: "1.5px rgba(246,180,14,0.3)" }}>
+          <motion.span className="display absolute left-0 top-0 block text-[22cqh] text-transparent" style={{ opacity: titaniumWord, WebkitTextStroke: "1.5px rgba(120,165,255,0.4)" }}>
             titanio · titanio · titanio
           </motion.span>
         </div>
       </motion.div>
 
       {/* Luz cálida detrás del armazón */}
-      <div className="absolute h-[70cqh] w-[70cqh] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(246,180,14,0.18),transparent_65%)]" style={{ left: frameStyle.left, top: frameStyle.top }} />
+      <div className="absolute h-[70cqh] w-[70cqh] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(45,107,255,0.34),transparent_65%)]" style={{ left: frameStyle.left, top: frameStyle.top }} />
 
       <div className="absolute -translate-x-1/2 -translate-y-1/2 [perspective:1100px]" style={frameStyle}>
         <motion.div style={{ opacity: aOpacity, rotateY: aRotY, rotateX: aRotX, scale: aScale, x: aX }}>
@@ -386,11 +391,11 @@ function MateriaScene({ p, mobile }: { p: MotionValue<number>; mobile: boolean }
         <SpecStack p={p} show={[0.03, 0.06, 0.13, 0.16]} items={[
           { node: <><Counter p={p} range={[0.03, 0.1]} to={6} /> mm</>, label: "acetato de alta densidad" },
           { node: <><Counter p={p} range={[0.04, 0.11]} to={5} /></>, label: "barriles en la bisagra flex" },
-          { node: <><Counter p={p} range={[0.05, 0.12]} to={100} />%</>, label: "color en toda la masa" },
+          { node: <><Counter p={p} range={[0.05, 0.12]} to={100} /><Pct /></>, label: "color en toda la masa" },
         ]} />
         <SpecStack p={p} show={[0.17, 0.2, 0.28, 0.31]} overlay items={[
           { node: <><Counter p={p} range={[0.17, 0.24]} to={16} /> g</>, label: "de metal en tu rostro" },
-          { node: <><Counter p={p} range={[0.18, 0.25]} to={0} />%</>, label: "níquel: hipoalergénico" },
+          { node: <><Counter p={p} range={[0.18, 0.25]} to={0} /><Pct /></>, label: "níquel: hipoalergénico" },
           { node: <><Counter p={p} range={[0.19, 0.26]} to={140} /> mm</>, label: "de varilla flexible" },
         ]} />
       </div>
@@ -405,7 +410,7 @@ function SpecStack({ p, show, items, overlay }: { p: MotionValue<number>; show: 
     <motion.div className={clsx("col-span-3 grid grid-cols-3 gap-4", overlay && "absolute inset-0")} style={{ opacity, y }}>
       {items.map((it) => (
         <div key={it.label} className="border-t border-paper/15 pt-3">
-          <p className="display text-[clamp(1.8rem,3.4cqw,3.4rem)] tabular-nums text-paper">{it.node}</p>
+          <p className="display whitespace-nowrap text-[clamp(1.05rem,2.3cqw,2.3rem)] tabular-nums text-paper">{it.node}</p>
           <p className="mt-1 text-[0.7rem] leading-snug text-paper/55 sm:text-xs">{it.label}</p>
         </div>
       ))}
@@ -433,10 +438,10 @@ function EyeChart({ cx }: { cx: string }) {
       <div className="absolute top-[7cqh] flex -translate-x-1/2 flex-col items-center gap-[1.6cqh]" style={{ left: cx }}>
         {CHART.map((row) => (
           <div key={row.label} className="relative flex items-center">
-            <span className="whitespace-nowrap font-sans font-bold tracking-[0.32em] text-night" style={{ fontSize: `${row.size}cqh`, lineHeight: 1 }}>
+            <span className="whitespace-nowrap font-sans font-bold tracking-[0.32em] text-white" style={{ fontSize: `${row.size}cqh`, lineHeight: 1 }}>
               {row.letters}
             </span>
-            <span className="absolute left-full ml-[3cqh] whitespace-nowrap font-mono text-[1.3cqh] text-night/45">{row.label}</span>
+            <span className="absolute left-full ml-[3cqh] whitespace-nowrap font-mono text-[1.3cqh] text-white/50">{row.label}</span>
           </div>
         ))}
       </div>
@@ -485,9 +490,10 @@ function MicasScene({ p, mobile }: { p: MotionValue<number>; mobile: boolean }) 
             "linear-gradient(115deg, transparent 28%, rgba(255,255,255,0.85) 36%, transparent 44%, transparent 56%, rgba(255,255,255,0.6) 61%, transparent 67%), radial-gradient(circle at 70% 30%, rgba(255,255,255,0.9), transparent 22%)",
         }}
       />
+      {/* Luz azul-violeta de pantallas: dura y con líneas de barrido */}
       <motion.div
-        className="absolute inset-0 mix-blend-color"
-        style={{ opacity: blue, backgroundColor: "#2F6BFF", backgroundImage: "repeating-linear-gradient(0deg, rgba(255,255,255,0.08) 0 2px, transparent 2px 4px)" }}
+        className="absolute inset-0 mix-blend-screen"
+        style={{ opacity: blue, backgroundColor: "rgba(112,72,255,0.5)", backgroundImage: "repeating-linear-gradient(0deg, rgba(255,255,255,0.1) 0 2px, transparent 2px 4px)" }}
       />
 
       {/* A través de la mica: nítido, sin reflejos ni luz azul (máscara real de cada mica) */}
@@ -503,8 +509,9 @@ function MicasScene({ p, mobile }: { p: MotionValue<number>; mobile: boolean }) 
         }}
       >
         <div
-          className="absolute bg-sun"
+          className="absolute"
           style={{
+            backgroundImage: MICAS_BG,
             width: "100cqw",
             height: "100cqh",
             left: `calc(${width} / 2 - ${cx})`,
@@ -515,17 +522,19 @@ function MicasScene({ p, mobile }: { p: MotionValue<number>; mobile: boolean }) 
         >
           <EyeChart cx={cx} />
         </div>
+        {/* Con Blue Block, a través de la mica la luz azul desaparece */}
+        <motion.div className="absolute inset-0 bg-[#808080] mix-blend-saturation" style={{ opacity: blue }} />
       </motion.div>
 
       {/* El armazón real encima (versión sin las varillas que se ven tras la mica) */}
       <motion.div className="absolute -translate-x-1/2 -translate-y-1/2" style={{ ...box, opacity: frameIn }}>
-        <Image src={OPTICAL.tryOn ?? OPTICAL.front} alt="" fill sizes="(min-width: 1024px) 58vw, 92vw" className="object-contain drop-shadow-[0_30px_30px_rgba(18,13,16,0.35)]" />
+        <Image src={OPTICAL.tryOn ?? OPTICAL.front} alt="" fill sizes="(min-width: 1024px) 58vw, 92vw" className="object-contain drop-shadow-[0_30px_30px_rgba(0,0,0,0.45)]" />
         {labels.map(([opacity, outside, inside]) => (
           <motion.div key={inside} className="absolute inset-0" style={{ opacity }}>
-            <span className="absolute -top-[9cqh] left-[2%] whitespace-nowrap rounded-full bg-night/10 px-3 py-1.5 text-[clamp(0.65rem,1.5cqh,0.85rem)] font-semibold text-night/70 backdrop-blur-sm">
+            <span className="absolute -top-[9cqh] left-[2%] whitespace-nowrap rounded-full bg-white/10 px-3 py-1.5 text-[clamp(0.6rem,1.4cqh,0.78rem)] font-semibold uppercase tracking-[0.14em] text-white/80 backdrop-blur-sm">
               ← {outside}
             </span>
-            <span className="absolute right-[2%] top-[104%] whitespace-nowrap rounded-full bg-night px-3 py-1.5 text-[clamp(0.65rem,1.5cqh,0.85rem)] font-semibold text-sun">
+            <span className="absolute right-[2%] top-[104%] whitespace-nowrap rounded-full bg-white px-3 py-1.5 text-[clamp(0.6rem,1.4cqh,0.78rem)] font-semibold uppercase tracking-[0.14em] text-night">
               {inside} ↑
             </span>
           </motion.div>
@@ -558,7 +567,7 @@ function MedidaScene({ p, mobile }: { p: MotionValue<number>; mobile: boolean })
   const box: CSSProperties = mobile
     ? { left: "50cqw", top: "36cqh", width: "84cqw" }
     : { left: "63cqw", top: "46cqh", width: "min(44cqw, 620px)" };
-  const stroke = "#F6B40E";
+  const stroke = "#8DB6FF";
   const sw = W / 300; // grosor proporcional al tamaño de la foto
 
   return (
@@ -575,7 +584,7 @@ function MedidaScene({ p, mobile }: { p: MotionValue<number>; mobile: boolean })
       />
       {/* Luz de mesa de trabajo: separa el carey oscuro del fondo */}
       <motion.div
-        className="absolute aspect-[16/9] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(246,241,234,0.16),rgba(246,180,14,0.05)_55%,transparent)]"
+        className="absolute aspect-[16/9] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(110,155,255,0.3),rgba(45,107,255,0.08)_55%,transparent)]"
         style={{ left: box.left, top: box.top, width: mobile ? "120cqw" : "min(70cqw, 1000px)", opacity: grid }}
       />
       <motion.div className="absolute" style={{ ...box, aspectRatio: `${W} / ${H}`, scale: frameScale, x: "-50%", y: "-50%" }}>
@@ -617,7 +626,7 @@ function MedidaScene({ p, mobile }: { p: MotionValue<number>; mobile: boolean })
         ].map(([k, v]) => (
           <div key={k} className="border-t border-paper/15 pt-3">
             <dt className="text-[0.7rem] uppercase tracking-[0.18em] text-paper/45">{k}</dt>
-            <dd className="mt-1 font-display text-xl font-black sm:text-2xl">{v}</dd>
+            <dd className="mt-2 font-display text-sm uppercase sm:text-base">{v}</dd>
           </div>
         ))}
       </motion.dl>
@@ -628,7 +637,7 @@ function MedidaScene({ p, mobile }: { p: MotionValue<number>; mobile: boolean })
 function Dimension({ style, opacity, value, hint, small }: { style: CSSProperties; opacity: MotionValue<number>; value: ReactNode; hint: string; small?: boolean }) {
   return (
     <motion.div className="absolute -translate-x-1/2 -translate-y-1/2 whitespace-nowrap text-center" style={{ ...style, opacity }}>
-      <p className={clsx("display tabular-nums text-sun", small ? "text-[clamp(1rem,2cqw,1.6rem)]" : "text-[clamp(1.2rem,2.6cqw,2.2rem)]")}>{value}</p>
+      <p className={clsx("display tabular-nums text-volt-ice", small ? "text-[clamp(0.85rem,1.5cqw,1.2rem)]" : "text-[clamp(1rem,2cqw,1.7rem)]")}>{value}</p>
       <p className="text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-paper/60">{hint}</p>
     </motion.div>
   );
@@ -711,8 +720,8 @@ function FlyingFrame({
       <span className="relative block" style={{ aspectRatio: `${photo.width} / ${photo.height}` }}>
         <Image src={photo.front} alt="" fill sizes="(min-width: 1024px) 13vw, 30vw" className="object-contain drop-shadow-[0_16px_14px_rgba(0,0,0,0.5)] transition-transform duration-300 group-hover:-translate-y-1 group-hover:scale-105" />
       </span>
-      <span className="mt-[0.8cqh] block font-display text-[clamp(0.8rem,1.9cqh,1.2rem)] font-black italic text-paper">{item.product.name}</span>
-      <span className="block text-[clamp(0.55rem,1.15cqh,0.72rem)] font-semibold uppercase tracking-[0.18em] text-sun opacity-0 transition-opacity group-hover:opacity-100">
+      <span className="mt-[0.8cqh] block font-display text-[clamp(0.58rem,1.3cqh,0.82rem)] uppercase tracking-[0.06em] text-paper">{item.product.name}</span>
+      <span className="block text-[clamp(0.55rem,1.15cqh,0.72rem)] font-semibold uppercase tracking-[0.18em] text-volt-ice opacity-0 transition-opacity group-hover:opacity-100">
         Pruébatelos
       </span>
     </motion.button>
@@ -725,10 +734,10 @@ function CtaTile({ p, style }: { p: MotionValue<number>; style: CSSProperties })
   return (
     <motion.a
       href="#catalogo"
-      className="pointer-events-auto absolute flex flex-col items-start justify-between rounded-2xl bg-sun p-[min(1.6cqh,2.4cqw)] text-night transition-colors hover:bg-sun-soft"
+      className="pointer-events-auto absolute flex flex-col items-start justify-between rounded-2xl bg-volt p-[min(1.6cqh,2.4cqw)] text-white shadow-glow transition-colors hover:bg-volt-soft"
       style={{ ...style, opacity, scale, x: "-50%", y: "-50%" }}
     >
-      <span className="display text-[clamp(0.8rem,min(2.6cqh,3.9cqw),1.8rem)] leading-[0.95]">Encuentra tu par</span>
+      <span className="display text-[clamp(0.5rem,min(1.9cqh,2.2cqw),1.25rem)] leading-[1.2]">Encuentra tu par</span>
       <ArrowRight className="h-[2.6cqh] w-[2.6cqh]" />
     </motion.a>
   );

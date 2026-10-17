@@ -38,11 +38,11 @@ export function Contact() {
               description="Optometristas y asesores de Ópticas Jennifer Sarabia. Te ayudamos a elegir, leer tu receta y confirmar tu pedido."
             />
             <ul className="mt-10 space-y-4 text-sm text-paper/80">
-              <li className="flex items-center gap-3"><MapPin className="h-4 w-4 text-sun" /> {site.address}</li>
-              <li className="flex items-center gap-3"><Clock className="h-4 w-4 text-sun" /> {site.hours}</li>
-              <li className="flex items-center gap-3"><MessageCircle className="h-4 w-4 text-sun" /> <a href={whatsappLink("Hola Sarabia Eyewear")} target="_blank" rel="noopener noreferrer" className="link-underline">{site.whatsappDisplay}</a></li>
-              <li className="flex items-center gap-3"><Mail className="h-4 w-4 text-sun" /> <a href={`mailto:${site.email}`} className="link-underline">{site.email}</a></li>
-              <li className="flex items-center gap-3"><Instagram className="h-4 w-4 text-sun" /> <a href={site.social.instagram} target="_blank" rel="noopener noreferrer" className="link-underline">@opticasjennifersarabia</a></li>
+              <li className="flex items-center gap-3"><MapPin className="h-4 w-4 text-volt" /> {site.address}</li>
+              <li className="flex items-center gap-3"><Clock className="h-4 w-4 text-volt" /> {site.hours}</li>
+              <li className="flex items-center gap-3"><MessageCircle className="h-4 w-4 text-volt" /> <a href={whatsappLink("Hola Sarabia Eyewear")} target="_blank" rel="noopener noreferrer" className="link-underline">{site.whatsappDisplay}</a></li>
+              <li className="flex items-center gap-3"><Mail className="h-4 w-4 text-volt" /> <a href={`mailto:${site.email}`} className="link-underline">{site.email}</a></li>
+              <li className="flex items-center gap-3"><Instagram className="h-4 w-4 text-volt" /> <a href={site.social.instagram} target="_blank" rel="noopener noreferrer" className="link-underline">@opticasjennifersarabia</a></li>
             </ul>
           </div>
 

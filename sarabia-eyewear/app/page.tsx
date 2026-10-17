@@ -1,5 +1,6 @@
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
+import { Campaign } from "@/components/Campaign";
 import { Catalog } from "@/components/Catalog";
 import { ArtOfSeeing } from "@/components/ArtOfSeeing";
 import { Configurator } from "@/components/Configurator";
@@ -53,6 +54,7 @@ export default function Home() {
       <Header />
       <main>
         <Hero />
+        <Campaign />
         <ArtOfSeeing />
         <Catalog />
         <Configurator />

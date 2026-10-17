@@ -566,7 +566,7 @@ export function TryOnModal({ initialProductId, initialColorId, onClose }: Props)
                       <span
                         className={clsx(
                           "h-2 w-2 rounded-full",
-                          status.tone === "ok" ? "bg-[#25D366]" : status.tone === "warn" ? "bg-sun" : "bg-paper/50",
+                          status.tone === "ok" ? "bg-[#25D366]" : status.tone === "warn" ? "bg-volt" : "bg-paper/50",
                         )}
                       />
                     )}
@@ -591,10 +591,10 @@ export function TryOnModal({ initialProductId, initialColorId, onClose }: Props)
           {mode === "intro" && (
             <div className="absolute inset-0 z-10 flex items-center justify-center overflow-y-auto p-6 pt-16">
               <div className="w-full max-w-sm text-center">
-                <div className="mx-auto w-52 rounded-3xl bg-paper px-6 py-5 sm:w-60">
+                <div className="stage-blue mx-auto w-52 rounded-3xl px-6 py-5 sm:w-60 [@media(max-height:700px)]:w-36 [@media(max-height:700px)]:py-3">
                   <ProductImage product={product} color={color} sizes="240px" className="h-auto w-full" />
                 </div>
-                <h2 className="display mt-6 text-balance text-3xl leading-[0.95] sm:text-4xl">
+                <h2 className="display mt-6 text-balance text-lg leading-snug sm:text-xl">
                   Activa tu cámara para probarte los {product.name} en tiempo real
                 </h2>
                 <p className="mt-3 text-sm leading-relaxed text-paper/60">
@@ -602,7 +602,7 @@ export function TryOnModal({ initialProductId, initialColorId, onClose }: Props)
                 </p>
 
                 {cameraError && (
-                  <div role="alert" className="mt-5 rounded-2xl border border-sun/30 bg-white/[0.06] p-4 text-left text-sm">
+                  <div role="alert" className="mt-5 rounded-2xl border border-volt/30 bg-white/[0.06] p-4 text-left text-sm">
                     <p className="font-semibold">No pudimos usar tu cámara</p>
                     <p className="mt-1 leading-relaxed text-paper/70">{cameraError}</p>
                   </div>
@@ -712,7 +712,7 @@ export function TryOnModal({ initialProductId, initialColorId, onClose }: Props)
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
               <p className="hidden text-xs font-semibold uppercase tracking-[0.2em] text-paper/50 lg:block">Probador virtual</p>
-              <h3 className="text-xl font-semibold tracking-tight lg:mt-2 lg:text-3xl">{product.name}</h3>
+              <h3 className="font-display text-lg uppercase lg:mt-2 lg:text-2xl">{product.name}</h3>
               <p className="truncate text-sm text-paper/60">
                 {color.name} · {materialLabels[product.material].badge}
               </p>
@@ -755,7 +755,7 @@ export function TryOnModal({ initialProductId, initialColorId, onClose }: Props)
                       isCurrent ? "bg-white/15 ring-2 ring-paper" : "bg-white/[0.05] hover:bg-white/10",
                     )}
                   >
-                    <span className="block rounded-xl bg-paper px-1.5 py-2">
+                    <span className="stage-blue block rounded-xl px-1.5 py-2">
                       <ProductImage product={p} color={p.colors[0]} sizes="80px" className="h-5 w-full object-contain" />
                     </span>
                     <span className="mt-1 block truncate px-0.5 text-[0.7rem] font-medium">{p.name}</span>

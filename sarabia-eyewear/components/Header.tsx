@@ -8,11 +8,11 @@ import { nav, site, whatsappLink } from "@/lib/site";
 
 export function Logo({ className }: { className?: string }) {
   return (
-    <a href="#top" className={clsx("group inline-flex items-end gap-2 leading-none", className)} aria-label={`${site.name} — inicio`}>
-      <span className="display text-[1.65rem] lowercase min-[400px]:text-[1.9rem]">sarabia</span>
-      <span className="mb-1 flex flex-col whitespace-nowrap max-[359px]:hidden text-[0.5rem] font-semibold uppercase leading-[1.3] tracking-[0.2em] text-paper/60 min-[400px]:text-[0.55rem] min-[400px]:tracking-[0.26em]">
+    <a href="#top" className={clsx("group inline-flex items-center gap-2.5 leading-none", className)} aria-label={`${site.name} — inicio`}>
+      <span className="display text-[1.05rem] tracking-[0.14em] min-[400px]:text-[1.2rem]">Sarabia</span>
+      <span className="hidden flex-col whitespace-nowrap border-l border-paper/20 pl-2.5 text-[0.5rem] font-semibold uppercase leading-[1.4] tracking-[0.26em] text-paper/60 sm:flex">
         <span>Eyewear</span>
-        <span className="text-sun">by J. Sarabia</span>
+        <span className="text-volt-ice">by J. Sarabia</span>
       </span>
     </a>
   );
@@ -35,12 +35,12 @@ export function Header() {
 
   return (
     <>
-      <div className="bg-sun text-night">
-        <div className="container flex h-9 items-center justify-center gap-2 text-[0.72rem] font-semibold tracking-wide sm:text-xs">
+      <div className="border-b border-paper/10 bg-night text-paper/70">
+        <div className="container flex h-9 items-center justify-center gap-2.5 whitespace-nowrap text-[0.52rem] font-medium uppercase tracking-[0.14em] min-[400px]:text-[0.56rem] sm:gap-3 sm:text-[0.62rem] sm:tracking-[0.2em]">
           <span>Envíos rápidos a todo México</span>
-          <span className="text-night/40">·</span>
+          <span className="h-1 w-1 rounded-full bg-volt" />
           <span>Garantía de ajuste</span>
-          <span className="hidden text-night/40 sm:inline">·</span>
+          <span className="hidden h-1 w-1 rounded-full bg-volt sm:inline-block" />
           <span className="hidden sm:inline">Micas certificadas</span>
         </div>
       </div>
@@ -56,7 +56,7 @@ export function Header() {
 
           <nav className="hidden items-center gap-8 lg:flex" aria-label="Principal">
             {nav.map((item) => (
-              <a key={item.href} href={item.href} className="link-underline whitespace-nowrap text-sm font-medium text-paper/70 hover:text-paper">
+              <a key={item.href} href={item.href} className="link-underline whitespace-nowrap text-[0.68rem] font-medium uppercase tracking-[0.22em] text-paper/70 hover:text-paper">
                 {item.label}
               </a>
             ))}
@@ -67,7 +67,7 @@ export function Header() {
               href={whatsappLink("Hola Sarabia Eyewear, quiero hacer un pedido. ¿Me ayudan?")}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-sun h-10 whitespace-nowrap px-4 text-sm sm:px-5"
+              className="btn-volt h-10 whitespace-nowrap px-4 text-sm sm:px-5"
             >
               <MessageCircle className="h-4 w-4" />
               <span className="hidden sm:inline">Pedir por WhatsApp</span>
@@ -113,7 +113,7 @@ export function Header() {
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.05 * i + 0.1 }}
-                  className="display border-b border-paper/10 py-4 text-5xl"
+                  className="display border-b border-paper/10 py-5 text-2xl sm:text-3xl"
                 >
                   {item.label}
                 </motion.a>
@@ -124,7 +124,7 @@ export function Header() {
                 href={whatsappLink("Hola Sarabia Eyewear, quiero hacer un pedido. ¿Me ayudan?")}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-sun h-14 w-full text-base"
+                className="btn-volt h-14 w-full text-base"
               >
                 <MessageCircle className="h-5 w-5" /> Pedir por WhatsApp
               </a>

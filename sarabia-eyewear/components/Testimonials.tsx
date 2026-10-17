@@ -15,7 +15,7 @@ export function Testimonials() {
         <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <SectionHeading eyebrow="Reseñas" title="Lo dicen mejor ellos." />
           <Reveal className="flex items-center gap-3">
-            <span className="text-5xl font-semibold tracking-tightest">4.9</span>
+            <span className="font-display text-5xl">4.9</span>
             <div>
               <div className="flex">
                 {Array.from({ length: 5 }).map((_, i) => <Star key={i} className="h-4 w-4 fill-paper" />)}
@@ -29,7 +29,7 @@ export function Testimonials() {
           {reviews.map((r, i) => (
             <Reveal key={r.name} delay={i * 0.08} className="flex flex-col rounded-3xl border border-paper/10 bg-night-2 p-7 shadow-card">
               <div className="flex">
-                {Array.from({ length: 5 }).map((_, k) => <Star key={k} className="h-4 w-4 fill-sun text-sun" />)}
+                {Array.from({ length: 5 }).map((_, k) => <Star key={k} className="h-4 w-4 fill-volt text-volt" />)}
               </div>
               <blockquote className="mt-5 flex-1 text-lg leading-snug tracking-tight">“{r.text}”</blockquote>
               <footer className="mt-6 flex items-center justify-between border-t border-paper/10 pt-5 text-sm">

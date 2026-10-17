@@ -62,7 +62,7 @@ export function Configurator() {
                         selected ? "border-paper bg-night-2 shadow-card" : "border-paper/10 bg-night hover:border-paper/40",
                       )}
                     >
-                      <span className="flex h-14 items-center justify-center rounded-xl bg-[#EEE7DD] px-2">
+                      <span className="stage-blue flex h-14 items-center justify-center rounded-xl px-2">
                         <ProductImage product={p} color={p.colors[0]} sizes="120px" className="max-h-10 w-full object-contain" />
                       </span>
                       <span className="mt-2 flex items-baseline justify-between gap-1">
@@ -133,7 +133,7 @@ export function Configurator() {
           {/* Paso 3 · Resumen */}
           <div className="lg:sticky lg:top-24">
             <Step number={3} title="Envía tu receta o confirma tu pedido" done={false} highlight>
-              <div className="rounded-2xl bg-sun p-4">
+              <div className="stage-blue rounded-2xl p-4">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={`${product.id}-${color.id}`}
@@ -146,7 +146,7 @@ export function Configurator() {
                       product={product}
                       color={color}
                       sizes="(min-width: 1024px) 280px, 70vw"
-                      className="mx-auto h-auto w-3/5 drop-shadow-[0_16px_16px_rgba(21,21,20,0.25)]"
+                      className="mx-auto h-auto w-3/5 drop-shadow-[0_18px_18px_rgba(0,0,0,0.5)]"
                     />
                   </motion.div>
                 </AnimatePresence>
@@ -175,7 +175,7 @@ export function Configurator() {
                       href={whatsappLink(`${baseMessage} Les envío la foto de mi receta.`)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="btn-sun h-14 w-full text-base"
+                      className="btn-volt h-14 w-full text-base"
                     >
                       <FileText className="h-4 w-4" /> Enviar mi receta por WhatsApp
                     </a>
@@ -189,7 +189,7 @@ export function Configurator() {
                     </a>
                   </>
                 ) : (
-                  <a href={whatsappLink(`${baseMessage} ¿Me ayudan a confirmar mi pedido?`)} target="_blank" rel="noopener noreferrer" className="btn-sun h-14 w-full text-base">
+                  <a href={whatsappLink(`${baseMessage} ¿Me ayudan a confirmar mi pedido?`)} target="_blank" rel="noopener noreferrer" className="btn-volt h-14 w-full text-base">
                     <MessageCircle className="h-4 w-4" /> Confirmar pedido por WhatsApp
                   </a>
                 )}

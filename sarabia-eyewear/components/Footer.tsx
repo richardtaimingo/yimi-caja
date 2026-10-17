@@ -75,8 +75,8 @@ export function Footer() {
           </div>
         </div>
 
-        <p className="display mt-16 select-none whitespace-nowrap text-[21vw] lowercase text-paper/[0.06] 2xl:text-[18rem]" aria-hidden>
-          sarabia
+        <p className="display mt-16 select-none whitespace-nowrap text-[12vw] text-paper/[0.06] 2xl:text-[10.5rem]" aria-hidden>
+          Sarabia
         </p>
         <div className="mt-6 flex flex-col justify-between gap-2 border-t border-paper/10 pt-6 text-xs text-paper/55 sm:flex-row">
           <p>© {new Date().getFullYear()} {site.name} · {site.endorsement}. Todos los derechos reservados.</p>

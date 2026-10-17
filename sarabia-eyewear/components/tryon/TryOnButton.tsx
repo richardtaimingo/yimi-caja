@@ -31,11 +31,11 @@ export function TryOnButton({ productId, colorId, variant = "outline", className
         className,
       )}
     >
-      <span className={clsx("relative flex items-center justify-center rounded-full bg-sun text-night", variant === "outline" ? "h-7 w-7" : "h-6 w-6")}>
+      <span className={clsx("relative flex items-center justify-center rounded-full bg-volt text-white", variant === "outline" ? "h-7 w-7" : "h-6 w-6")}>
         <ScanFace className={variant === "outline" ? "h-4 w-4" : "h-3.5 w-3.5"} strokeWidth={2} />
         <span className="absolute -right-0.5 -top-0.5 flex h-2.5 w-2.5">
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sun opacity-60" />
-          <span className="relative inline-flex h-2.5 w-2.5 rounded-full border-2 border-white bg-sun" />
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-volt opacity-60" />
+          <span className="relative inline-flex h-2.5 w-2.5 rounded-full border-2 border-white bg-volt" />
         </span>
       </span>
       Pruébatelos en vivo

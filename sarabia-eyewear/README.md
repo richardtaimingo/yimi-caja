@@ -26,7 +26,8 @@ Todos los componentes con Framer Motion o estado llevan `"use client"`.
 | # | Sección | Componente |
 | --- | --- | --- |
 | 1 | Header sticky + botón "Pedir por WhatsApp" | `components/Header.tsx` |
-| 2 | Hero con selector rápido (Para Ver / De Sol / Blue Block) y preview flotante | `components/Hero.tsx` |
+| 2 | Hero tipo póster de campaña con selector rápido (Para Ver / De Sol / Blue Block) y armazón flotante | `components/Hero.tsx` |
+| 2b | Campaña en 6 pósters (fotos reales con gradación azul; cada uno abre el probador) | `components/Campaign.tsx` |
 | 3 | Scrollytelling "El Arte de Ver Bien" en 4 capítulos (ver abajo) | `components/ArtOfSeeing.tsx` |
 | 4 | Catálogo con filtros por estilo y material, swatches, vista frente/ángulo con inclinación 3D | `components/Catalog.tsx` |
 | 5 | Configurador en 3 clics (armazón → mica → receta/confirmación) | `components/Configurator.tsx` |
@@ -36,6 +37,13 @@ Todos los componentes con Framer Motion o estado llevan `"use client"`.
 
 El filtro del Hero, el catálogo, el configurador y el probador comparten estado mediante `components/ShopProvider.tsx`.
 
+### Dirección visual
+
+Campaña monocroma azul: fondo negro azulado (`night`), luz azul eléctrica (`volt`), titulares en mayúsculas con la
+sans extendida Michroma (`.display`) y texto diminuto de póster (`.micro`). `components/LitFrame.tsx` ilumina las
+fotos reales como en un set (luz de contorno, reflejo espejo en las micas, gotas de agua y reflejo en el piso) y la
+clase `.stage-blue` da el fondo de estudio a las fotos del catálogo, el configurador y el probador.
+
 ### Scrollytelling "El Arte de Ver Bien"
 
 Una escena fija (`position: sticky`, 640 vh de recorrido) controlada por `useScroll` + `useSpring` de Framer Motion.
@@ -43,8 +51,8 @@ Las capas se alinean con unidades de contenedor (`cqw`/`cqh`), así que la compo
 
 1. **Materia:** el armazón de acetato gira de perfil a frente y le sigue uno de titanio. Un destello recorre sólo el
    armazón (CSS `mask-image` con su propio recorte) y las cifras cuentan con el scroll.
-2. **Micas:** entra el bloque amarillo. Afuera, una cartilla de Snellen se ve borrosa, con reflejos o con luz azul;
-   a través de las micas del armazón real se ve nítida (máscara PNG con la forma exacta de cada mica).
+2. **Micas:** entra el bloque de luz azul. Afuera, una cartilla de Snellen se ve borrosa, con reflejos o con luz azul-violeta;
+   a través de las micas del armazón real se ve nítida (y neutra con Blue Block) (máscara PNG con la forma exacta de cada mica).
 3. **Medida:** plano técnico con cotas SVG que se trazan solas (ancho total, calibre, puente, distancia pupilar).
 4. **Colección:** los 11 armazones vuelan a una cuadrícula; cada uno abre el probador.
 
@@ -86,7 +94,7 @@ node scripts/upscale_frames.mjs crops sr          # 2. super-resolución ESRGAN 
 python3 -I scripts/cutout_frames.py <imagenes> public/frames frames.json --sr sr --ts lib/framePhotos.ts  # 3. recorte final
 ```
 
-El recorte calcula un mate real en el borde (sin halo blanco sobre fondos oscuros ni amarillos), detecta micas
+El recorte calcula un mate real en el borde (sin halo blanco sobre fondos oscuros o de color), detecta micas
 claras y genera sus máscaras. `components/FrameIllustration.tsx` queda como respaldo SVG si un color no tiene foto.
 
 ## Antes de publicar
