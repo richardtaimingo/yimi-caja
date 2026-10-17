@@ -8,11 +8,13 @@ type Props = {
   view?: "front" | "angle";
   sizes?: string;
   priority?: boolean;
+  /** Calidad del WebP servido (90 por defecto: los recortes ya vienen afinados). */
+  quality?: number;
   className?: string;
 };
 
 /** Foto real del armazón. Mientras un color no tenga foto, muestra la ilustración de respaldo. */
-export function ProductImage({ product, color, view = "front", sizes = "(min-width: 1024px) 25vw, 90vw", priority, className }: Props) {
+export function ProductImage({ product, color, view = "front", sizes = "(min-width: 1024px) 25vw, 90vw", priority, quality = 90, className }: Props) {
   const photo = color.photo;
   const alt = `${product.name} en ${color.name}${view === "angle" ? ", vista en ángulo" : ""}`;
   if (!photo) {
@@ -25,6 +27,7 @@ export function ProductImage({ product, color, view = "front", sizes = "(min-wid
       width={photo.width}
       height={photo.height}
       sizes={sizes}
+      quality={quality}
       priority={priority}
       className={className}
     />

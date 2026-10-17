@@ -198,7 +198,8 @@ function ProductCard({ product, intent }: { product: Product; intent: Intent }) 
   });
 
   return (
-    <article className="group flex h-full flex-col">
+    // content-visibility: el navegador omite pintar las tarjetas fuera de pantalla (scroll fluido en móvil)
+    <article className="group flex h-full flex-col [contain-intrinsic-block-size:auto_640px] [content-visibility:auto]">
       <div
         className="stage-blue relative aspect-[5/4] overflow-hidden rounded-3xl [perspective:900px]"
         onPointerMove={(e) => {
@@ -225,7 +226,7 @@ function ProductCard({ product, intent }: { product: Product; intent: Intent }) 
               {product.badge}
             </span>
           )}
-          <span className="rounded-full bg-night/80 px-2.5 py-1 text-[0.68rem] font-medium text-paper/80 backdrop-blur">
+          <span className="rounded-full bg-night/85 px-2.5 py-1 text-[0.68rem] font-medium text-paper/85">
             {materialLabels[product.material].badge}
           </span>
         </div>
@@ -248,15 +249,17 @@ function ProductCard({ product, intent }: { product: Product; intent: Intent }) 
                 <ProductImage
                   product={product}
                   color={color}
-                  sizes="(min-width: 1280px) 25vw, (min-width: 640px) 45vw, 90vw"
-                  className="h-auto max-h-full w-full object-contain drop-shadow-[0_24px_20px_rgba(0,0,0,0.55)]"
+                  sizes="(min-width: 1280px) 19vw, (min-width: 640px) 42vw, calc(100vw - 88px)"
+                  className="h-auto max-h-full w-full object-contain"
                 />
               </motion.div>
             </AnimatePresence>
           </motion.div>
         </motion.div>
 
-        <div className="absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 rounded-full bg-night/80 p-0.5 text-[0.68rem] font-medium backdrop-blur">
+        {/* Sombra de contacto estática (más barata que un drop-shadow sobre una capa que se inclina) */}
+        <div aria-hidden className="pointer-events-none absolute bottom-[17%] left-[18%] right-[18%] h-[9%] rounded-[50%] bg-[radial-gradient(closest-side,rgba(1,3,12,0.6),transparent)]" />
+        <div className="absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 rounded-full bg-night/85 p-0.5 text-[0.68rem] font-medium">
           {(["front", "angle"] as const).map((v) => (
             <button
               key={v}

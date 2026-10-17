@@ -52,7 +52,9 @@ export function lockScroll() {
   locks += 1;
   if (locks > 1) return;
   lenis?.stop();
-  document.documentElement.style.overflow = "hidden";
+  const root = document.documentElement;
+  root.style.overflow = "hidden";
+  root.dataset.scrollLocked = ""; // el botón flotante se oculta mientras hay un modal o menú abierto
 }
 
 export function unlockScroll() {
@@ -60,5 +62,7 @@ export function unlockScroll() {
   locks -= 1;
   if (locks > 0) return;
   lenis?.start();
-  document.documentElement.style.overflow = "";
+  const root = document.documentElement;
+  root.style.overflow = "";
+  delete root.dataset.scrollLocked;
 }

@@ -2,13 +2,14 @@
 
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import Image from "next/image";
-import { AnimatePresence, motion, useMotionValueEvent, useScroll, useSpring, useTransform, type MotionValue } from "framer-motion";
+import { AnimatePresence, motion, useMotionValueEvent, useScroll, useTransform, type MotionValue } from "framer-motion";
 import { ArrowRight, ScanFace } from "lucide-react";
 import clsx from "clsx";
 import { products, type ProductPhoto } from "@/lib/products";
 import { framePhotos } from "@/lib/framePhotos";
-import { GRAIN } from "@/lib/textures";
+import { GRAIN, maskOf } from "@/lib/textures";
 import { useShop } from "./ShopProvider";
+import { scrollToTarget } from "@/lib/scroll";
 
 /**
  * "El Arte de Ver Bien": escena fija de 4 capítulos controlada por el scroll.
@@ -83,7 +84,8 @@ const CHAPTERS = [
 ];
 
 // Bloque de luz azul del capítulo II (el mismo fondo se repite dentro de la mica para alinearse).
-const MICAS_BG = "radial-gradient(90% 80% at 62% 45%, #2A66F5 0%, #1446D8 35%, #0A2A8F 70%, #061A5C 100%)";
+const MICAS_BG =
+  "radial-gradient(30% 26% at 62% 42%, rgba(200,216,255,0.2), transparent 70%), radial-gradient(90% 80% at 62% 45%, #2552D8 0%, #1B47C9 32%, #0B2470 70%, #050E2E 100%)";
 
 function useIsMobile() {
   const [mobile, setMobile] = useState(false);
@@ -102,27 +104,28 @@ function useWindow(p: MotionValue<number>, a: number, b: number, c: number, d: n
   return useTransform(p, [a, b, c, d], [0, 1, 1, 0]);
 }
 
+/** Fuera de [a, d] la escena no se dibuja (display: none): el navegador no la recalcula ni la pinta. */
+function useGate(p: MotionValue<number>, a: number, d: number) {
+  return useTransform(p, (v) => (v < a || v > d ? "none" : "block"));
+}
+
 export function ArtOfSeeing() {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
-  const p = useSpring(scrollYProgress, { stiffness: 140, damping: 30, mass: 0.35 });
+  // Sin useSpring: en escritorio Lenis ya suaviza la rueda y en táctil la inercia nativa es fluida.
+  // Un resorte encima añadía ~300 px de retraso y seguía animando un segundo después de soltar.
+  const p = scrollYProgress;
   const mobile = useIsMobile();
-  const [beat, setBeat] = useState(0);
-
-  useMotionValueEvent(scrollYProgress, "change", (v) => {
-    const next = BEATS.findIndex((b) => v < b.until);
-    setBeat(next === -1 ? BEATS.length - 1 : next);
-  });
 
   const jump = (start: number) => {
     const el = ref.current;
     if (!el) return;
-    const top = el.getBoundingClientRect().top + window.scrollY + (el.offsetHeight - window.innerHeight) * (start + 0.035);
-    window.scrollTo({ top, behavior: "smooth" });
+    scrollToTarget(el.getBoundingClientRect().top + window.scrollY + (el.offsetHeight - window.innerHeight) * (start + 0.035));
   };
 
-  const onBlue = BEATS[beat].chapter === 1;
-  const blueClip = useTransform(p, [0.27, 0.33, 0.6, 0.65], ["inset(0% 0% 0% 100%)", "inset(0% 0% 0% 0%)", "inset(0% 0% 0% 0%)", "inset(0% 100% 0% 0%)"]);
+  // Barrido del bloque azul con translateX (lo compone la GPU; clip-path repintaba toda la pantalla)
+  const blueX = useTransform(p, [0.27, 0.33, 0.6, 0.65], ["100%", "0%", "0%", "-100%"]);
+  const blueGate = useGate(p, 0.26, 0.66);
 
   return (
     <section id="materiales" ref={ref} className="relative h-[640vh] bg-night" aria-label="El Arte de Ver Bien">
@@ -135,9 +138,10 @@ export function ArtOfSeeing() {
         ))}
       </ol>
 
-      <div className="sticky top-0 h-[100dvh] overflow-hidden [container-type:size]">
+      {/* svh: el escenario no cambia de tamaño cuando el navegador móvil oculta su barra */}
+      <div className="sticky top-0 h-[100svh] overflow-hidden [container-type:size]">
         {/* Bloque de luz azul que barre la escena en el capítulo II */}
-        <motion.div className="absolute inset-0" style={{ clipPath: blueClip, backgroundImage: MICAS_BG }} aria-hidden />
+        <motion.div className="absolute inset-0 will-change-transform" style={{ x: blueX, display: blueGate, backgroundImage: MICAS_BG }} aria-hidden />
         <div className="pointer-events-none absolute inset-0 opacity-[0.09] mix-blend-overlay" style={{ backgroundImage: GRAIN }} aria-hidden />
 
         <div aria-hidden>
@@ -148,10 +152,33 @@ export function ArtOfSeeing() {
         </div>
         <ColeccionScene p={p} mobile={mobile} />
 
-        <StoryText beat={beat} onBlue={onBlue} mobile={mobile} />
-        <ProgressRail p={p} beat={beat} onBlue={onBlue} onJump={jump} />
+        <StoryChrome p={p} mobile={mobile} onJump={jump} />
       </div>
     </section>
+  );
+}
+
+/**
+ * Texto y riel de capítulos. El beat vive aquí (no en la raíz): al cambiar de beat sólo se
+ * re-renderiza este bloque, no las cuatro escenas.
+ */
+function StoryChrome({ p, mobile, onJump }: { p: MotionValue<number>; mobile: boolean; onJump: (start: number) => void }) {
+  const [beat, setBeat] = useState(0);
+  const beatRef = useRef(0);
+  useMotionValueEvent(p, "change", (v) => {
+    const found = BEATS.findIndex((b) => v < b.until);
+    const next = found === -1 ? BEATS.length - 1 : found;
+    if (next !== beatRef.current) {
+      beatRef.current = next;
+      setBeat(next);
+    }
+  });
+  const onBlue = BEATS[beat].chapter === 1;
+  return (
+    <>
+      <StoryText beat={beat} onBlue={onBlue} mobile={mobile} />
+      <ProgressRail p={p} beat={beat} onBlue={onBlue} onJump={onJump} />
+    </>
   );
 }
 
@@ -230,13 +257,13 @@ function FinaleCtas() {
 
 function ProgressRail({ p, beat, onBlue, onJump }: { p: MotionValue<number>; beat: number; onBlue: boolean; onJump: (s: number) => void }) {
   const chapter = BEATS[beat].chapter;
-  const fill = useTransform(p, [0, 1], ["0%", "100%"]);
+  const fill = useTransform(p, [0, 1], [0, 1]);
   return (
     <>
       {/* Escritorio: riel vertical */}
       <nav className="pointer-events-auto absolute left-5 top-1/2 z-30 hidden -translate-y-1/2 lg:block" aria-label="Capítulos">
         <div className={clsx("relative flex flex-col gap-5 border-l pl-3", onBlue ? "border-white/25" : "border-paper/15")}>
-          <motion.span className={clsx("absolute -left-px top-0 w-px", onBlue ? "bg-white" : "bg-volt")} style={{ height: fill }} />
+          <motion.span className={clsx("absolute -left-px top-0 h-full w-px origin-top", onBlue ? "bg-white" : "bg-volt-soft")} style={{ scaleY: fill }} />
           {CHAPTERS.map((c, i) => (
             <button
               key={c.n}
@@ -287,10 +314,11 @@ function ChapterNumeral({ p }: { p: MotionValue<number> }) {
 function Numeral({ p, n, a, b, dark }: { p: MotionValue<number>; n: string; a: number; b: number; dark: boolean }) {
   const opacity = useTransform(p, [a - 0.03, a + 0.02, b - 0.03, b], [0, 1, 1, 0]);
   const y = useTransform(p, [a, b], ["6cqh", "-6cqh"]);
+  const display = useGate(p, a - 0.04, b + 0.01);
   return (
     <motion.span
-      className="display pointer-events-none absolute bottom-[-2cqh] right-[2cqw] select-none text-[34cqh] leading-none text-transparent"
-      style={{ opacity, y, WebkitTextStroke: `1.5px ${dark ? "rgba(255,255,255,0.16)" : "rgba(233,239,249,0.07)"}` }}
+      className="display pointer-events-none absolute bottom-[-2cqh] right-[2cqw] select-none text-[34cqh] leading-none text-transparent will-change-transform"
+      style={{ opacity, y, display, WebkitTextStroke: `1.5px ${dark ? "rgba(255,255,255,0.16)" : "rgba(233,239,249,0.07)"}` }}
     >
       {n}
     </motion.span>
@@ -299,23 +327,20 @@ function Numeral({ p, n, a, b, dark }: { p: MotionValue<number>; n: string; a: n
 
 /* ───────────────────────── Piezas compartidas ───────────────────────── */
 
-/** Foto real con un destello de luz que recorre sólo el armazón (enmascarado con su propio recorte). */
-function ShinyFrame({ photo, sheen, className, style, priority }: { photo: ProductPhoto; sheen: MotionValue<string>; className?: string; style?: CSSProperties; priority?: boolean }) {
+/**
+ * Foto real con un destello de luz que recorre sólo el armazón (enmascarado con su silueta).
+ * El destello se mueve con transform en su propia capa: la foto y su sombra se rasterizan una vez.
+ */
+function ShinyFrame({ photo, sheen, className, style }: { photo: ProductPhoto; sheen: MotionValue<string>; className?: string; style?: CSSProperties }) {
   return (
     <div className={clsx("relative", className)} style={{ aspectRatio: `${photo.width} / ${photo.height}`, ...style }}>
-      <Image src={photo.front} alt="" fill sizes="(min-width: 1024px) 50vw, 90vw" priority={priority} className="object-contain drop-shadow-[0_40px_40px_rgba(0,0,0,0.55)]" />
-      <motion.div
-        className="absolute inset-0 mix-blend-screen"
-        style={{
-          backgroundImage: "linear-gradient(105deg, transparent 42%, rgba(255,255,255,0.5) 50%, transparent 58%)",
-          backgroundSize: "280% 100%",
-          backgroundPositionX: sheen,
-          WebkitMaskImage: `url(${photo.front})`,
-          maskImage: `url(${photo.front})`,
-          WebkitMaskSize: "100% 100%",
-          maskSize: "100% 100%",
-        }}
-      />
+      <Image src={photo.front} alt="" fill quality={90} sizes="(min-width: 1024px) 44vw, 86vw" className="object-contain drop-shadow-[0_40px_40px_rgba(0,0,0,0.55)]" />
+      <div className="absolute inset-0 overflow-hidden mix-blend-screen" style={maskOf(photo.mask ?? photo.front)}>
+        <motion.div
+          className="absolute inset-y-0 left-0 w-[280%] bg-[linear-gradient(105deg,transparent_42%,rgba(255,255,255,0.5)_50%,transparent_58%)] will-change-transform"
+          style={{ x: sheen }}
+        />
+      </div>
     </div>
   );
 }
@@ -330,7 +355,8 @@ function Counter({ p, range, to, decimals = 0 }: { p: MotionValue<number>; range
   const value = useTransform(p, range, [0, to], { clamp: true });
   const ref = useRef<HTMLSpanElement>(null);
   useMotionValueEvent(value, "change", (v) => {
-    if (ref.current) ref.current.textContent = v.toFixed(decimals);
+    const text = v.toFixed(decimals);
+    if (ref.current && ref.current.textContent !== text) ref.current.textContent = text;
   });
   return <span ref={ref}>0</span>;
 }
@@ -339,6 +365,7 @@ function Counter({ p, range, to, decimals = 0 }: { p: MotionValue<number>; range
 
 function MateriaScene({ p, mobile }: { p: MotionValue<number>; mobile: boolean }) {
   const scene = useWindow(p, -1, 0, 0.29, 0.32);
+  const display = useGate(p, -1, 0.33);
   const wordX = useTransform(p, [0, 0.3], ["8%", "-48%"]);
   const acetateWord = useTransform(p, [0.13, 0.16], [1, 0]);
   const titaniumWord = useTransform(p, [0.14, 0.17], [0, 1]);
@@ -349,21 +376,21 @@ function MateriaScene({ p, mobile }: { p: MotionValue<number>; mobile: boolean }
   const aRotX = useTransform(p, [0, 0.11], [10, 0]);
   const aScale = useTransform(p, [0, 0.11, 0.165], [0.78, 1.06, 0.86]);
   const aX = useTransform(p, [0.12, 0.165], ["0cqw", mobile ? "-30cqw" : "-14cqw"]);
-  const aSheen = useTransform(p, [0.03, 0.12], ["120%", "-20%"]);
+  const aSheen = useTransform(p, [0.03, 0.12], ["-77%", "13%"]);
 
   // Titanio: entra desde la derecha
   const tOpacity = useTransform(p, [0.14, 0.175, 0.28, 0.31], [0, 1, 1, 0]);
   const tRotY = useTransform(p, [0.14, 0.22, 0.31], [50, -2, -26]);
   const tScale = useTransform(p, [0.14, 0.22, 0.31], [0.8, 1.04, 0.92]);
   const tX = useTransform(p, [0.14, 0.2], [mobile ? "30cqw" : "16cqw", "0cqw"]);
-  const tSheen = useTransform(p, [0.18, 0.28], ["120%", "-20%"]);
+  const tSheen = useTransform(p, [0.18, 0.28], ["-77%", "13%"]);
 
   const frameStyle = mobile ? { left: "50cqw", top: "36cqh", width: "86cqw" } : { left: "63cqw", top: "46cqh", width: "min(44cqw, 640px)" };
 
   return (
-    <motion.div className="absolute inset-0" style={{ opacity: scene }}>
+    <motion.div className="absolute inset-0" style={{ opacity: scene, display }}>
       {/* Palabra gigante contorneada, deslizada por el scroll */}
-      <motion.div className="absolute left-0 top-[14cqh] whitespace-nowrap lg:top-[10cqh]" style={{ x: wordX }}>
+      <motion.div className="absolute left-0 top-[14cqh] whitespace-nowrap will-change-transform lg:top-[10cqh]" style={{ x: wordX }}>
         <div className="relative">
           <motion.span className="display block text-[22cqh] text-transparent" style={{ opacity: acetateWord, WebkitTextStroke: "1.5px rgba(233,239,249,0.14)" }}>
             acetato · acetato · acetato
@@ -379,7 +406,7 @@ function MateriaScene({ p, mobile }: { p: MotionValue<number>; mobile: boolean }
 
       <div className="absolute -translate-x-1/2 -translate-y-1/2 [perspective:1100px]" style={frameStyle}>
         <motion.div style={{ opacity: aOpacity, rotateY: aRotY, rotateX: aRotX, scale: aScale, x: aX }}>
-          <ShinyFrame photo={ACETATE} sheen={aSheen} priority />
+          <ShinyFrame photo={ACETATE} sheen={aSheen} />
         </motion.div>
         <motion.div className="absolute inset-0 flex items-center" style={{ opacity: tOpacity, rotateY: tRotY, scale: tScale, x: tX }}>
           <ShinyFrame photo={TITANIUM} sheen={tSheen} className="w-full" />
@@ -451,6 +478,7 @@ function EyeChart({ cx }: { cx: string }) {
 
 function MicasScene({ p, mobile }: { p: MotionValue<number>; mobile: boolean }) {
   const scene = useWindow(p, 0.29, 0.32, 0.61, 0.645);
+  const display = useGate(p, 0.28, 0.655);
   const frameIn = useWindow(p, 0.31, 0.345, 0.6, 0.63);
   // Qué le pasa al mundo "afuera" de la mica en cada paso
   const blurLayer = useTransform(p, [0.4, 0.44], [1, 0]);
@@ -471,10 +499,10 @@ function MicasScene({ p, mobile }: { p: MotionValue<number>; mobile: boolean }) 
   ];
 
   return (
-    <motion.div className="absolute inset-0" style={{ opacity: scene }}>
+    <motion.div className="absolute inset-0" style={{ opacity: scene, display }}>
       {/* El mundo afuera: borroso, con destellos o con luz azul */}
       <div className="absolute inset-0 opacity-60">
-        <motion.div className="absolute inset-0 blur-[0.55cqh]" style={{ opacity: blurLayer }}>
+        <motion.div className="absolute inset-0 blur-[0.55cqh] will-change-[opacity]" style={{ opacity: blurLayer }}>
           <EyeChart cx={cx} />
         </motion.div>
         <motion.div className="absolute inset-0" style={{ opacity: useTransform(blurLayer, (v) => 1 - v) }}>
@@ -482,7 +510,7 @@ function MicasScene({ p, mobile }: { p: MotionValue<number>; mobile: boolean }) 
         </motion.div>
       </div>
       <motion.div
-        className="absolute inset-[-10%]"
+        className="absolute inset-[-10%] will-change-transform"
         style={{
           opacity: glare,
           x: glareX,
@@ -526,9 +554,9 @@ function MicasScene({ p, mobile }: { p: MotionValue<number>; mobile: boolean }) 
         <motion.div className="absolute inset-0 bg-[#808080] mix-blend-saturation" style={{ opacity: blue }} />
       </motion.div>
 
-      {/* El armazón real encima (versión sin las varillas que se ven tras la mica) */}
-      <motion.div className="absolute -translate-x-1/2 -translate-y-1/2" style={{ ...box, opacity: frameIn }}>
-        <Image src={OPTICAL.tryOn ?? OPTICAL.front} alt="" fill sizes="(min-width: 1024px) 58vw, 92vw" className="object-contain drop-shadow-[0_30px_30px_rgba(0,0,0,0.45)]" />
+      {/* El armazón real encima (versión sin las varillas que se ven tras la mica); capa propia */}
+      <motion.div className="absolute -translate-x-1/2 -translate-y-1/2 will-change-transform" style={{ ...box, opacity: frameIn }}>
+        <Image src={OPTICAL.tryOn ?? OPTICAL.front} alt="" fill quality={90} sizes="(min-width: 1024px) 50vw, 92vw" className="object-contain drop-shadow-[0_30px_30px_rgba(0,0,0,0.45)]" />
         {labels.map(([opacity, outside, inside]) => (
           <motion.div key={inside} className="absolute inset-0" style={{ opacity }}>
             <span className="absolute -top-[9cqh] left-[2%] whitespace-nowrap rounded-full bg-white/10 px-3 py-1.5 text-[clamp(0.6rem,1.4cqh,0.78rem)] font-semibold uppercase tracking-[0.14em] text-white/80 backdrop-blur-sm">
@@ -548,6 +576,7 @@ function MicasScene({ p, mobile }: { p: MotionValue<number>; mobile: boolean }) 
 
 function MedidaScene({ p, mobile }: { p: MotionValue<number>; mobile: boolean }) {
   const scene = useWindow(p, 0.6, 0.645, 0.8, 0.835);
+  const display = useGate(p, 0.59, 0.845);
   const grid = useTransform(p, [0.62, 0.68], [0, 1]);
   const frameScale = useTransform(p, [0.62, 0.7, 0.83], [0.9, 1, 1.04]);
   const W = OPTICAL.width;
@@ -571,7 +600,7 @@ function MedidaScene({ p, mobile }: { p: MotionValue<number>; mobile: boolean })
   const sw = W / 300; // grosor proporcional al tamaño de la foto
 
   return (
-    <motion.div className="absolute inset-0" style={{ opacity: scene }}>
+    <motion.div className="absolute inset-0" style={{ opacity: scene, display }}>
       {/* Retícula de plano técnico */}
       <motion.div
         className="absolute inset-0"
@@ -587,8 +616,8 @@ function MedidaScene({ p, mobile }: { p: MotionValue<number>; mobile: boolean })
         className="absolute aspect-[16/9] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(110,155,255,0.3),rgba(45,107,255,0.08)_55%,transparent)]"
         style={{ left: box.left, top: box.top, width: mobile ? "120cqw" : "min(70cqw, 1000px)", opacity: grid }}
       />
-      <motion.div className="absolute" style={{ ...box, aspectRatio: `${W} / ${H}`, scale: frameScale, x: "-50%", y: "-50%" }}>
-        <Image src={OPTICAL.tryOn ?? OPTICAL.front} alt="" fill sizes="(min-width: 1024px) 50vw, 84vw" className="object-contain drop-shadow-[0_30px_30px_rgba(0,0,0,0.55)]" />
+      <motion.div className="absolute will-change-transform" style={{ ...box, aspectRatio: `${W} / ${H}`, scale: frameScale, x: "-50%", y: "-50%" }}>
+        <Image src={OPTICAL.tryOn ?? OPTICAL.front} alt="" fill quality={90} sizes="(min-width: 1024px) 44vw, 84vw" className="object-contain drop-shadow-[0_30px_30px_rgba(0,0,0,0.55)]" />
         <svg viewBox={`0 0 ${W} ${H}`} className="absolute inset-0 h-full w-full overflow-visible">
           <g fill="none" stroke={stroke} strokeWidth={sw} strokeLinecap="round">
             {/* Ancho total */}
@@ -649,6 +678,7 @@ const COLLECTION = products.map((product) => ({ product, color: product.colors[0
 
 function ColeccionScene({ p, mobile }: { p: MotionValue<number>; mobile: boolean }) {
   const scene = useTransform(p, [0.8, 0.84], [0, 1]);
+  const display = useGate(p, 0.79, 2);
   const cols = mobile ? 3 : 4;
   const area = mobile ? { x0: 4, x1: 96, y0: 13, y1: 62 } : { x0: 44, x1: 97, y0: 14, y1: 88 };
   const rows = Math.ceil((COLLECTION.length + 1) / cols);
@@ -656,7 +686,7 @@ function ColeccionScene({ p, mobile }: { p: MotionValue<number>; mobile: boolean
   const cellH = (area.y1 - area.y0) / rows;
 
   return (
-    <motion.div className="absolute inset-0" style={{ opacity: scene }}>
+    <motion.div className="absolute inset-0" style={{ opacity: scene, display }}>
       {COLLECTION.map((item, i) => (
         <FlyingFrame
           key={item.product.id}
@@ -701,30 +731,31 @@ function FlyingFrame({
   const fromRot = Math.sin(index * 4.1) * 70;
   const start = 0.82 + index * 0.005;
   const end = start + 0.07;
-  const x = useTransform(p, [start, end], [fromX, to.x]);
-  const y = useTransform(p, [start, end], [fromY, to.y]);
+  // La caja queda fija en su celda; el vuelo es sólo transform (no mueve el layout ni cuenta como CLS)
+  const x = useTransform(p, [start, end], [`${(fromX - to.x).toFixed(2)}cqw`, "0cqw"]);
+  const y = useTransform(p, [start, end], [`${(fromY - to.y).toFixed(2)}cqh`, "0cqh"]);
   const rotate = useTransform(p, [start, end], [fromRot, 0]);
   const scale = useTransform(p, [start, end], [1.7, 1]);
   const opacity = useTransform(p, [start - 0.01, start + 0.02], [0, 1]);
-  const left = useTransform(x, (v) => `${v}cqw`);
-  const top = useTransform(y, (v) => `${v}cqh`);
 
   return (
+    <div className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2" style={{ left: `${to.x}cqw`, top: `${to.y}cqh`, width: `${width}cqw` }}>
     <motion.button
       type="button"
       onClick={() => openTryOn(item.product.id, item.color.id)}
-      className="group pointer-events-auto absolute text-center"
-      style={{ left, top, rotate, scale, opacity, width: `${width}cqw`, x: "-50%", y: "-50%" }}
+      className="group pointer-events-auto block w-full text-center will-change-transform"
+      style={{ x, y, rotate, scale, opacity }}
       aria-label={`Probarte ${item.product.name}`}
     >
       <span className="relative block" style={{ aspectRatio: `${photo.width} / ${photo.height}` }}>
-        <Image src={photo.front} alt="" fill sizes="(min-width: 1024px) 13vw, 30vw" className="object-contain drop-shadow-[0_16px_14px_rgba(0,0,0,0.5)] transition-transform duration-300 group-hover:-translate-y-1 group-hover:scale-105" />
+        <Image src={photo.front} alt="" fill quality={90} sizes="(min-width: 1024px) 12vw, 28vw" className="object-contain drop-shadow-[0_16px_14px_rgba(0,0,0,0.5)] transition-transform duration-300 group-hover:-translate-y-1 group-hover:scale-105" />
       </span>
       <span className="mt-[0.8cqh] block font-display text-[clamp(0.58rem,1.3cqh,0.82rem)] uppercase tracking-[0.06em] text-paper">{item.product.name}</span>
       <span className="block text-[clamp(0.55rem,1.15cqh,0.72rem)] font-semibold uppercase tracking-[0.18em] text-volt-ice opacity-0 transition-opacity group-hover:opacity-100">
         Pruébatelos
       </span>
     </motion.button>
+    </div>
   );
 }
 
@@ -734,7 +765,7 @@ function CtaTile({ p, style }: { p: MotionValue<number>; style: CSSProperties })
   return (
     <motion.a
       href="#catalogo"
-      className="pointer-events-auto absolute flex flex-col items-start justify-between rounded-2xl bg-volt p-[min(1.6cqh,2.4cqw)] text-white shadow-glow transition-colors hover:bg-volt-soft"
+      className="pointer-events-auto absolute flex flex-col items-start justify-between rounded-2xl bg-volt p-[min(1.6cqh,2.4cqw)] text-white shadow-glow transition-colors hover:bg-volt-deep"
       style={{ ...style, opacity, scale, x: "-50%", y: "-50%" }}
     >
       <span className="display text-[clamp(0.5rem,min(1.9cqh,2.2cqw),1.25rem)] leading-[1.2]">Encuentra tu par</span>

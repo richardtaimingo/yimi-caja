@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 import { products, type LensOptionId } from "@/lib/products";
+import { scrollToTarget } from "@/lib/scroll";
 
 /** Intención de compra elegida en el selector rápido del Hero. */
 export type Intent = "todos" | "ver" | "sol" | "blue";
@@ -47,7 +48,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
         colorId,
         lensId: product?.category === "sol" ? "solo" : intent === "blue" ? "blue" : prev.lensId === "solo" ? null : prev.lensId,
       }));
-      document.getElementById("como-funciona")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      scrollToTarget(document.getElementById("como-funciona"));
     },
     [intent],
   );

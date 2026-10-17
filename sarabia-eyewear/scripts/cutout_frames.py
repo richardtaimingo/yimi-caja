@@ -153,17 +153,29 @@ def cutout(rgb, band=4):
     matte = np.maximum(matte, np.clip((spread - 24.0) / 36.0, 0.0, 1.0))
     alpha = np.where(transparent, 0.0, np.where(near, matte, 1.0))
     alpha = np.minimum(ndimage.gaussian_filter(alpha, 0.6), np.where(transparent, 0.0, 1.0))
+    # Borde más limpio: se "aprieta" el alfa (~0.25 px de origen) y se endurece la transición,
+    # así no queda el contorno claro de la mezcla con el fondo blanco
+    choke = max(1, band // 6)
+    alpha = ndimage.grey_erosion(alpha, size=(2 * choke + 1, 2 * choke + 1))
+    alpha = np.clip(ndimage.gaussian_filter(alpha, 0.5 * choke), 0.0, 1.0) ** 1.15
     alpha[alpha < 0.03] = 0.0
-    # Color sin el blanco: des-multiplica; con alfa bajo (ruidoso) usa el color sólido más cercano
+    # Sin motas sueltas (costuras del escalado) ni píxeles pegados al borde de la imagen
+    pieces, count = ndimage.label(alpha > 0)
+    if count > 1:
+        sizes = ndimage.sum(np.ones_like(alpha), pieces, range(1, count + 1))
+        alpha[np.isin(pieces, np.where(sizes < 2 * band * band)[0] + 1)] = 0.0
+    edge = max(2, band // 3)
+    alpha[:edge] = 0.0
+    alpha[-edge:] = 0.0
+    alpha[:, :edge] = 0.0
+    alpha[:, -edge:] = 0.0
+    # Color sin rastro del fondo: todo píxel translúcido toma el color sólido más cercano del armazón
     color = rgb.copy()
-    solid = (alpha >= 0.98) & ~near
+    solid = alpha >= 0.995
     if solid.any():
         _, (iy, ix) = ndimage.distance_transform_edt(~solid, return_indices=True)
-        a = np.maximum(alpha, 1e-3)[..., None]
-        unmul = np.clip((rgb - 255.0 * (1.0 - a)) / a, 0, 255)
-        mix = np.clip((alpha - 0.2) / 0.5, 0.0, 1.0)[..., None]
-        fixed = mix * unmul + (1.0 - mix) * rgb[iy, ix]
-        color[near] = fixed[near]
+        soft = ~solid
+        color[soft] = rgb[iy[soft], ix[soft]]
     rgba = np.dstack([color, alpha * 255.0]).astype(np.uint8)
 
     # Micas claras: une los huecos de cada lado (una varilla puede partir la mica) y toma su envolvente
@@ -240,14 +252,25 @@ def upscale_rgb(rgb, factor):
 
 
 def super_resolved(pid):
-    """Ampliación ESRGAN 4x: limpia los bloques JPEG y recupera textura del carey y los remaches."""
+    """Ampliación ESRGAN (8x): limpia los bloques JPEG y define los bordes del carey y los remaches."""
     im = Image.open(SR / f"{pid}.png").convert("RGB")
-    return np.asarray(im.filter(ImageFilter.UnsharpMask(radius=1.2, percent=35, threshold=3)))
+    return np.asarray(im.filter(ImageFilter.UnsharpMask(radius=1.6, percent=30, threshold=3)))
+
+
+def save_alpha_mask(alpha, path, width):
+    """Máscara ligera para CSS mask-image (sólo el canal alfa importa): ancho fijo y 1 px más estrecha."""
+    a = Image.fromarray(np.clip(alpha, 0, 255).astype(np.uint8), "L")
+    a = a.resize((width, max(1, round(a.height * width / a.width))), Image.LANCZOS).filter(ImageFilter.MinFilter(3))
+    im = Image.new("LA", a.size, 255)
+    im.putalpha(a)
+    im.save(path, optimize=True)
 
 
 meta = {}
 if CROPS:
     CROPS.mkdir(parents=True, exist_ok=True)
+else:
+    (OUT / "masks").mkdir(parents=True, exist_ok=True)
 for pid, spec in SELECTION.items():
     key, (x0, y0, x1, y1), grid = crop_box(spec)
     region = images[key][y0:y1, x0:x1]
@@ -255,15 +278,18 @@ for pid, spec in SELECTION.items():
     if CROPS:
         Image.fromarray(region, "RGB").save(CROPS / f"{pid}.png")
         continue
+    source_width = region.shape[1]
     if SR and (SR / f"{pid}.png").exists():
-        region, band = super_resolved(pid), 6
+        region = super_resolved(pid)
     else:
-        region, band = upscale_rgb(region, 3 if region.shape[1] < 250 else 2), 4
+        region = upscale_rgb(region, 3 if region.shape[1] < 250 else 2)
+    band = max(4, round(1.5 * region.shape[1] / source_width))  # franja de borde ≈ 1.5 px de origen
     rgba, lens_regions = cutout(region, band)
     centers, boxes = lens_geometry(rgba, lens_regions)
     big = Image.fromarray(rgba, "RGBA")
-    big.save(OUT / f"{pid}.webp", "WEBP", quality=92, method=6)
-    entry = {"width": big.width, "height": big.height, "lensCenters": centers, "lensBoxes": boxes, "clearLenses": bool(lens_regions)}
+    big.save(OUT / f"{pid}.webp", "WEBP", quality=94, method=6)
+    save_alpha_mask(rgba[..., 3], OUT / "masks" / f"{pid}.png", 640)
+    entry = {"width": big.width, "height": big.height, "lensCenters": centers, "lensBoxes": boxes, "clearLenses": bool(lens_regions), "mask": f"/frames/masks/{pid}.png"}
     if lens_regions:
         lens = np.zeros(rgba.shape[:2], dtype=bool)
         for r in lens_regions:
@@ -271,7 +297,8 @@ for pid, spec in SELECTION.items():
         mask = ndimage.binary_dilation(lens, iterations=2).astype(np.uint8) * 255
         # Máscara para CSS mask-image: blanco con la mica en el canal alfa (borde suave)
         alpha_img = Image.fromarray(mask, "L").filter(ImageFilter.GaussianBlur(2))
-        lens_png = Image.new("RGBA", alpha_img.size, (255, 255, 255, 0))
+        alpha_img = alpha_img.resize((800, round(alpha_img.height * 800 / alpha_img.width)), Image.LANCZOS)
+        lens_png = Image.new("LA", alpha_img.size, 255)
         lens_png.putalpha(alpha_img)
         lens_png.save(OUT / f"{pid}-lens.png", optimize=True)
         entry["lensMask"] = f"/frames/{pid}-lens.png"
@@ -279,18 +306,22 @@ for pid, spec in SELECTION.items():
         inner = ndimage.binary_erosion(lens, iterations=5)
         tryon = rgba.copy()
         tryon[inner, 3] = 0
-        Image.fromarray(tryon, "RGBA").save(OUT / f"{pid}-tryon.webp", "WEBP", quality=92, method=6)
+        Image.fromarray(tryon, "RGBA").save(OUT / f"{pid}-tryon.webp", "WEBP", quality=94, method=6)
         entry["tryOn"] = f"/frames/{pid}-tryon.webp"
     meta[pid] = entry
     print(f"{pid:24s} {big.width}x{big.height} clear={entry['clearLenses']} centers={centers}")
 
+MASTER_WIDTH = 2400  # ancho del master que debe exportarse por armazón (ver encabezado de framePhotos.ts)
+
+
 def ts_entry(pid, e):
     pair = lambda pts: "[" + ", ".join(f"[{round(float(x), 3)}, {round(float(y), 3)}]" for x, y in pts) + "]"
-    fields = [f'front: "/frames/{pid}.webp"', f"width: {e['width']}", f"height: {e['height']}", f"lensCenters: {pair(e['lensCenters'])}"]
+    fields = [f'front: "/frames/{pid}.webp"', f'mask: "{e["mask"]}"', f"width: {e['width']}", f"height: {e['height']}", f"lensCenters: {pair(e['lensCenters'])}"]
     if e["clearLenses"]:
         boxes = "[" + ", ".join("[" + ", ".join(str(round(float(v), 3)) for v in b) + "]" for b in e["lensBoxes"]) + "]"
         fields += [f'tryOn: "{e["tryOn"]}"', f'lensMask: "{e["lensMask"]}"', f"lensBoxes: {boxes}"]
-    return f'  "{pid}": {{{", ".join(fields)}}},'
+    master = f"{MASTER_WIDTH}x{round(MASTER_WIDTH * e['height'] / e['width'])}"
+    return f"  // Reemplazo: exportar {master} px (ahora {e['width']}x{e['height']}, escalado con IA)\n  \"{pid}\": {{{', '.join(fields)}}},"
 
 
 if not CROPS:
@@ -300,6 +331,15 @@ if not CROPS:
             'import type { ProductPhoto } from "./products";\n\n'
             "// Generado por scripts/cutout_frames.py a partir de las fotos de referencia.\n"
             "// Medidas en px de cada WebP; centros y cajas de mica normalizados (0–1).\n"
+            "//\n"
+            "// ESPECIFICACIÓN PARA REEMPLAZAR LAS FOTOS (nitidez Retina 3x en hero, campaña y catálogo):\n"
+            "// - Vista frontal, master de 2400 px de ancho (mínimo 2000) × su alto natural; resolución nativa,\n"
+            "//   nunca escalada: armazón ocupando ≥ 4000 px del sensor, f/8–f/11 con apilado de foco.\n"
+            "// - PNG-24 RGBA (o WebP sin pérdida) con alfa recto, recorte a pluma, borde ≤ 2 px y sin halo.\n"
+            "// - sRGB IEC61966-2.1 incrustado, balance de blancos neutro, puente centrado y micas niveladas,\n"
+            "//   2 % de margen uniforme. Micas claras: máscara de mica en escala de grises al mismo tamaño.\n"
+            "// - Opcional: vista 3/4 con la misma especificación (sustituye el giro CSS del catálogo).\n"
+            "// Colocar en public/frames y volver a correr scripts/cutout_frames.py --ts lib/framePhotos.ts.\n"
             "export const framePhotos: Record<string, ProductPhoto> = {\n"
             + "\n".join(ts_entry(pid, e) for pid, e in meta.items())
             + "\n};\n"

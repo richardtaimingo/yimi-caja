@@ -1,33 +1,60 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { MessageCircle } from "lucide-react";
 import { whatsappLink } from "@/lib/site";
 
+/**
+ * Asesoría por WhatsApp. Aparece cuando el hero ya salió de pantalla (el hero y el header tienen su
+ * propio acceso) y se retira junto al formulario de contacto y mientras hay un modal o menú abierto,
+ * para no tapar textos ni competir con el CTA principal. Respeta las áreas seguras del teléfono.
+ */
 export function WhatsAppFab() {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const watched = ["top", "contacto"].map((id) => document.getElementById(id)).filter((el): el is HTMLElement => Boolean(el));
+    const onScreen = new Set<Element>();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) onScreen.add(entry.target);
+          else onScreen.delete(entry.target);
+        }
+        setVisible(onScreen.size === 0);
+      },
+      { rootMargin: "0px 0px -30% 0px" },
+    );
+    watched.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <motion.a
-      href={whatsappLink("Hola Sarabia Eyewear, quiero asesoría para elegir mis lentes.")}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label="Asesoría en línea por WhatsApp"
-      initial={{ scale: 0, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      transition={{ delay: 1.2, type: "spring" }}
-      whileHover={{ scale: 1.04 }}
-      className="fixed bottom-5 right-5 z-30 flex items-center gap-3"
-    >
-      <span className="hidden items-center gap-2 rounded-full bg-night-2 py-2 pl-3 pr-4 text-sm font-semibold text-paper shadow-lift lg:flex">
-        <span className="relative flex h-2.5 w-2.5">
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#25D366] opacity-75" />
-          <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[#25D366]" />
-        </span>
-        Asesoría en línea
-      </span>
-      <span className="relative flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lift">
-        <MessageCircle className="h-6 w-6" />
-        <span className="absolute -right-1 -top-1 rounded-full bg-paper px-1.5 py-0.5 text-[0.6rem] font-semibold text-night lg:hidden">En línea</span>
-      </span>
-    </motion.a>
+    <AnimatePresence>
+      {visible && (
+        <motion.a
+          key="whatsapp-fab"
+          href={whatsappLink("Hola Sarabia Eyewear, quiero asesoría para elegir mis lentes.")}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Asesoría en línea por WhatsApp"
+          initial={{ opacity: 0, transform: "translateY(16px) scale(0.92)" }}
+          animate={{ opacity: 1, transform: "translateY(0px) scale(1)" }}
+          exit={{ opacity: 0, transform: "translateY(16px) scale(0.92)" }}
+          transition={{ type: "spring", stiffness: 260, damping: 22 }}
+          className="group fixed bottom-[max(1rem,calc(env(safe-area-inset-bottom)+0.5rem))] right-[max(1rem,env(safe-area-inset-right))] z-30 flex items-center gap-3 transition-opacity [html[data-scroll-locked]_&]:pointer-events-none [html[data-scroll-locked]_&]:opacity-0 lg:bottom-6 lg:right-6"
+        >
+          <span className="hidden items-center gap-2 rounded-full border border-white/[0.12] bg-[rgba(7,11,22,0.72)] py-2 pl-3 pr-4 text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-paper/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] backdrop-blur-[16px] transition-colors group-hover:text-white lg:flex">
+            <span className="h-2 w-2 rounded-full bg-[#25D366]" aria-hidden />
+            Asesoría en línea
+          </span>
+          <span className="relative flex h-12 w-12 items-center justify-center rounded-full border border-white/[0.12] bg-[rgba(7,11,22,0.72)] text-[#25D366] shadow-[inset_0_1px_0_rgba(255,255,255,0.14),0_12px_32px_-12px_rgba(0,0,0,0.7)] backdrop-blur-[16px] backdrop-saturate-150 transition-transform duration-300 group-hover:scale-105 group-active:scale-95 lg:h-14 lg:w-14">
+            <MessageCircle className="h-[1.375rem] w-[1.375rem] lg:h-6 lg:w-6" aria-hidden />
+            <span className="absolute right-0.5 top-0.5 h-2.5 w-2.5 rounded-full bg-[#25D366] ring-2 ring-night" aria-hidden />
+          </span>
+        </motion.a>
+      )}
+    </AnimatePresence>
   );
 }
