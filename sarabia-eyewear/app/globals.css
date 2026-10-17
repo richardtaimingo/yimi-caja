@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-bone font-sans text-ink antialiased;
+    font-feature-settings: "ss01", "cv11";
+  }
+  ::selection {
+    @apply bg-ink text-bone;
+  }
+  :focus-visible {
+    @apply outline-none ring-2 ring-clay ring-offset-2 ring-offset-bone;
+  }
+}
+
+@layer components {
+  .eyebrow {
+    @apply text-xs font-semibold uppercase tracking-[0.24em] text-ink-muted;
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-ink font-semibold text-bone transition-all duration-300 hover:bg-ink-soft active:scale-[0.98];
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-ink/15 font-semibold text-ink transition-all duration-300 hover:border-ink hover:bg-white active:scale-[0.98];
+  }
+  .btn-light {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-bone font-semibold text-ink transition-all duration-300 hover:bg-white active:scale-[0.98];
+  }
+  .field {
+    @apply mt-2 block w-full rounded-2xl border border-white/15 bg-white/[0.04] px-4 py-3.5 text-bone placeholder:text-bone/35 transition focus:border-bone/60 focus:outline-none focus:ring-0;
+  }
+  .link-underline {
+    @apply relative after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-full after:origin-right after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:origin-left hover:after:scale-x-100;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
