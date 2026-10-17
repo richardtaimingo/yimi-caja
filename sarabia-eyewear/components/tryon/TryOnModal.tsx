@@ -123,7 +123,7 @@ export function TryOnModal({ initialProductId, initialColorId, onClose }: Props)
   const scaleRef = useRef(frameScale(product));
   const mannequinRef = useRef({ yaw: 0.35, pitch: 0, dragging: false, lastInteraction: 0 });
   const dragRef = useRef<{ x: number; y: number; manual: ManualPose; yaw: number; pitch: number } | null>(null);
-  const unmountedRef = useRef(false);
+  const closedRef = useRef(false);
 
   selectedRef.current = selected;
   manualRef.current = manual;
@@ -153,13 +153,13 @@ export function TryOnModal({ initialProductId, initialColorId, onClose }: Props)
       .then((m) => m.getFaceTracker())
       .then((tracker) => {
         trackerRef.current = tracker;
-        if (!unmountedRef.current) setTrackerState("ready");
+        if (!closedRef.current) setTrackerState("ready");
         return tracker;
       })
       .catch((error) => {
         console.warn("[probador] No se pudo cargar el detector facial; se usa el modo manual.", error);
         trackerLoadRef.current = null;
-        if (!unmountedRef.current) setTrackerState("failed");
+        if (!closedRef.current) setTrackerState("failed");
         return null;
       });
     return trackerLoadRef.current;
@@ -178,7 +178,7 @@ export function TryOnModal({ initialProductId, initialColorId, onClose }: Props)
         video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } },
         audio: false,
       });
-      if (unmountedRef.current) {
+      if (closedRef.current) {
         stream.getTracks().forEach((track) => track.stop());
         return;
       }
@@ -196,7 +196,7 @@ export function TryOnModal({ initialProductId, initialColorId, onClose }: Props)
       setCameraError(describeCameraError(error));
       switchMode("intro");
     } finally {
-      if (!unmountedRef.current) setStarting(false);
+      if (!closedRef.current) setStarting(false);
     }
   }, [loadTracker, stopCamera, switchMode]);
 
@@ -214,11 +214,18 @@ export function TryOnModal({ initialProductId, initialColorId, onClose }: Props)
     };
   }, [startCamera]);
 
-  // Limpieza al cerrar: apagar la cámara y liberar la foto subida.
+  // Al cerrar se apaga la cámara de inmediato (el desmontaje llega hasta que termina la animación de salida).
+  const close = useCallback(() => {
+    closedRef.current = true; // un arranque de cámara pendiente suelta el stream en cuanto llegue
+    stopCamera();
+    onClose();
+  }, [stopCamera, onClose]);
+
+  // Limpieza al desmontar: apagar la cámara (por si se abrió durante la salida) y liberar la foto subida.
   useEffect(() => {
-    unmountedRef.current = false;
+    closedRef.current = false;
     return () => {
-      unmountedRef.current = true;
+      closedRef.current = true;
       stopCamera();
       if (photoUrlRef.current) URL.revokeObjectURL(photoUrlRef.current);
     };
@@ -250,7 +257,7 @@ export function TryOnModal({ initialProductId, initialColorId, onClose }: Props)
           console.warn("[probador] Falló la detección en la foto.", error);
         }
       }
-      if (photoRef.current !== img || unmountedRef.current) return;
+      if (photoRef.current !== img || closedRef.current) return;
       photoLandmarksRef.current = landmarks;
       if (!landmarks) setManual(DEFAULT_MANUAL_POSE);
       setPhotoState(landmarks ? "face" : "manual");
@@ -461,7 +468,7 @@ export function TryOnModal({ initialProductId, initialColorId, onClose }: Props)
   // ---------- Teclado y scroll ----------
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") close();
     };
     window.addEventListener("keydown", onKey);
     const previous = document.body.style.overflow;
@@ -470,7 +477,7 @@ export function TryOnModal({ initialProductId, initialColorId, onClose }: Props)
       window.removeEventListener("keydown", onKey);
       document.body.style.overflow = previous;
     };
-  }, [onClose]);
+  }, [close]);
 
   const status = (() => {
     if (mode === "camera") {
@@ -572,7 +579,7 @@ export function TryOnModal({ initialProductId, initialColorId, onClose }: Props)
             )}
             <button
               type="button"
-              onClick={onClose}
+              onClick={close}
               className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-black/55 backdrop-blur transition hover:bg-black/75"
               aria-label="Cerrar probador"
             >
