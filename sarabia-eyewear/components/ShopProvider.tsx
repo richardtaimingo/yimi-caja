@@ -15,6 +15,10 @@ type ShopContextValue = {
   setSelection: (patch: Partial<Selection>) => void;
   /** Precarga un armazón en el configurador y hace scroll hasta él. */
   configure: (productId: string, colorId: string) => void;
+  /** Armazón abierto en el probador virtual (null si está cerrado). */
+  tryOn: { productId: string; colorId: string } | null;
+  openTryOn: (productId: string, colorId: string) => void;
+  closeTryOn: () => void;
 };
 
 const ShopContext = createContext<ShopContextValue | null>(null);
@@ -48,7 +52,14 @@ export function ShopProvider({ children }: { children: ReactNode }) {
     [intent],
   );
 
-  const value = useMemo(() => ({ intent, setIntent, selection, setSelection, configure }), [intent, setIntent, selection, setSelection, configure]);
+  const [tryOn, setTryOn] = useState<ShopContextValue["tryOn"]>(null);
+  const openTryOn = useCallback((productId: string, colorId: string) => setTryOn({ productId, colorId }), []);
+  const closeTryOn = useCallback(() => setTryOn(null), []);
+
+  const value = useMemo(
+    () => ({ intent, setIntent, selection, setSelection, configure, tryOn, openTryOn, closeTryOn }),
+    [intent, setIntent, selection, setSelection, configure, tryOn, openTryOn, closeTryOn],
+  );
 
   return <ShopContext.Provider value={value}>{children}</ShopContext.Provider>;
 }

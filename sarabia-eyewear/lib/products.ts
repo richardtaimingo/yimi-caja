@@ -13,6 +13,20 @@ export type Colorway = {
   pattern?: "tortoise" | "crystal";
   /** Tinte de la mica (sólo armazones de sol). */
   lens?: string;
+  /** Fotografía real del armazón en este color. */
+  photo?: ProductPhoto;
+};
+
+export type ProductPhoto = {
+  /** Recorte PNG/WebP con fondo transparente, vista frontal (catálogo, hero y probador virtual). */
+  front: string;
+  /** Vista en ángulo 3/4 (opcional). */
+  angle?: string;
+  width: number;
+  height: number;
+  /** Centros de las micas en la foto frontal (0–1), para alinear el probador virtual. */
+  lensCenters: [[number, number], [number, number]];
+  credit?: { author: string; url: string };
 };
 
 export type Product = {

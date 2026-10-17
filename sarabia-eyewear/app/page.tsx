@@ -10,6 +10,7 @@ import { faqs } from "@/lib/faqs";
 import { Contact } from "@/components/Contact";
 import { Footer } from "@/components/Footer";
 import { WhatsAppFab } from "@/components/WhatsAppFab";
+import { TryOnRoot } from "@/components/tryon/TryOnRoot";
 import { products } from "@/lib/products";
 import { site } from "@/lib/site";
 
@@ -62,6 +63,7 @@ export default function Home() {
       </main>
       <Footer />
       <WhatsAppFab />
+      <TryOnRoot />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
     </>
   );

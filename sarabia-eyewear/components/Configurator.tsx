@@ -6,8 +6,9 @@ import clsx from "clsx";
 import { lensOptionsFor, materialLabels, products } from "@/lib/products";
 import { currency, orderMessage, whatsappLink } from "@/lib/site";
 import { swatchStyle } from "@/lib/swatch";
-import { FrameIllustration } from "./FrameIllustration";
+import { ProductImage } from "./ProductImage";
 import { useShop } from "./ShopProvider";
+import { TryOnButton } from "./tryon/TryOnButton";
 import { SectionHeading } from "./ui";
 
 export function Configurator() {
@@ -29,7 +30,7 @@ export function Configurator() {
     : "";
 
   return (
-    <section id="como-funciona" className="scroll-mt-20 bg-bone-warm py-20 md:py-28">
+    <section id="como-funciona" className="scroll-mt-20 bg-night-2 py-20 md:py-28">
       <div className="container">
         <SectionHeading
           eyebrow="Cómo funciona"
@@ -58,15 +59,17 @@ export function Configurator() {
                       }
                       className={clsx(
                         "rounded-2xl border p-3 text-left transition",
-                        selected ? "border-ink bg-white shadow-card" : "border-ink/10 bg-bone hover:border-ink/30",
+                        selected ? "border-paper bg-night-2 shadow-card" : "border-paper/10 bg-night hover:border-paper/40",
                       )}
                     >
-                      <FrameIllustration shape={p.shape} material={p.material} color={p.colors[0]} className="h-10 w-full" />
+                      <span className="flex h-14 items-center justify-center rounded-xl bg-[#EEE7DD] px-2">
+                        <ProductImage product={p} color={p.colors[0]} sizes="120px" className="max-h-10 w-full object-contain" />
+                      </span>
                       <span className="mt-2 flex items-baseline justify-between gap-1">
                         <span className="text-sm font-semibold">{p.name}</span>
-                        <span className="text-[0.68rem] text-ink-muted">{p.category === "sol" ? "Sol" : "Ver"}</span>
+                        <span className="text-[0.68rem] text-paper/55">{p.category === "sol" ? "Sol" : "Ver"}</span>
                       </span>
-                      <span className="text-xs text-ink-muted">{currency.format(p.price)}</span>
+                      <span className="text-xs text-paper/55">{currency.format(p.price)}</span>
                     </button>
                   );
                 })}
@@ -81,13 +84,13 @@ export function Configurator() {
                     aria-pressed={c.id === color.id}
                     onClick={() => setSelection({ colorId: c.id })}
                     className={clsx(
-                      "h-8 w-8 rounded-full ring-offset-2 ring-offset-bone transition",
-                      c.id === color.id ? "ring-2 ring-ink" : "ring-1 ring-ink/15 hover:ring-ink/40",
+                      "h-8 w-8 rounded-full ring-offset-2 ring-offset-night transition",
+                      c.id === color.id ? "ring-2 ring-paper" : "ring-1 ring-paper/20 hover:ring-paper/50",
                     )}
                     style={swatchStyle(c)}
                   />
                 ))}
-                <span className="text-sm text-ink-muted">{color.name}</span>
+                <span className="text-sm text-paper/55">{color.name}</span>
               </div>
             </Step>
 
@@ -104,7 +107,7 @@ export function Configurator() {
                       onClick={() => setSelection({ lensId: o.id })}
                       className={clsx(
                         "flex flex-col rounded-2xl border p-4 text-left transition",
-                        selected ? "border-ink bg-white shadow-card" : "border-ink/10 bg-bone hover:border-ink/30",
+                        selected ? "border-paper bg-night-2 shadow-card" : "border-paper/10 bg-night hover:border-paper/40",
                       )}
                     >
                       <span className="flex items-start justify-between gap-2">
@@ -112,13 +115,13 @@ export function Configurator() {
                         <span
                           className={clsx(
                             "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border",
-                            selected ? "border-ink bg-ink text-bone" : "border-ink/25",
+                            selected ? "border-paper bg-paper text-night" : "border-paper/25",
                           )}
                         >
                           {selected && <Check className="h-3 w-3" strokeWidth={3} />}
                         </span>
                       </span>
-                      <span className="mt-1 flex-1 text-xs leading-relaxed text-ink-muted">{o.description}</span>
+                      <span className="mt-1 flex-1 text-xs leading-relaxed text-paper/55">{o.description}</span>
                       <span className="mt-3 text-sm font-medium">{o.price ? `+${currency.format(o.price)}` : "Sin costo extra"}</span>
                     </button>
                   );
@@ -130,7 +133,7 @@ export function Configurator() {
           {/* Paso 3 · Resumen */}
           <div className="lg:sticky lg:top-24">
             <Step number={3} title="Envía tu receta o confirma tu pedido" done={false} highlight>
-              <div className="rounded-2xl bg-bone-warm p-4">
+              <div className="rounded-2xl bg-sun p-4">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={`${product.id}-${color.id}`}
@@ -139,15 +142,17 @@ export function Configurator() {
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.25 }}
                   >
-                    <FrameIllustration
-                      shape={product.shape}
-                      material={product.material}
+                    <ProductImage
+                      product={product}
                       color={color}
-                      title={`${product.name} en ${color.name}`}
-                      className="mx-auto w-3/5 drop-shadow-[0_16px_16px_rgba(21,21,20,0.18)]"
+                      sizes="(min-width: 1024px) 280px, 70vw"
+                      className="mx-auto h-auto w-3/5 drop-shadow-[0_16px_16px_rgba(21,21,20,0.25)]"
                     />
                   </motion.div>
                 </AnimatePresence>
+                <div className="mt-3 flex justify-center">
+                  <TryOnButton productId={product.id} colorId={color.id} variant="chip" />
+                </div>
               </div>
 
               <dl className="mt-5 space-y-2 text-sm">
@@ -155,7 +160,7 @@ export function Configurator() {
                 <Row label={materialLabels[product.material].badge} value={`${product.specs.lens}□${product.specs.bridge}-${product.specs.temple}`} muted />
                 <Row label={lens ? `Micas: ${lens.name}` : "Micas: elige una opción"} value={lens ? (lens.price ? `+${currency.format(lens.price)}` : "Incluido") : "—"} />
                 <Row label="Envío" value="Gratis" muted />
-                <div className="flex items-baseline justify-between border-t border-ink/10 pt-3">
+                <div className="flex items-baseline justify-between border-t border-paper/10 pt-3">
                   <dt className="font-semibold">Total</dt>
                   <dd className="text-2xl font-semibold tracking-tight">{currency.format(total)}</dd>
                 </div>
@@ -163,14 +168,14 @@ export function Configurator() {
 
               <div className="mt-5 space-y-2">
                 {!lens ? (
-                  <p className="rounded-2xl border border-dashed border-ink/20 p-4 text-center text-sm text-ink-muted">Elige tu tipo de mica en el paso 2 para continuar.</p>
+                  <p className="rounded-2xl border border-dashed border-paper/20 p-4 text-center text-sm text-paper/55">Elige tu tipo de mica en el paso 2 para continuar.</p>
                 ) : lens.needsRx ? (
                   <>
                     <a
                       href={whatsappLink(`${baseMessage} Les envío la foto de mi receta.`)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="btn-primary h-14 w-full text-base"
+                      className="btn-sun h-14 w-full text-base"
                     >
                       <FileText className="h-4 w-4" /> Enviar mi receta por WhatsApp
                     </a>
@@ -178,18 +183,18 @@ export function Configurator() {
                       href={whatsappLink(`${baseMessage} No tengo receta reciente, ¿me ayudan con mi examen de la vista?`)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="btn-ghost h-12 w-full text-sm"
+                      className="btn-outline h-12 w-full text-sm"
                     >
                       No tengo receta: hablar con un asesor
                     </a>
                   </>
                 ) : (
-                  <a href={whatsappLink(`${baseMessage} ¿Me ayudan a confirmar mi pedido?`)} target="_blank" rel="noopener noreferrer" className="btn-primary h-14 w-full text-base">
+                  <a href={whatsappLink(`${baseMessage} ¿Me ayudan a confirmar mi pedido?`)} target="_blank" rel="noopener noreferrer" className="btn-sun h-14 w-full text-base">
                     <MessageCircle className="h-4 w-4" /> Confirmar pedido por WhatsApp
                   </a>
                 )}
               </div>
-              <p className="mt-3 text-center text-xs text-ink-muted">Un asesor confirma medidas, forma de pago y fecha de entrega.</p>
+              <p className="mt-3 text-center text-xs text-paper/55">Un asesor confirma medidas, forma de pago y fecha de entrega.</p>
             </Step>
           </div>
         </div>
@@ -200,12 +205,12 @@ export function Configurator() {
 
 function Step({ number, title, done, highlight, children }: { number: number; title: string; done: boolean; highlight?: boolean; children: React.ReactNode }) {
   return (
-    <div className={clsx("rounded-[1.75rem] p-5 sm:p-7", highlight ? "bg-white shadow-lift" : "bg-bone")}>
+    <div className={clsx("rounded-[1.75rem] p-5 sm:p-7", highlight ? "bg-night-2 shadow-lift" : "bg-night")}>
       <div className="mb-5 flex items-center gap-3">
         <span
           className={clsx(
             "flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold transition-colors",
-            done ? "bg-ink text-bone" : "bg-bone-deep text-ink",
+            done ? "bg-paper text-night" : "bg-night-3 text-paper",
           )}
         >
           {done ? <Check className="h-4 w-4" strokeWidth={2.5} /> : number}
@@ -219,7 +224,7 @@ function Step({ number, title, done, highlight, children }: { number: number; ti
 
 function Row({ label, value, muted }: { label: string; value: string; muted?: boolean }) {
   return (
-    <div className={clsx("flex items-baseline justify-between gap-4", muted && "text-ink-muted")}>
+    <div className={clsx("flex items-baseline justify-between gap-4", muted && "text-paper/55")}>
       <dt>{label}</dt>
       <dd className="shrink-0 font-medium">{value}</dd>
     </div>

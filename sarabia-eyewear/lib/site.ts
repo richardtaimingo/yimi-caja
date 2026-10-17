@@ -39,6 +39,11 @@ export function orderMessage({ model, color, lens, extra }: { model: string; col
   return `Hola Sarabia Eyewear, me interesa el armazón ${model} en color ${color}${lensPart}.${extra ? ` ${extra}` : ""}`;
 }
 
+/** Mensaje del probador virtual. */
+export function tryOnMessage(model: string, color: string) {
+  return `Hola, me acabo de probar los ${model} en color ${color} en su probador virtual y me encantaron. Quiero pedirlos.`;
+}
+
 export const currency = new Intl.NumberFormat("es-MX", {
   style: "currency",
   currency: "MXN",

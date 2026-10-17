@@ -11,10 +11,10 @@ export function FAQ() {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <section className="bg-bone-warm py-20 md:py-28">
+    <section className="bg-night-2 py-20 md:py-28">
       <div className="container grid gap-12 lg:grid-cols-[1fr_1.4fr]">
         <SectionHeading eyebrow="Preguntas frecuentes" title="Sin letras chiquitas." description="¿Te quedó alguna duda? Escríbenos por WhatsApp y te contestamos en minutos." />
-        <div className="divide-y divide-ink/10 border-y border-ink/10">
+        <div className="divide-y divide-paper/10 border-y border-paper/10">
           {faqs.map((f, i) => {
             const isOpen = open === i;
             return (
@@ -27,7 +27,7 @@ export function FAQ() {
                     className="flex w-full items-center justify-between gap-6 py-6 text-left text-lg font-semibold tracking-tight"
                   >
                     {f.q}
-                    <motion.span animate={{ rotate: isOpen ? 45 : 0 }} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-ink/15">
+                    <motion.span animate={{ rotate: isOpen ? 45 : 0 }} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-paper/15">
                       <Plus className="h-4 w-4" />
                     </motion.span>
                   </button>
@@ -41,7 +41,7 @@ export function FAQ() {
                       transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
                       className="overflow-hidden"
                     >
-                      <p className="max-w-2xl pb-6 leading-relaxed text-ink-muted">{f.a}</p>
+                      <p className="max-w-2xl pb-6 leading-relaxed text-paper/55">{f.a}</p>
                     </motion.div>
                   )}
                 </AnimatePresence>

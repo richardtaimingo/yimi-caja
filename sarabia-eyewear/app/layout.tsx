@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
+import { Playfair_Display } from "next/font/google";
 import { MotionConfig } from "framer-motion";
 import { ShopProvider } from "@/components/ShopProvider";
 import { site } from "@/lib/site";
@@ -23,14 +24,17 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#F9F9F8",
+  themeColor: "#120D10",
   width: "device-width",
   initialScale: 1,
 };
 
+// Serif de titulares (se descarga en build y se sirve desde el propio dominio).
+const display = Playfair_Display({ subsets: ["latin"], variable: "--font-display", display: "swap" });
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es-MX" className={`${GeistSans.variable} ${GeistMono.variable}`}>
+    <html lang="es-MX" className={`${GeistSans.variable} ${GeistMono.variable} ${display.variable}`}>
       <body>
         <MotionConfig reducedMotion="user">
           <ShopProvider>{children}</ShopProvider>

@@ -1,41 +1,37 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, Glasses, MessageCircle, MonitorSmartphone, Sun } from "lucide-react";
+import { ArrowLeft, ArrowRight, Glasses, MonitorSmartphone, ScanFace, Sun } from "lucide-react";
 import clsx from "clsx";
-import { FrameIllustration } from "./FrameIllustration";
+import { ProductImage } from "./ProductImage";
 import { useShop, type Intent } from "./ShopProvider";
-import { products, type Product } from "@/lib/products";
+import { materialLabels, products, type Product } from "@/lib/products";
+import { media } from "@/lib/media";
 import { currency, whatsappLink } from "@/lib/site";
 
 type QuickIntent = Exclude<Intent, "todos">;
 
-const intents: Record<QuickIntent, { label: string; icon: typeof Glasses; word: string; copy: string; bg: string; ids: string[]; message: string }> = {
+const intents: Record<QuickIntent, { label: string; icon: typeof Glasses; copy: string; ids: string[]; message: string }> = {
   ver: {
     label: "Para Ver",
     icon: Glasses,
-    word: "con claridad.",
     copy: "Armazones oftálmicos de autor con micas monofocales, antirreflejante y UV. Tu graduación, nuestro diseño.",
-    bg: "#E6E2D9",
     ids: ["valeria", "roma", "ines", "mateo"],
     message: "Hola Sarabia Eyewear, busco lentes graduados. ¿Me ayudan a elegir armazón?",
   },
   sol: {
     label: "De Sol",
     icon: Sun,
-    word: "sin filtros.",
-    copy: "Lentes de sol con protección UV400 y polarizado. Siluetas audaces para ciudad, carretera y playa.",
-    bg: "#DCE1D5",
+    copy: "Protección UV400 y polarizado en siluetas audaces para ciudad, carretera y playa.",
     ids: ["costa", "tulum", "lumen", "brava"],
     message: "Hola Sarabia Eyewear, me interesan sus lentes de sol. ¿Qué modelos me recomiendan?",
   },
   blue: {
     label: "Blue Block",
     icon: MonitorSmartphone,
-    word: "sin cansancio.",
-    copy: "Micas neutras con filtro de luz azul para jornadas largas frente a pantallas. Sin graduación, sin pretextos.",
-    bg: "#DFE3EA",
+    copy: "Micas neutras con filtro de luz azul para jornadas largas frente a pantallas.",
     ids: ["roma", "valeria", "mateo", "ines"],
     message: "Hola Sarabia Eyewear, quiero unos lentes con micas neutras Blue Block.",
   },
@@ -44,23 +40,23 @@ const intents: Record<QuickIntent, { label: string; icon: typeof Glasses; word: 
 const order: QuickIntent[] = ["ver", "sol", "blue"];
 
 export function Hero() {
-  const { setIntent } = useShop();
+  const { setIntent, openTryOn } = useShop();
   const [active, setActive] = useState<QuickIntent>("ver");
-  const [featured, setFeatured] = useState(0);
+  const [index, setIndex] = useState(0);
 
   const config = intents[active];
   const list = useMemo(() => config.ids.map((id) => products.find((p) => p.id === id)!) as Product[], [config]);
-  const current = list[featured % list.length];
-  const color = current.colors[Math.floor(featured / list.length) % current.colors.length];
+  const current = list[index % list.length];
+  const color = current.colors.find((c) => c.photo) ?? current.colors[0];
 
   useEffect(() => {
-    const t = setInterval(() => setFeatured((n) => n + 1), 4200);
-    return () => clearInterval(t);
-  }, [active, featured]);
+    const t = setTimeout(() => setIndex((n) => n + 1), 5200);
+    return () => clearTimeout(t);
+  }, [active, index]);
 
   const choose = (key: QuickIntent) => {
     setActive(key);
-    setFeatured(0);
+    setIndex(0);
   };
 
   const goToCatalog = () => {
@@ -68,180 +64,151 @@ export function Hero() {
     document.getElementById("catalogo")?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const step = (delta: number) => setIndex((n) => (n + delta + list.length) % list.length);
+
+  const cutout = (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={`${current.id}-${color.id}`}
+        initial={{ opacity: 0, x: 80, rotate: 4 }}
+        animate={{ opacity: 1, x: 0, rotate: -7 }}
+        exit={{ opacity: 0, x: -60, rotate: -14 }}
+        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <motion.div animate={{ y: [0, -12, 0] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}>
+          <ProductImage
+            product={current}
+            color={color}
+            priority
+            sizes="(min-width: 768px) 46vw, 90vw"
+            className="h-auto w-full drop-shadow-[0_40px_40px_rgba(0,0,0,0.55)]"
+          />
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+
   return (
-    <section id="top" className="relative overflow-hidden">
-      <div className="container grid items-center gap-10 pb-14 pt-8 md:pt-14 lg:grid-cols-12 lg:gap-8 lg:pb-20">
-        <div className="lg:col-span-6">
-          <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="eyebrow">
-            Diseño de autor · Hecho para México
-          </motion.p>
+    <section id="top" className="relative pb-14 pt-3 md:pb-20 md:pt-6">
+      <div className="container">
+        <div className="relative overflow-hidden rounded-[2rem] bg-black md:grid md:min-h-[620px] md:grid-cols-[1.7fr_1fr]">
+          {/* Panel oscuro con fotografía y wordmark */}
+          <div className="relative flex min-h-[520px] flex-col justify-between overflow-hidden p-6 sm:p-10">
+            {media.hero ? (
+              <Image src={media.hero.src} alt={media.hero.alt} fill priority sizes="(min-width: 768px) 62vw, 100vw" className="object-cover opacity-75" />
+            ) : (
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_20%,#3a2a30,transparent_60%)]" />
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-black/20" />
 
-          <motion.h1
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            className="mt-5 text-[3.1rem] font-semibold leading-[0.92] tracking-tightest sm:text-7xl xl:text-[5.6rem]"
-          >
-            Mira el mundo
-            <br />
-            <span className="relative inline-block h-[1.02em] overflow-hidden align-bottom">
-              <AnimatePresence mode="wait">
-                <motion.span
-                  key={config.word}
-                  initial={{ y: "100%" }}
-                  animate={{ y: 0 }}
-                  exit={{ y: "-100%" }}
-                  transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                  className="block whitespace-nowrap text-ink-muted"
-                >
-                  {config.word}
-                </motion.span>
-              </AnimatePresence>
-            </span>
-          </motion.h1>
+            <div className="relative flex items-center justify-between gap-4">
+              <p className="eyebrow text-paper/70">Colección Otoño · 2026</p>
+              <p className="hidden text-xs text-paper/50 sm:block">Diseñada en México</p>
+            </div>
 
-          {/* Selector rápido */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 }}
-            className="mt-8 inline-flex w-full max-w-md rounded-full bg-bone-warm p-1 sm:w-auto"
-            role="tablist"
-            aria-label="¿Qué estás buscando?"
-          >
-            {order.map((key) => {
-              const Icon = intents[key].icon;
-              const selected = key === active;
-              return (
-                <button
-                  key={key}
-                  role="tab"
-                  aria-selected={selected}
-                  onClick={() => choose(key)}
-                  className={clsx(
-                    "relative flex flex-1 items-center justify-center gap-2 rounded-full px-3 py-3 text-sm font-semibold transition-colors sm:flex-none sm:px-5",
-                    selected ? "text-bone" : "text-ink-soft hover:text-ink",
-                  )}
-                >
-                  {selected && <motion.span layoutId="hero-intent" className="absolute inset-0 rounded-full bg-ink" transition={{ type: "spring", bounce: 0.2, duration: 0.5 }} />}
-                  <Icon className="relative h-4 w-4" />
-                  <span className="relative whitespace-nowrap">{intents[key].label}</span>
-                </button>
-              );
-            })}
-          </motion.div>
-
-          <AnimatePresence mode="wait">
-            <motion.p
-              key={active}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.3 }}
-              className="mt-6 min-h-[5.25rem] max-w-md text-lg leading-relaxed text-ink-soft sm:min-h-[3.5rem]"
-            >
-              {config.copy}
-            </motion.p>
-          </AnimatePresence>
-
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-            <button type="button" onClick={goToCatalog} className="btn-primary h-14 px-8 text-base">
-              Ver modelos <ArrowRight className="h-4 w-4" />
-            </button>
-            <a href={whatsappLink(config.message)} target="_blank" rel="noopener noreferrer" className="btn-ghost h-14 px-7 text-base">
-              <MessageCircle className="h-4 w-4" /> Asesoría por WhatsApp
-            </a>
+            <div className="relative">
+              <h1 className="display text-[clamp(4.6rem,12.5vw,11.5rem)] lowercase text-paper">
+                sarabia
+                <span className="sr-only"> Eyewear: armazones oftálmicos y de sol de autor</span>
+              </h1>
+              <div className="mt-5 grid max-w-md gap-5">
+                <p className="font-display text-xl italic text-paper sm:text-2xl">Mira el mundo con claridad.</p>
+                <AnimatePresence mode="wait">
+                  <motion.p
+                    key={active}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.3 }}
+                    className="min-h-[3rem] text-sm leading-relaxed text-paper/70"
+                  >
+                    {config.copy}
+                  </motion.p>
+                </AnimatePresence>
+                <div className="flex flex-wrap items-center gap-3">
+                  <button type="button" onClick={goToCatalog} className="btn-sun h-12 px-7 text-sm">
+                    Ver modelos <ArrowRight className="h-4 w-4" />
+                  </button>
+                  <a
+                    href={whatsappLink(config.message)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="link-underline text-sm font-semibold text-paper"
+                  >
+                    Asesoría por WhatsApp
+                  </a>
+                </div>
+              </div>
+              <p className="mt-8 text-xs text-paper/45">
+                Desde {currency.format(Math.min(...products.map((p) => p.price)))} · Envíos rápidos · Garantía de ajuste
+              </p>
+            </div>
           </div>
 
-          <p className="mt-6 text-sm text-ink-muted">
-            Desde <strong className="font-semibold text-ink">{currency.format(Math.min(...products.map((p) => p.price)))}</strong> · Envíos rápidos · Garantía de ajuste
-          </p>
-        </div>
-
-        {/* Preview flotante */}
-        <div className="relative lg:col-span-6">
-          <motion.div
-            className="relative aspect-[4/4.2] overflow-hidden rounded-[2rem] sm:aspect-[4/3.5]"
-            animate={{ backgroundColor: config.bg }}
-            transition={{ duration: 0.8 }}
-          >
-            <AnimatePresence mode="wait">
-              <motion.span
-                key={current.id}
-                initial={{ opacity: 0, x: 40 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -40 }}
-                transition={{ duration: 0.6 }}
-                className="pointer-events-none absolute -left-3 top-4 select-none text-[7rem] font-semibold leading-none tracking-tightest text-white/50 sm:text-[10rem]"
-              >
-                {current.name}
-              </motion.span>
-            </AnimatePresence>
-
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={`${active}-${current.id}-${color.id}`}
-                initial={{ opacity: 0, x: 60, rotate: -6 }}
-                animate={{ opacity: 1, x: 0, rotate: 0 }}
-                exit={{ opacity: 0, x: -60, rotate: 6 }}
-                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                className="absolute inset-0 flex items-center justify-center px-8 pb-28 pt-10"
-              >
-                <motion.div
-                  animate={{ y: [0, -10, 0] }}
-                  transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                  className="w-[86%] drop-shadow-[0_30px_30px_rgba(21,21,20,0.25)]"
-                >
-                  <FrameIllustration
-                    shape={current.shape}
-                    material={current.material}
-                    color={active === "blue" ? { ...color, lens: undefined } : color}
-                    title={`${current.name} en ${color.name}`}
-                    className="h-auto w-full"
-                  />
-                </motion.div>
-              </motion.div>
-            </AnimatePresence>
-
-            {active === "blue" && (
-              <span className="absolute right-5 top-5 inline-flex items-center gap-1.5 rounded-full bg-[#2F5C8A] px-3 py-1.5 text-xs font-semibold text-white">
-                <MonitorSmartphone className="h-3.5 w-3.5" /> Filtro de luz azul
-              </span>
-            )}
-
-            {/* Mini tarjetas flotantes para cambiar de modelo */}
-            <div className="absolute inset-x-3 bottom-3 grid grid-cols-4 gap-2 sm:inset-x-5 sm:bottom-5">
-              {list.map((p, k) => {
-                const selected = p.id === current.id;
+          {/* Bloque amarillo */}
+          <div className="relative flex min-h-[340px] flex-col justify-between bg-sun p-6 text-night sm:p-8">
+            <div className="inline-flex self-start rounded-full bg-night/10 p-1" role="tablist" aria-label="¿Qué estás buscando?">
+              {order.map((key) => {
+                const Icon = intents[key].icon;
+                const selected = key === active;
                 return (
-                  <motion.button
-                    key={`${active}-${p.id}`}
-                    type="button"
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.06 * k }}
-                    whileHover={{ y: -4 }}
-                    onClick={() => setFeatured(k)}
-                    aria-label={`Ver ${p.name}`}
-                    aria-pressed={selected}
+                  <button
+                    key={key}
+                    role="tab"
+                    aria-selected={selected}
+                    onClick={() => choose(key)}
                     className={clsx(
-                      "flex min-w-0 flex-col rounded-2xl p-2 text-left backdrop-blur transition-colors sm:p-2.5",
-                      selected ? "bg-white shadow-card" : "bg-white/55 hover:bg-white/80",
+                      "relative flex items-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold transition-colors sm:text-sm",
+                      selected ? "text-sun" : "text-night/70 hover:text-night",
                     )}
                   >
-                    <FrameIllustration
-                      shape={p.shape}
-                      material={p.material}
-                      color={active === "blue" ? { ...p.colors[0], lens: undefined } : p.colors[0]}
-                      className="h-7 w-full sm:h-9"
-                    />
-                    <span className="mt-1.5 truncate text-[0.7rem] font-semibold sm:text-xs">{p.name}</span>
-                    <span className="hidden text-[0.7rem] text-ink-muted sm:block">{currency.format(p.price)}</span>
-                  </motion.button>
+                    {selected && <motion.span layoutId="hero-intent" className="absolute inset-0 rounded-full bg-night" transition={{ type: "spring", bounce: 0.2, duration: 0.5 }} />}
+                    <Icon className="relative h-3.5 w-3.5" />
+                    <span className="relative whitespace-nowrap">{intents[key].label}</span>
+                  </button>
                 );
               })}
             </div>
-          </motion.div>
+
+            {/* En móvil el armazón cruza el borde entre el panel oscuro y el amarillo */}
+            <div className="pointer-events-none relative -mt-28 mb-2 w-[92%] self-center md:hidden">{cutout}</div>
+
+            <div className="mt-auto flex items-end justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold tabular-nums text-night/60">
+                  {String((index % list.length) + 1).padStart(2, "0")} / {String(list.length).padStart(2, "0")}
+                </p>
+                <AnimatePresence mode="wait">
+                  <motion.div key={current.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}>
+                    <p className="display mt-1 text-5xl">{current.name}</p>
+                    <p className="mt-2 text-sm font-medium text-night/70">
+                      {materialLabels[current.material].badge} · {currency.format(current.price)}
+                    </p>
+                  </motion.div>
+                </AnimatePresence>
+                <div className="mt-4 flex gap-2">
+                  <button type="button" onClick={() => step(-1)} aria-label="Modelo anterior" className="flex h-10 w-10 items-center justify-center rounded-full border border-night/25 transition hover:bg-night hover:text-sun">
+                    <ArrowLeft className="h-4 w-4" />
+                  </button>
+                  <button type="button" onClick={() => step(1)} aria-label="Modelo siguiente" className="flex h-10 w-10 items-center justify-center rounded-full border border-night/25 transition hover:bg-night hover:text-sun">
+                    <ArrowRight className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => openTryOn(current.id, color.id)}
+                className="flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-2xl bg-paper/75 text-night shadow-card backdrop-blur transition hover:bg-paper"
+                aria-label={`Pruébatelos en vivo: ${current.name}`}
+                title="Pruébatelos en vivo"
+              >
+                <ScanFace className="h-6 w-6" />
+              </button>
+            </div>
+          </div>
+
+          {/* En escritorio el armazón cruza la unión de ambos paneles */}
+          <div className="pointer-events-none absolute left-[63%] top-[46%] hidden w-[44%] -translate-x-1/2 -translate-y-1/2 md:block">{cutout}</div>
         </div>
       </div>
 
@@ -262,12 +229,12 @@ function Marquee() {
     "Micas certificadas",
   ];
   return (
-    <div className="overflow-hidden border-y border-ink/10 bg-bone-warm py-4" aria-hidden>
+    <div className="mt-10 overflow-hidden border-y border-paper/10 py-4" aria-hidden>
       <div className="flex w-max animate-marquee gap-10 whitespace-nowrap">
         {[...items, ...items].map((t, k) => (
-          <span key={k} className="flex items-center gap-10 text-sm font-medium uppercase tracking-[0.18em] text-ink-soft">
+          <span key={k} className="flex items-center gap-10 font-display text-xl italic text-paper/70">
             {t}
-            <span className="h-1.5 w-1.5 rounded-full bg-sand" />
+            <span className="h-1.5 w-1.5 rounded-full bg-sun" />
           </span>
         ))}
       </div>

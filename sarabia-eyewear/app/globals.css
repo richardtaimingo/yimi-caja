@@ -6,34 +6,39 @@
   html {
     scroll-behavior: smooth;
     -webkit-tap-highlight-color: transparent;
+    color-scheme: dark;
   }
   body {
-    @apply bg-bone font-sans text-ink antialiased;
+    @apply bg-night font-sans text-paper antialiased;
     font-feature-settings: "ss01", "cv11";
   }
   ::selection {
-    @apply bg-ink text-bone;
+    @apply bg-sun text-night;
   }
   :focus-visible {
-    @apply outline-none ring-2 ring-clay ring-offset-2 ring-offset-bone;
+    @apply outline-none ring-2 ring-sun ring-offset-2 ring-offset-night;
   }
 }
 
 @layer components {
   .eyebrow {
-    @apply text-xs font-semibold uppercase tracking-[0.24em] text-ink-muted;
+    @apply text-xs font-semibold uppercase tracking-[0.24em] text-paper/55;
   }
-  .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-full bg-ink font-semibold text-bone transition-all duration-300 hover:bg-ink-soft active:scale-[0.98];
+  /* Titulares editoriales: serif de alto contraste, muy compacta. */
+  .display {
+    @apply font-display font-black leading-[0.86] tracking-[-0.035em];
   }
-  .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 rounded-full border border-ink/15 font-semibold text-ink transition-all duration-300 hover:border-ink hover:bg-white active:scale-[0.98];
+  .btn-sun {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-sun font-semibold text-night transition-all duration-300 hover:bg-sun-soft active:scale-[0.98];
   }
-  .btn-light {
-    @apply inline-flex items-center justify-center gap-2 rounded-full bg-bone font-semibold text-ink transition-all duration-300 hover:bg-white active:scale-[0.98];
+  .btn-paper {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-paper font-semibold text-night transition-all duration-300 hover:bg-white active:scale-[0.98];
+  }
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-paper/25 font-semibold text-paper transition-all duration-300 hover:border-paper hover:bg-paper/[0.06] active:scale-[0.98];
   }
   .field {
-    @apply mt-2 block w-full rounded-2xl border border-white/15 bg-white/[0.04] px-4 py-3.5 text-bone placeholder:text-bone/35 transition focus:border-bone/60 focus:outline-none focus:ring-0;
+    @apply mt-2 block w-full rounded-2xl border border-paper/15 bg-paper/[0.04] px-4 py-3.5 text-paper placeholder:text-paper/35 transition focus:border-sun/70 focus:outline-none focus:ring-0;
   }
   .link-underline {
     @apply relative after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-full after:origin-right after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:origin-left hover:after:scale-x-100;

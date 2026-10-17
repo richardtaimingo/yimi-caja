@@ -29,18 +29,21 @@ type Props = {
   material: Material;
   color: Colorway;
   view?: "front" | "angle";
+  /** "tryon": micas más translúcidas para dibujarse sobre un rostro en el probador virtual. */
+  variant?: "default" | "tryon";
   className?: string;
   title?: string;
 } & Omit<SVGProps<SVGSVGElement>, "color" | "viewBox">;
 
-export function FrameIllustration({ shape, material, color, view = "front", className, title, ...rest }: Props) {
+export function FrameIllustration({ shape, material, color, view = "front", variant = "default", className, title, ...rest }: Props) {
   const uid = useId().replace(/:/g, "");
   const isSun = Boolean(color.lens);
+  const isTryOn = variant === "tryon";
   const patternFill = color.pattern === "tortoise" ? `url(#tort-${uid})` : color.frame;
   // En mixtos el aro es metálico y la ceja de acetato.
   const rimColor = material === "mixto" ? color.metal ?? "#B8975A" : patternFill;
   const stroke = strokeByMaterial[material];
-  const lensFill = isSun ? `url(#tint-${uid})` : "rgba(214,226,232,0.28)";
+  const lensFill = isSun ? `url(#tint-${uid})` : isTryOn ? "rgba(214,226,232,0.1)" : "rgba(214,226,232,0.28)";
   const lens = lensPaths[shape];
   const isAngle = view === "angle";
 
@@ -54,7 +57,7 @@ export function FrameIllustration({ shape, material, color, view = "front", clas
       {[false, true].map((mirrored) => (
         <g key={String(mirrored)} transform={mirrored ? "translate(240 0) scale(-1 1)" : undefined}>
           <path d={lens} fill={lensFill} />
-          <path d={lens} fill={`url(#shine-${uid})`} opacity={isSun ? 0.5 : 0.9} />
+          <path d={lens} fill={`url(#shine-${uid})`} opacity={isTryOn ? 0.3 : isSun ? 0.5 : 0.9} />
           <path d={lens} fill="none" stroke={rimColor} strokeWidth={stroke} opacity={color.pattern === "crystal" ? 0.78 : 1} />
           {material === "mixto" && (
             // Ceja de acetato recortada a la mitad superior de la mica
@@ -87,8 +90,8 @@ export function FrameIllustration({ shape, material, color, view = "front", clas
           <ellipse cx="8" cy="22" rx="3.5" ry="2.5" fill="#e0b070" opacity="0.4" />
         </pattern>
         <linearGradient id={`tint-${uid}`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={color.lens} stopOpacity="0.95" />
-          <stop offset="100%" stopColor={color.lens} stopOpacity="0.62" />
+          <stop offset="0%" stopColor={color.lens} stopOpacity={isTryOn ? 0.86 : 0.95} />
+          <stop offset="100%" stopColor={color.lens} stopOpacity={isTryOn ? 0.55 : 0.62} />
         </linearGradient>
         <linearGradient id={`shine-${uid}`} x1="0" y1="0" x2="1" y2="1">
           <stop offset="0%" stopColor="#fff" stopOpacity="0.55" />

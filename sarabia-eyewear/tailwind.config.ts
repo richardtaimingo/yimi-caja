@@ -3,22 +3,25 @@ import type { Config } from "tailwindcss";
 const config: Config = {
   content: ["./app/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./lib/**/*.{ts,tsx}"],
   theme: {
-    container: { center: true, padding: { DEFAULT: "1.25rem", lg: "2rem" }, screens: { "2xl": "1320px" } },
+    container: { center: true, padding: { DEFAULT: "1.25rem", lg: "2rem" }, screens: { "2xl": "1360px" } },
     extend: {
       colors: {
-        ink: { DEFAULT: "#151514", soft: "#2A2927", muted: "#6B6862" },
-        bone: { DEFAULT: "#F9F9F8", warm: "#F1EFEA", deep: "#E6E2D9" },
-        sand: { DEFAULT: "#C9B79C", dark: "#9C8566" },
-        clay: "#B5694B",
+        // Fondo editorial: negro con un matiz ciruela, en tres niveles de superficie.
+        night: { DEFAULT: "#120D10", 2: "#1B1418", 3: "#261D22" },
+        // Texto y superficies claras.
+        paper: "#F6F1EA",
+        // Acento: amarillo intenso de los bloques de color.
+        sun: { DEFAULT: "#F6B40E", deep: "#DE9E00", soft: "#FFD45C" },
       },
       fontFamily: {
         sans: ["var(--font-geist-sans)", "ui-sans-serif", "system-ui", "sans-serif"],
+        display: ["var(--font-display)", "Georgia", "Times New Roman", "serif"],
         mono: ["var(--font-geist-mono)", "ui-monospace", "monospace"],
       },
       letterSpacing: { tightest: "-0.055em" },
       boxShadow: {
-        card: "0 1px 2px rgba(21,21,20,0.04), 0 8px 24px -12px rgba(21,21,20,0.12)",
-        lift: "0 24px 48px -24px rgba(21,21,20,0.28)",
+        card: "0 1px 2px rgba(0,0,0,0.3), 0 18px 40px -24px rgba(0,0,0,0.7)",
+        lift: "0 40px 80px -40px rgba(0,0,0,0.85)",
       },
       keyframes: {
         marquee: { from: { transform: "translateX(0)" }, to: { transform: "translateX(-50%)" } },

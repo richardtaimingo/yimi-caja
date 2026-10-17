@@ -47,12 +47,12 @@ export function ArtOfSeeing() {
   };
 
   return (
-    <section id="materiales" ref={ref} className="relative h-[320vh] scroll-mt-0 bg-ink text-bone" aria-label="El Arte de Ver Bien">
+    <section id="materiales" ref={ref} className="relative h-[320vh] scroll-mt-0 bg-night-2 text-paper" aria-label="El Arte de Ver Bien">
       <div className="sticky top-0 flex h-[100dvh] flex-col overflow-hidden pt-16 md:pt-[4.5rem]">
         <div className="container flex flex-1 flex-col gap-6 py-6 lg:grid lg:grid-cols-2 lg:items-center lg:gap-16 lg:py-10">
           {/* Texto */}
           <div className="order-2 lg:order-1">
-            <p className="eyebrow text-bone/50">El Arte de Ver Bien</p>
+            <p className="eyebrow text-paper/50">El Arte de Ver Bien</p>
 
             <div className="mt-4 flex gap-2" role="tablist" aria-label="Fases">
               {steps.map((s, i) => (
@@ -78,7 +78,7 @@ export function ArtOfSeeing() {
                   exit={{ opacity: 0, y: -24 }}
                   transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
                 >
-                  <p className="flex items-center gap-2 text-sm font-medium text-sand">
+                  <p className="flex items-center gap-2 text-sm font-medium text-sun">
                     {(() => {
                       const Icon = steps[step].icon;
                       return <Icon className="h-4 w-4" />;
@@ -86,10 +86,10 @@ export function ArtOfSeeing() {
                     {steps[step].kicker}
                   </p>
                   <h2 className="mt-3 text-3xl font-semibold leading-[1] tracking-tightest sm:text-5xl lg:text-6xl">{steps[step].title}</h2>
-                  <p className="mt-4 max-w-lg text-sm leading-relaxed text-bone/65 sm:text-base lg:mt-6 lg:text-lg">{steps[step].body}</p>
+                  <p className="mt-4 max-w-lg text-sm leading-relaxed text-paper/65 sm:text-base lg:mt-6 lg:text-lg">{steps[step].body}</p>
                   <ul className="mt-5 flex flex-wrap gap-2">
                     {steps[step].points.map((p) => (
-                      <li key={p} className="rounded-full bg-white/[0.08] px-3 py-1.5 text-xs font-medium text-bone/85">
+                      <li key={p} className="rounded-full bg-white/[0.08] px-3 py-1.5 text-xs font-medium text-paper/85">
                         {p}
                       </li>
                     ))}
@@ -113,7 +113,7 @@ export function ArtOfSeeing() {
 
 function PhaseBar({ progress, index }: { progress: MotionValue<number>; index: number }) {
   const scaleX = useTransform(progress, [index / 3, (index + 1) / 3], [0, 1]);
-  return <motion.span className="absolute inset-0 origin-left rounded-full bg-bone" style={{ scaleX }} />;
+  return <motion.span className="absolute inset-0 origin-left rounded-full bg-paper" style={{ scaleX }} />;
 }
 
 /** Opacidad de cada escena según su tercio del recorrido. */
@@ -182,7 +182,7 @@ function LensLayer({ spread, index, total, label, color }: { spread: MotionValue
       />
       <motion.span
         style={{ opacity: labelOpacity }}
-        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 whitespace-nowrap rounded-full bg-bone px-2.5 py-1 text-[0.65rem] font-semibold text-ink sm:text-xs"
+        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 whitespace-nowrap rounded-full bg-paper px-2.5 py-1 text-[0.65rem] font-semibold text-night sm:text-xs"
       >
         {label}
       </motion.span>
@@ -227,8 +227,8 @@ function FitScene({ progress }: { progress: MotionValue<number> }) {
 
 function SpecChip({ className, label, value }: { className?: string; label: string; value: string }) {
   return (
-    <div className={clsx("absolute rounded-2xl border border-white/10 bg-ink/70 px-3 py-2 backdrop-blur", className)}>
-      <p className="text-[0.65rem] uppercase tracking-[0.18em] text-bone/50">{label}</p>
+    <div className={clsx("absolute rounded-2xl border border-white/10 bg-black/70 px-3 py-2 backdrop-blur", className)}>
+      <p className="text-[0.65rem] uppercase tracking-[0.18em] text-paper/50">{label}</p>
       <p className="text-sm font-semibold">{value}</p>
     </div>
   );

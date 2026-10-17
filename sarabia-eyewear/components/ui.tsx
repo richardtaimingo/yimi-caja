@@ -34,10 +34,10 @@ export function SectionHeading({
 }) {
   return (
     <Reveal className={clsx("max-w-2xl", className)}>
-      <p className={clsx("eyebrow", invert && "text-bone/60")}>{eyebrow}</p>
-      <h2 className="mt-4 text-4xl font-semibold leading-[0.98] tracking-tightest sm:text-5xl lg:text-6xl">{title}</h2>
+      <p className={clsx("eyebrow", invert && "text-night/60")}>{eyebrow}</p>
+      <h2 className="display mt-4 text-5xl sm:text-6xl lg:text-7xl">{title}</h2>
       {description && (
-        <p className={clsx("mt-5 max-w-lg text-base leading-relaxed sm:text-lg", invert ? "text-bone/70" : "text-ink-muted")}>
+        <p className={clsx("mt-5 max-w-lg text-base leading-relaxed sm:text-lg", invert ? "text-night/70" : "text-paper/55")}>
           {description}
         </p>
       )}

@@ -30,7 +30,7 @@ export function Contact() {
   return (
     <section id="contacto" className="scroll-mt-20 py-20 md:py-28">
       <div className="container">
-        <div className="grid overflow-hidden rounded-[2rem] bg-ink text-bone lg:grid-cols-2">
+        <div className="grid overflow-hidden rounded-[2rem] bg-night-2 text-paper lg:grid-cols-2">
           <div className="p-8 sm:p-12 lg:p-16">
             <SectionHeading
               invert
@@ -38,19 +38,19 @@ export function Contact() {
               title={<>Habla con<br />un asesor real.</>}
               description="Optometristas y asesores de Ópticas Jennifer Sarabia. Te ayudamos a elegir, leer tu receta y confirmar tu pedido."
             />
-            <ul className="mt-10 space-y-4 text-sm text-bone/80">
-              <li className="flex items-center gap-3"><MapPin className="h-4 w-4 text-sand" /> {site.address}</li>
-              <li className="flex items-center gap-3"><Clock className="h-4 w-4 text-sand" /> {site.hours}</li>
-              <li className="flex items-center gap-3"><MessageCircle className="h-4 w-4 text-sand" /> <a href={whatsappLink("Hola Sarabia Eyewear")} target="_blank" rel="noopener noreferrer" className="link-underline">{site.whatsappDisplay}</a></li>
-              <li className="flex items-center gap-3"><Mail className="h-4 w-4 text-sand" /> <a href={`mailto:${site.email}`} className="link-underline">{site.email}</a></li>
-              <li className="flex items-center gap-3"><Instagram className="h-4 w-4 text-sand" /> <a href={site.social.instagram} target="_blank" rel="noopener noreferrer" className="link-underline">@opticasjennifersarabia</a></li>
+            <ul className="mt-10 space-y-4 text-sm text-paper/80">
+              <li className="flex items-center gap-3"><MapPin className="h-4 w-4 text-sun" /> {site.address}</li>
+              <li className="flex items-center gap-3"><Clock className="h-4 w-4 text-sun" /> {site.hours}</li>
+              <li className="flex items-center gap-3"><MessageCircle className="h-4 w-4 text-sun" /> <a href={whatsappLink("Hola Sarabia Eyewear")} target="_blank" rel="noopener noreferrer" className="link-underline">{site.whatsappDisplay}</a></li>
+              <li className="flex items-center gap-3"><Mail className="h-4 w-4 text-sun" /> <a href={`mailto:${site.email}`} className="link-underline">{site.email}</a></li>
+              <li className="flex items-center gap-3"><Instagram className="h-4 w-4 text-sun" /> <a href={site.social.instagram} target="_blank" rel="noopener noreferrer" className="link-underline">@opticasjennifersarabia</a></li>
             </ul>
           </div>
 
-          <Reveal className="bg-ink-soft p-8 sm:p-12 lg:p-16">
+          <Reveal className="bg-night-3 p-8 sm:p-12 lg:p-16">
             <form ref={formRef} onSubmit={onSubmit} className="space-y-5">
               <label className="block">
-                <span className="text-sm font-medium text-bone/70">Nombre</span>
+                <span className="text-sm font-medium text-paper/70">Nombre</span>
                 <input
                   value={name}
                   onChange={(e) => setName(e.target.value)}
@@ -61,7 +61,7 @@ export function Contact() {
                 />
               </label>
               <fieldset>
-                <legend className="text-sm font-medium text-bone/70">Motivo</legend>
+                <legend className="text-sm font-medium text-paper/70">Motivo</legend>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {reasons.map((r) => (
                     <button
@@ -69,7 +69,7 @@ export function Contact() {
                       type="button"
                       aria-pressed={reason === r}
                       onClick={() => setReason(r)}
-                      className={`rounded-full border px-4 py-2 text-sm transition ${reason === r ? "border-bone bg-bone text-ink" : "border-white/15 text-bone/80 hover:border-white/40"}`}
+                      className={`rounded-full border px-4 py-2 text-sm transition ${reason === r ? "border-paper bg-paper text-night" : "border-white/15 text-paper/80 hover:border-white/40"}`}
                     >
                       {r}
                     </button>
@@ -77,7 +77,7 @@ export function Contact() {
                 </div>
               </fieldset>
               <label className="block">
-                <span className="text-sm font-medium text-bone/70">Mensaje (opcional)</span>
+                <span className="text-sm font-medium text-paper/70">Mensaje (opcional)</span>
                 <textarea
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
@@ -92,11 +92,11 @@ export function Contact() {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={onLinkClick}
-                className="btn-light h-14 w-full text-base"
+                className="btn-paper h-14 w-full text-base"
               >
                 <MessageCircle className="h-5 w-5" /> Enviar por WhatsApp
               </a>
-              <p className="text-center text-xs text-bone/50">Respondemos en menos de 15 minutos en horario de tienda.</p>
+              <p className="text-center text-xs text-paper/50">Respondemos en menos de 15 minutos en horario de tienda.</p>
             </form>
           </Reveal>
         </div>

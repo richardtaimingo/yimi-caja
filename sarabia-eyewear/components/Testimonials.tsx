@@ -18,26 +18,26 @@ export function Testimonials() {
             <span className="text-5xl font-semibold tracking-tightest">4.9</span>
             <div>
               <div className="flex">
-                {Array.from({ length: 5 }).map((_, i) => <Star key={i} className="h-4 w-4 fill-ink" />)}
+                {Array.from({ length: 5 }).map((_, i) => <Star key={i} className="h-4 w-4 fill-paper" />)}
               </div>
-              <p className="text-sm text-ink-muted">Calificación promedio de clientes</p>
+              <p className="text-sm text-paper/55">Calificación promedio de clientes</p>
             </div>
           </Reveal>
         </div>
 
         <div className="mt-12 grid gap-5 md:grid-cols-3">
           {reviews.map((r, i) => (
-            <Reveal key={r.name} delay={i * 0.08} className="flex flex-col rounded-3xl border border-ink/10 bg-white p-7 shadow-card">
+            <Reveal key={r.name} delay={i * 0.08} className="flex flex-col rounded-3xl border border-paper/10 bg-night-2 p-7 shadow-card">
               <div className="flex">
-                {Array.from({ length: 5 }).map((_, k) => <Star key={k} className="h-4 w-4 fill-clay text-clay" />)}
+                {Array.from({ length: 5 }).map((_, k) => <Star key={k} className="h-4 w-4 fill-sun text-sun" />)}
               </div>
               <blockquote className="mt-5 flex-1 text-lg leading-snug tracking-tight">“{r.text}”</blockquote>
-              <footer className="mt-6 flex items-center justify-between border-t border-ink/10 pt-5 text-sm">
+              <footer className="mt-6 flex items-center justify-between border-t border-paper/10 pt-5 text-sm">
                 <span>
                   <span className="block font-semibold">{r.name}</span>
-                  <span className="text-ink-muted">{r.city}</span>
+                  <span className="text-paper/55">{r.city}</span>
                 </span>
-                <span className="rounded-full bg-bone-warm px-3 py-1 text-xs font-medium">{r.model}</span>
+                <span className="rounded-full bg-night-2 px-3 py-1 text-xs font-medium">{r.model}</span>
               </footer>
             </Reveal>
           ))}
