@@ -587,7 +587,7 @@ export function TryOnModal({ initialProductId, initialColorId, onClose }: Props)
                 <div className="mx-auto w-52 rounded-3xl bg-paper px-6 py-5 sm:w-60">
                   <ProductImage product={product} color={color} sizes="240px" className="h-auto w-full" />
                 </div>
-                <h2 className="mt-6 text-balance text-2xl font-semibold leading-tight tracking-tight sm:text-3xl">
+                <h2 className="display mt-6 text-balance text-3xl leading-[0.95] sm:text-4xl">
                   Activa tu cámara para probarte los {product.name} en tiempo real
                 </h2>
                 <p className="mt-3 text-sm leading-relaxed text-paper/60">
@@ -783,7 +783,7 @@ export function TryOnModal({ initialProductId, initialColorId, onClose }: Props)
               href={whatsappLink(tryOnMessage(product.name, color.name))}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex h-14 items-center justify-center gap-2 rounded-full bg-[#25D366] px-5 text-base font-semibold text-night transition hover:brightness-95"
+              className="inline-flex h-14 items-center justify-center gap-2 whitespace-nowrap rounded-full bg-[#25D366] px-4 text-[0.92rem] font-semibold text-night transition hover:brightness-95"
             >
               <MessageCircle className="h-5 w-5" /> Comprar este modelo por WhatsApp
             </a>
