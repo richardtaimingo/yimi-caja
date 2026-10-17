@@ -18,7 +18,7 @@ export function Footer() {
   ];
 
   return (
-    <footer className="border-t border-paper/10 pb-28 pt-16 md:pb-12">
+    <footer className="overflow-hidden border-t border-paper/10 pb-28 pt-16 md:pb-12">
       <div className="container">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1fr]">
           <div>
@@ -75,8 +75,8 @@ export function Footer() {
           </div>
         </div>
 
-        <p className="mt-16 select-none text-[18vw] font-semibold leading-[0.8] tracking-tightest text-paper/[0.05] md:text-[12rem]" aria-hidden>
-          SARABIA
+        <p className="display mt-16 select-none whitespace-nowrap text-[21vw] lowercase text-paper/[0.06] 2xl:text-[18rem]" aria-hidden>
+          sarabia
         </p>
         <div className="mt-6 flex flex-col justify-between gap-2 border-t border-paper/10 pt-6 text-xs text-paper/55 sm:flex-row">
           <p>© {new Date().getFullYear()} {site.name} · {site.endorsement}. Todos los derechos reservados.</p>

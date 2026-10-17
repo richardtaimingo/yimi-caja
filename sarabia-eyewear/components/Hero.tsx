@@ -18,21 +18,21 @@ const intents: Record<QuickIntent, { label: string; icon: typeof Glasses; copy: 
     label: "Para Ver",
     icon: Glasses,
     copy: "Armazones oftálmicos de autor con micas monofocales, antirreflejante y UV. Tu graduación, nuestro diseño.",
-    ids: ["valeria", "roma", "ines", "mateo"],
+    ids: ["mateo", "valeria"],
     message: "Hola Sarabia Eyewear, busco lentes graduados. ¿Me ayudan a elegir armazón?",
   },
   sol: {
     label: "De Sol",
     icon: Sun,
     copy: "Protección UV400 y polarizado en siluetas audaces para ciudad, carretera y playa.",
-    ids: ["costa", "tulum", "lumen", "brava"],
+    ids: ["costa", "roma", "olivia", "gata"],
     message: "Hola Sarabia Eyewear, me interesan sus lentes de sol. ¿Qué modelos me recomiendan?",
   },
   blue: {
     label: "Blue Block",
     icon: MonitorSmartphone,
     copy: "Micas neutras con filtro de luz azul para jornadas largas frente a pantallas.",
-    ids: ["roma", "valeria", "mateo", "ines"],
+    ids: ["valeria", "mateo"],
     message: "Hola Sarabia Eyewear, quiero unos lentes con micas neutras Blue Block.",
   },
 };
@@ -89,11 +89,11 @@ export function Hero() {
   );
 
   return (
-    <section id="top" className="relative pb-14 pt-3 md:pb-20 md:pt-6">
+    <section id="top" className="relative pb-14 pt-3 md:pb-20 md:pt-6 lg:pt-6">
       <div className="container">
-        <div className="relative overflow-hidden rounded-[2rem] bg-black md:grid md:min-h-[620px] md:grid-cols-[1.7fr_1fr]">
-          {/* Panel oscuro con fotografía y wordmark */}
-          <div className="relative flex min-h-[520px] flex-col justify-between overflow-hidden p-6 sm:p-10">
+        <div className="relative overflow-hidden rounded-[1.5rem] bg-black sm:rounded-[2rem] lg:grid lg:min-h-[620px] lg:grid-cols-[1.7fr_1fr]">
+          {/* Panel oscuro con fotografía y wordmark (abajo deja aire para el armazón que cruza en móvil/tablet) */}
+          <div className="relative flex min-h-[480px] flex-col justify-between overflow-hidden p-5 pb-24 sm:min-h-[540px] sm:p-10 sm:pb-36 lg:pb-10">
             {media.hero ? (
               <Image src={media.hero.src} alt={media.hero.alt} fill priority sizes="(min-width: 768px) 62vw, 100vw" className="object-cover opacity-75" />
             ) : (
@@ -146,8 +146,8 @@ export function Hero() {
           </div>
 
           {/* Bloque amarillo */}
-          <div className="relative flex min-h-[340px] flex-col justify-between bg-sun p-6 text-night sm:p-8">
-            <div className="inline-flex self-start rounded-full bg-night/10 p-1" role="tablist" aria-label="¿Qué estás buscando?">
+          <div className="relative flex min-h-[340px] flex-col justify-between gap-6 bg-sun p-5 text-night sm:p-8">
+            <div className="inline-flex max-w-full self-start rounded-full bg-night/10 p-1" role="tablist" aria-label="¿Qué estás buscando?">
               {order.map((key) => {
                 const Icon = intents[key].icon;
                 const selected = key === active;
@@ -158,7 +158,7 @@ export function Hero() {
                     aria-selected={selected}
                     onClick={() => choose(key)}
                     className={clsx(
-                      "relative flex items-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold transition-colors sm:text-sm",
+                      "relative flex items-center gap-1.5 rounded-full px-2.5 py-2 text-xs font-semibold transition-colors min-[380px]:px-3 sm:text-sm",
                       selected ? "text-sun" : "text-night/70 hover:text-night",
                     )}
                   >
@@ -171,7 +171,7 @@ export function Hero() {
             </div>
 
             {/* En móvil el armazón cruza el borde entre el panel oscuro y el amarillo */}
-            <div className="pointer-events-none relative -mt-28 mb-2 w-[92%] self-center md:hidden">{cutout}</div>
+            <div className="pointer-events-none relative order-first -mt-24 w-[90%] max-w-[460px] self-center sm:-mt-36 lg:hidden">{cutout}</div>
 
             <div className="mt-auto flex items-end justify-between gap-4">
               <div>
@@ -186,19 +186,27 @@ export function Hero() {
                     </p>
                   </motion.div>
                 </AnimatePresence>
-                <div className="mt-4 flex gap-2">
+                <div className="mt-4 flex flex-wrap items-center gap-2">
                   <button type="button" onClick={() => step(-1)} aria-label="Modelo anterior" className="flex h-10 w-10 items-center justify-center rounded-full border border-night/25 transition hover:bg-night hover:text-sun">
                     <ArrowLeft className="h-4 w-4" />
                   </button>
                   <button type="button" onClick={() => step(1)} aria-label="Modelo siguiente" className="flex h-10 w-10 items-center justify-center rounded-full border border-night/25 transition hover:bg-night hover:text-sun">
                     <ArrowRight className="h-4 w-4" />
                   </button>
+                  {/* En móvil y tablet va junto a las flechas para no chocar con el botón flotante de WhatsApp */}
+                  <button
+                    type="button"
+                    onClick={() => openTryOn(current.id, color.id)}
+                    className="ml-1 inline-flex h-10 items-center gap-2 rounded-full bg-night px-4 text-sm font-semibold text-sun transition hover:bg-night/85 lg:hidden"
+                  >
+                    <ScanFace className="h-4 w-4" /> Pruébatelos
+                  </button>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => openTryOn(current.id, color.id)}
-                className="flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-2xl bg-paper/75 text-night shadow-card backdrop-blur transition hover:bg-paper"
+                className="hidden h-14 w-14 shrink-0 flex-col items-center justify-center rounded-2xl bg-paper/75 text-night shadow-card backdrop-blur transition hover:bg-paper lg:flex"
                 aria-label={`Pruébatelos en vivo: ${current.name}`}
                 title="Pruébatelos en vivo"
               >
@@ -208,7 +216,7 @@ export function Hero() {
           </div>
 
           {/* En escritorio el armazón cruza la unión de ambos paneles */}
-          <div className="pointer-events-none absolute left-[63%] top-[46%] hidden w-[44%] -translate-x-1/2 -translate-y-1/2 md:block">{cutout}</div>
+          <div className="pointer-events-none absolute left-[63%] top-[46%] hidden w-[44%] -translate-x-1/2 -translate-y-1/2 lg:block">{cutout}</div>
         </div>
       </div>
 

@@ -24,23 +24,17 @@ export function SectionHeading({
   title,
   description,
   className,
-  invert,
 }: {
   eyebrow: string;
   title: ReactNode;
   description?: ReactNode;
   className?: string;
-  invert?: boolean;
 }) {
   return (
     <Reveal className={clsx("max-w-2xl", className)}>
-      <p className={clsx("eyebrow", invert && "text-night/60")}>{eyebrow}</p>
-      <h2 className="display mt-4 text-5xl sm:text-6xl lg:text-7xl">{title}</h2>
-      {description && (
-        <p className={clsx("mt-5 max-w-lg text-base leading-relaxed sm:text-lg", invert ? "text-night/70" : "text-paper/55")}>
-          {description}
-        </p>
-      )}
+      <p className="eyebrow">{eyebrow}</p>
+      <h2 className="display mt-4 text-[2.75rem] sm:text-6xl lg:text-7xl">{title}</h2>
+      {description && <p className="mt-5 max-w-lg text-base leading-relaxed text-paper/60 sm:text-lg">{description}</p>}
     </Reveal>
   );
 }

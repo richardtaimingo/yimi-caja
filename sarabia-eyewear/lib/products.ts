@@ -1,3 +1,5 @@
+import { framePhotos } from "./framePhotos";
+
 export type FrameShape = "round" | "square" | "cateye" | "aviator";
 export type Material = "acetato" | "titanio" | "mixto";
 export type Category = "oftalmico" | "sol";
@@ -5,27 +7,33 @@ export type Category = "oftalmico" | "sol";
 export type Colorway = {
   id: string;
   name: string;
-  /** Color principal del armazón (o color base si lleva patrón). */
+  /** Color principal del armazón (para el swatch). */
   frame: string;
-  /** Color del metal en armazones mixtos (browline). */
+  /** Color del metal en armazones mixtos o metálicos. */
   metal?: string;
-  /** Patrón opcional para acetatos. */
+  /** Patrón del acetato. */
   pattern?: "tortoise" | "crystal";
-  /** Tinte de la mica (sólo armazones de sol). */
+  /** Tinte de la mica (lentes de sol). */
   lens?: string;
   /** Fotografía real del armazón en este color. */
   photo?: ProductPhoto;
 };
 
 export type ProductPhoto = {
-  /** Recorte PNG/WebP con fondo transparente, vista frontal (catálogo, hero y probador virtual). */
+  /** Recorte WebP con fondo transparente, vista frontal (catálogo, hero y probador virtual). */
   front: string;
   /** Vista en ángulo 3/4 (opcional). */
   angle?: string;
+  /** Versión para el probador sin las varillas que se ven a través de micas claras. */
+  tryOn?: string;
+  /** Máscara de las micas (sólo micas claras): se usa en el scrollytelling. */
+  lensMask?: string;
   width: number;
   height: number;
   /** Centros de las micas en la foto frontal (0–1), para alinear el probador virtual. */
   lensCenters: [[number, number], [number, number]];
+  /** Cajas de las micas [x0, y0, x1, y1] (0–1), cuando son claras. */
+  lensBoxes?: [number, number, number, number][];
   credit?: { author: string; url: string };
 };
 
@@ -65,152 +73,186 @@ export const materialLabels: Record<Material, { label: string; badge: string }> 
   mixto: { label: "Mixto", badge: "Acetato + Titanio" },
 };
 
+const photo = (id: string) => framePhotos[id];
+
 export const products: Product[] = [
-  {
-    id: "valeria",
-    name: "Valeria",
-    tagline: "Cat-eye editorial de esquinas afiladas.",
-    description:
-      "Nuestro icono. Una línea superior que se eleva con intención y un frente pulido a mano que atrapa la luz. Para quien entra a un lugar y se queda.",
-    category: "oftalmico",
-    shape: "cateye",
-    material: "acetato",
-    price: 1890,
-    badge: "Best Seller",
-    blueBlockReady: true,
-    specs: { lens: 52, bridge: 18, temple: 145, weight: 22, hinge: "Bisagra flex de 5 barriles", fit: "Medio" },
-    colors: [
-      { id: "negro", name: "Negro Piano", frame: "#151514" },
-      { id: "carey", name: "Carey Habana", frame: "#6B3E1F", pattern: "tortoise" },
-      { id: "rosa", name: "Rosa Cuarzo", frame: "#E2B0A8", pattern: "crystal" },
-    ],
-  },
-  {
-    id: "roma",
-    name: "Roma",
-    tagline: "Redondo esencial en titanio de 9 gramos.",
-    description:
-      "Silueta circular de perfil finísimo, inspirada en los archivos de los años 30. Tan ligera que la olvidas puesta; tan precisa que se nota de lejos.",
-    category: "oftalmico",
-    shape: "round",
-    material: "titanio",
-    price: 2390,
-    badge: "Nuevo",
-    blueBlockReady: true,
-    specs: { lens: 49, bridge: 21, temple: 145, weight: 9, hinge: "Bisagra de titanio con tornillo antiaflojante", fit: "Angosto" },
-    colors: [
-      { id: "oro", name: "Oro Cepillado", frame: "#B8975A" },
-      { id: "plata", name: "Plata Luna", frame: "#9DA1A4" },
-      { id: "grafito", name: "Grafito", frame: "#3A3B3D" },
-    ],
-  },
   {
     id: "mateo",
     name: "Mateo",
-    tagline: "Cuadrado arquitectónico con remaches de acero.",
+    tagline: "Cuadrado de autor con remaches de acero.",
     description:
       "Líneas rectas, aristas suaves y un grosor que da carácter sin pesar. El armazón que usarías en la oficina, en la cena y en la foto del pasaporte.",
     category: "oftalmico",
     shape: "square",
     material: "acetato",
     price: 1890,
+    badge: "Best Seller",
     blueBlockReady: true,
     specs: { lens: 51, bridge: 20, temple: 145, weight: 24, hinge: "Bisagra flex de 5 barriles", fit: "Amplio" },
     colors: [
-      { id: "carey", name: "Carey Oscuro", frame: "#3D2412", pattern: "tortoise" },
-      { id: "azul", name: "Azul Medianoche", frame: "#1F2A44" },
-      { id: "humo", name: "Humo Cristal", frame: "#7C7A76", pattern: "crystal" },
+      { id: "carey", name: "Carey Habana", frame: "#4A2A18", pattern: "tortoise", photo: photo("mateo-carey") },
+      { id: "negro", name: "Negro Piano", frame: "#111111", photo: photo("mateo-negro") },
     ],
   },
   {
-    id: "ines",
-    name: "Inés",
-    tagline: "Browline mixto: carácter arriba, ligereza abajo.",
+    id: "valeria",
+    name: "Valeria",
+    tagline: "Cat-eye en acetato verde bosque.",
     description:
-      "Ceja de acetato y aro inferior de titanio. Un clásico de mediados de siglo reinterpretado con proporciones contemporáneas y plaquetas ajustables.",
+      "Una ceja que se eleva con intención y un verde translúcido que cambia con la luz. Para quien entra a un lugar y se queda.",
     category: "oftalmico",
-    shape: "square",
-    material: "mixto",
-    price: 2190,
+    shape: "cateye",
+    material: "acetato",
+    price: 1790,
     badge: "Nuevo",
     blueBlockReady: true,
-    specs: { lens: 50, bridge: 20, temple: 145, weight: 15, hinge: "Bisagra metálica con resorte", fit: "Medio" },
-    colors: [
-      { id: "negro-oro", name: "Negro / Oro", frame: "#1A1A19", metal: "#B8975A" },
-      { id: "carey-plata", name: "Carey / Plata", frame: "#5A3416", pattern: "tortoise", metal: "#A7ABAE" },
-      { id: "verde-oro", name: "Verde Botella / Oro", frame: "#284034", metal: "#B8975A" },
-    ],
+    specs: { lens: 53, bridge: 17, temple: 145, weight: 21, hinge: "Bisagra flex de 5 barriles", fit: "Medio" },
+    colors: [{ id: "verde", name: "Verde Bosque", frame: "#3E5A2E", pattern: "crystal", photo: photo("valeria-verde") }],
   },
   {
     id: "costa",
     name: "Costa",
-    tagline: "Aviador de doble puente con polarizado de serie.",
+    tagline: "Aviador de doble puente en acetato.",
     description:
-      "Gotas amplias, doble puente y micas polarizadas G-15 que cortan el deslumbramiento del asfalto y del mar. Para carretera, playa y ciudad.",
+      "Gotas amplias, doble puente y micas que cortan el deslumbramiento del asfalto y del mar. Para carretera, playa y ciudad.",
     category: "sol",
     shape: "aviator",
+    material: "acetato",
+    price: 2190,
+    badge: "Best Seller",
+    specs: { lens: 56, bridge: 16, temple: 145, weight: 27, hinge: "Bisagra flex de 7 barriles", fit: "Amplio" },
+    colors: [
+      { id: "carey-g15", name: "Carey / G-15", frame: "#3B2416", pattern: "tortoise", lens: "#3E4A36", photo: photo("costa-carey-g15") },
+      { id: "negro-humo", name: "Negro / Humo", frame: "#141414", lens: "#2E3440", photo: photo("costa-negro-humo") },
+      { id: "carey-degradado", name: "Carey / Degradado", frame: "#5A3416", pattern: "tortoise", lens: "#6B4426", photo: photo("costa-carey-degradado") },
+    ],
+  },
+  {
+    id: "roma",
+    name: "Roma",
+    tagline: "Óvalo metálico de inspiración noventera.",
+    description:
+      "Aro fino de metal pulido y micas ovaladas. Retro en la forma, ligero en la cara, imposible de pasar desapercibido.",
+    category: "sol",
+    shape: "round",
     material: "titanio",
     price: 2290,
-    badge: "Best Seller",
-    specs: { lens: 58, bridge: 15, temple: 140, weight: 14, hinge: "Bisagra de titanio con resorte", fit: "Amplio" },
+    badge: "Nuevo",
+    specs: { lens: 54, bridge: 19, temple: 140, weight: 16, hinge: "Bisagra de titanio con resorte", fit: "Medio" },
     colors: [
-      { id: "oro-verde", name: "Oro / G-15", frame: "#C2A15F", lens: "#3E4A36" },
-      { id: "negro-humo", name: "Negro / Humo", frame: "#1E1E1D", lens: "#2C2C2E" },
-      { id: "plata-azul", name: "Plata / Azul Espejo", frame: "#A7ABAE", lens: "#2F5C8A" },
+      { id: "oro-g15", name: "Oro / G-15", frame: "#C9A55A", lens: "#3E4A36", photo: photo("roma-oro-g15") },
+      { id: "oro-cafe", name: "Oro / Café", frame: "#C9A55A", lens: "#4A3A30", photo: photo("roma-oro-cafe") },
+      { id: "vino-cafe", name: "Vino / Café", frame: "#6B2328", lens: "#5A4038", photo: photo("roma-vino-cafe") },
+    ],
+  },
+  {
+    id: "olivia",
+    name: "Olivia",
+    tagline: "Óvalo grueso de acetato. Puro 90s.",
+    description:
+      "Volumen redondeado y micas pequeñas que estilizan el rostro. El lente que se ve igual de bien con traje que con camiseta.",
+    category: "sol",
+    shape: "round",
+    material: "acetato",
+    price: 1690,
+    specs: { lens: 52, bridge: 20, temple: 145, weight: 25, hinge: "Bisagra flex de 5 barriles", fit: "Medio" },
+    colors: [
+      { id: "negro-humo", name: "Negro / Humo", frame: "#0E0E0E", lens: "#3A3A3A", photo: photo("olivia-negro-humo") },
+      { id: "carey-cafe", name: "Carey / Café", frame: "#5A3416", pattern: "tortoise", lens: "#7A5030", photo: photo("olivia-carey-cafe") },
+      { id: "caramelo", name: "Caramelo", frame: "#6E4A2C", pattern: "crystal", lens: "#5B3A24", photo: photo("olivia-cafe") },
     ],
   },
   {
     id: "tulum",
     name: "Tulum",
-    tagline: "Cat-eye XL con micas degradadas.",
+    tagline: "Cat-eye mixto: ceja de acetato, aro de metal.",
     description:
-      "Volumen generoso y un ángulo felino que estiliza el rostro. Micas degradadas UV400 que dejan ver tu mirada mientras te protegen.",
+      "Un ángulo felino suavizado con metal dorado. Micas amplias con protección UV400 para días largos de sol.",
+    category: "sol",
+    shape: "cateye",
+    material: "mixto",
+    price: 2090,
+    badge: "Edición limitada",
+    specs: { lens: 55, bridge: 17, temple: 142, weight: 18, hinge: "Bisagra metálica con resorte", fit: "Medio" },
+    colors: [
+      { id: "oro-verde", name: "Oro / Verde", frame: "#C9A55A", metal: "#C9A55A", lens: "#4E6A48", photo: photo("tulum-oro-verde") },
+      { id: "negro-oro", name: "Negro / Oro", frame: "#151515", metal: "#C9A55A", lens: "#4A4442", photo: photo("tulum-negro-oro") },
+    ],
+  },
+  {
+    id: "gata",
+    name: "Gata",
+    tagline: "Cat-eye afilado. Actitud de cine.",
+    description:
+      "Puntas que se elevan como un trazo de delineador. El clásico de pantalla grande, en acetato pulido a mano.",
     category: "sol",
     shape: "cateye",
     material: "acetato",
-    price: 1990,
-    badge: "Edición limitada",
-    specs: { lens: 55, bridge: 17, temple: 145, weight: 27, hinge: "Bisagra flex de 7 barriles", fit: "Amplio" },
+    price: 1590,
+    specs: { lens: 52, bridge: 18, temple: 140, weight: 22, hinge: "Bisagra flex de 5 barriles", fit: "Angosto" },
     colors: [
-      { id: "carey", name: "Carey / Café", frame: "#5A3416", pattern: "tortoise", lens: "#5B3A24" },
-      { id: "hueso", name: "Hueso / Humo", frame: "#E9E2D3", lens: "#3A3A3A" },
-      { id: "cereza", name: "Cereza / Rosa", frame: "#7D1F24", lens: "#9C5A5E" },
+      { id: "negro", name: "Negro Brillante", frame: "#0A0A0A", lens: "#1C1C1C", photo: photo("gata-negro") },
+      { id: "carey", name: "Carey / Ámbar", frame: "#4A2A18", pattern: "tortoise", lens: "#8A5A30", photo: photo("gata-carey") },
     ],
   },
   {
     id: "brava",
     name: "Brava",
-    tagline: "Cuadrado oversize. Actitud de ciudad.",
+    tagline: "Rectangular de acetato grueso.",
     description:
-      "Frente grueso de acetato de alta densidad y micas planas que cubren de verdad. El par que convierte cualquier outfit en declaración.",
+      "Frente de alta densidad y micas planas que cubren de verdad. El par que convierte cualquier outfit en declaración.",
     category: "sol",
     shape: "square",
     material: "acetato",
-    price: 1890,
-    specs: { lens: 54, bridge: 19, temple: 145, weight: 28, hinge: "Bisagra flex de 5 barriles", fit: "Amplio" },
+    price: 1690,
+    specs: { lens: 53, bridge: 19, temple: 145, weight: 26, hinge: "Bisagra flex de 5 barriles", fit: "Amplio" },
     colors: [
-      { id: "negro", name: "Negro / Humo", frame: "#141413", lens: "#232325" },
-      { id: "oliva", name: "Oliva / Verde", frame: "#4D5236", lens: "#3B4733" },
-      { id: "arena", name: "Arena Cristal / Café", frame: "#CDB892", pattern: "crystal", lens: "#6A4A2E" },
+      { id: "carey", name: "Carey / Café", frame: "#5A3416", pattern: "tortoise", lens: "#6A4A2E", photo: photo("brava-carey") },
+      { id: "negro-g15", name: "Negro / G-15", frame: "#121212", lens: "#4B5A48", photo: photo("brava-negro-g15") },
+      { id: "miel", name: "Carey Miel", frame: "#9A6A34", pattern: "tortoise", lens: "#A0663A", photo: photo("brava-miel") },
     ],
   },
   {
-    id: "lumen",
-    name: "Lumen",
-    tagline: "Redondo mixto con micas espejo.",
+    id: "lince",
+    name: "Lince",
+    tagline: "Rectangular metálico, minimal y preciso.",
     description:
-      "Aro de titanio, ceja de acetato y micas espejo con tratamiento hidrofóbico. Retro en la forma, técnico en cada detalle.",
+      "Aro delgado de metal y micas rectangulares. Ligero, discreto y con la precisión de un instrumento.",
     category: "sol",
-    shape: "round",
-    material: "mixto",
-    price: 2490,
-    badge: "Nuevo",
-    specs: { lens: 50, bridge: 22, temple: 145, weight: 17, hinge: "Bisagra metálica con resorte", fit: "Medio" },
+    shape: "square",
+    material: "titanio",
+    price: 1990,
+    specs: { lens: 55, bridge: 18, temple: 140, weight: 14, hinge: "Bisagra de titanio con tornillo antiaflojante", fit: "Medio" },
     colors: [
-      { id: "carey-ambar", name: "Carey / Ámbar", frame: "#5A3416", pattern: "tortoise", metal: "#B8975A", lens: "#A8692A" },
-      { id: "negro-humo", name: "Negro / Humo", frame: "#1A1A19", metal: "#3A3B3D", lens: "#2B2B2D" },
-      { id: "hueso-violeta", name: "Hueso / Violeta Espejo", frame: "#E9E2D3", metal: "#A7ABAE", lens: "#5A4C8C" },
+      { id: "oro-humo", name: "Oro / Humo", frame: "#C9A55A", lens: "#2C2C2E", photo: photo("lince-oro-humo") },
+      { id: "negro-humo", name: "Negro / Humo", frame: "#161616", lens: "#26282C", photo: photo("lince-negro-humo") },
     ],
+  },
+  {
+    id: "luna",
+    name: "Luna",
+    tagline: "Media luna: carey abajo, metal arriba.",
+    description:
+      "Aro inferior de acetato carey y ceja de metal dorado. Una silueta ligera que deja ver la mirada.",
+    category: "sol",
+    shape: "cateye",
+    material: "mixto",
+    price: 2190,
+    specs: { lens: 52, bridge: 19, temple: 140, weight: 17, hinge: "Bisagra metálica con resorte", fit: "Medio" },
+    colors: [{ id: "carey-oro", name: "Carey / Oro", frame: "#5A3416", pattern: "tortoise", metal: "#C9A55A", lens: "#4E5A40", photo: photo("luna-carey-oro") }],
+  },
+  {
+    id: "andes",
+    name: "Andes",
+    tagline: "Máscara aviador de una sola pieza.",
+    description:
+      "Frente envolvente de acetato negro y micas G-15. Para la carretera de montaña y los días de sol sin tregua.",
+    category: "sol",
+    shape: "aviator",
+    material: "acetato",
+    price: 1890,
+    specs: { lens: 60, bridge: 14, temple: 140, weight: 30, hinge: "Bisagra flex de 7 barriles", fit: "Amplio" },
+    colors: [{ id: "negro-g15", name: "Negro / G-15", frame: "#0E0E0E", lens: "#4B5A48", photo: photo("andes-negro") }],
   },
 ];
 

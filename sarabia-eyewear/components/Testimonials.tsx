@@ -3,9 +3,9 @@ import { Reveal, SectionHeading } from "./ui";
 
 // Contenido de ejemplo: reemplazar por reseñas reales (Google, Instagram) antes de publicar.
 const reviews = [
-  { name: "Mariana G.", city: "CDMX", model: "Valeria · Carey", text: "Por fin unos lentes que se ven caros sin costar una fortuna. Las micas llegaron perfectas con mi graduación." },
-  { name: "Diego R.", city: "Guadalajara", model: "Costa · Oro / G-15", text: "Los polarizados son otro nivel. Manejar en carretera ya no me cansa la vista." },
-  { name: "Sofía L.", city: "Monterrey", model: "Roma · Oro cepillado", text: "Ligerísimos. Trabajo 9 horas frente a la compu con Blue Block y se nota la diferencia." },
+  { name: "Mariana G.", city: "CDMX", model: "Valeria · Verde Bosque", text: "Por fin unos lentes que se ven caros sin costar una fortuna. Las micas llegaron perfectas con mi graduación." },
+  { name: "Diego R.", city: "Guadalajara", model: "Costa · Carey / G-15", text: "Los polarizados son otro nivel. Manejar en carretera ya no me cansa la vista." },
+  { name: "Sofía L.", city: "Monterrey", model: "Mateo · Carey Habana", text: "Ligerísimos. Trabajo 9 horas frente a la compu con Blue Block y se nota la diferencia." },
 ];
 
 export function Testimonials() {

@@ -281,7 +281,7 @@ export function TryOnModal({ initialProductId, initialColorId, onClose }: Props)
     }
     let src: string;
     if (photo) {
-      src = photo.front;
+      src = photo.tryOn ?? photo.front;
     } else {
       const svg = holderRef.current?.querySelector("svg");
       if (!svg) return;

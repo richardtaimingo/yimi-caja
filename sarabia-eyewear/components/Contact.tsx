@@ -30,10 +30,9 @@ export function Contact() {
   return (
     <section id="contacto" className="scroll-mt-20 py-20 md:py-28">
       <div className="container">
-        <div className="grid overflow-hidden rounded-[2rem] bg-night-2 text-paper lg:grid-cols-2">
-          <div className="p-8 sm:p-12 lg:p-16">
+        <div className="grid overflow-hidden rounded-[1.5rem] bg-night-2 text-paper sm:rounded-[2rem] lg:grid-cols-2">
+          <div className="p-6 sm:p-12 lg:p-16">
             <SectionHeading
-              invert
               eyebrow="Contacto"
               title={<>Habla con<br />un asesor real.</>}
               description="Optometristas y asesores de Ópticas Jennifer Sarabia. Te ayudamos a elegir, leer tu receta y confirmar tu pedido."
@@ -47,7 +46,7 @@ export function Contact() {
             </ul>
           </div>
 
-          <Reveal className="bg-night-3 p-8 sm:p-12 lg:p-16">
+          <Reveal className="bg-night-3 p-6 sm:p-12 lg:p-16">
             <form ref={formRef} onSubmit={onSubmit} className="space-y-5">
               <label className="block">
                 <span className="text-sm font-medium text-paper/70">Nombre</span>

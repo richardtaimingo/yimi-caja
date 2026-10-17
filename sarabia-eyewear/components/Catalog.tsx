@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useMotionValue, useSpring } from "framer-motion";
 import { MessageCircle, RotateCcw, SlidersHorizontal } from "lucide-react";
 import clsx from "clsx";
 import { materialLabels, products, shapeLabels, type FrameShape, type Material, type Product } from "@/lib/products";
@@ -60,7 +60,7 @@ export function Catalog() {
                 aria-selected={intent === key}
                 onClick={() => setIntent(key)}
                 className={clsx(
-                  "relative rounded-full px-3 py-2 text-sm font-medium transition-colors sm:px-4",
+                  "relative rounded-full px-2.5 py-2 text-[0.8rem] font-medium transition-colors min-[380px]:px-3 min-[380px]:text-sm sm:px-4",
                   intent === key ? "text-night" : "text-paper/80 hover:text-paper",
                 )}
               >
@@ -156,9 +156,9 @@ function FilterGroup({
   onChange: (id: string) => void;
 }) {
   return (
-    <div className="flex min-w-0 items-center gap-3">
-      <span className="w-16 shrink-0 text-xs font-semibold uppercase tracking-[0.16em] text-paper/55 lg:w-auto">{label}</span>
-      <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-0.5" role="radiogroup" aria-label={label}>
+    <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+      <span className="shrink-0 text-xs font-semibold uppercase tracking-[0.16em] text-paper/55 sm:w-16 lg:w-auto">{label}</span>
+      <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-label={label}>
         {options.map((o) => (
           <button
             key={o.id}
@@ -184,6 +184,10 @@ function ProductCard({ product, intent }: { product: Product; intent: Intent }) 
   const [colorId, setColorId] = useState(product.colors[0].id);
   const [view, setView] = useState<"front" | "angle">("front");
   const color = product.colors.find((c) => c.id === colorId) ?? product.colors[0];
+  const tiltX = useMotionValue(0);
+  const tiltY = useMotionValue(0);
+  const springX = useSpring(tiltX, { stiffness: 160, damping: 18 });
+  const springY = useSpring(tiltY, { stiffness: 160, damping: 18 });
 
   const lens = product.category === "sol" ? "solares de fábrica UV400" : intent === "blue" ? "neutras con Blue Block" : undefined;
   const message = orderMessage({
@@ -196,9 +200,17 @@ function ProductCard({ product, intent }: { product: Product; intent: Intent }) 
   return (
     <article className="group flex h-full flex-col">
       <div
-        className="relative aspect-[5/4] overflow-hidden rounded-3xl bg-[#EEE7DD] transition-colors duration-500 group-hover:bg-sun"
-        onPointerEnter={(e) => e.pointerType === "mouse" && setView("angle")}
-        onPointerLeave={(e) => e.pointerType === "mouse" && setView("front")}
+        className="relative aspect-[5/4] overflow-hidden rounded-3xl bg-[#EEE7DD] transition-colors duration-500 [perspective:900px] group-hover:bg-sun"
+        onPointerMove={(e) => {
+          if (e.pointerType !== "mouse") return;
+          const r = e.currentTarget.getBoundingClientRect();
+          tiltY.set(((e.clientX - r.left) / r.width - 0.5) * 26);
+          tiltX.set(-((e.clientY - r.top) / r.height - 0.5) * 16);
+        }}
+        onPointerLeave={() => {
+          tiltX.set(0);
+          tiltY.set(0);
+        }}
       >
         <div className="absolute left-4 top-4 z-10 flex flex-wrap gap-1.5">
           {product.badge && (
@@ -216,24 +228,31 @@ function ProductCard({ product, intent }: { product: Product; intent: Intent }) 
           </span>
         </div>
 
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div
-            key={`${color.id}-${view}`}
-            initial={{ opacity: 0, x: view === "angle" ? 16 : -16 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
-            className="absolute inset-0 flex items-center justify-center px-6 pb-10 pt-12"
-          >
-            <ProductImage
-              product={product}
-              color={color}
-              view={view}
-              sizes="(min-width: 1280px) 25vw, (min-width: 640px) 45vw, 90vw"
-              className="h-auto max-h-full w-full object-contain drop-shadow-[0_18px_18px_rgba(21,21,20,0.22)]"
-            />
+        {/* Foto real en 3D: se inclina con el cursor y "Ángulo" la gira a 3/4 */}
+        <motion.div
+          className="absolute inset-0 flex items-center justify-center px-6 pb-10 pt-12 [transform-style:preserve-3d]"
+          animate={view === "angle" ? { rotateY: -34, rotateX: 7, scale: 0.94 } : { rotateY: 0, rotateX: 0, scale: 1 }}
+          transition={{ type: "spring", stiffness: 120, damping: 16 }}
+        >
+          <motion.div className="w-full [transform-style:preserve-3d]" style={{ rotateX: springX, rotateY: springY }}>
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={color.id}
+                initial={{ opacity: 0, scale: 0.94 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 1.03 }}
+                transition={{ duration: 0.25 }}
+              >
+                <ProductImage
+                  product={product}
+                  color={color}
+                  sizes="(min-width: 1280px) 25vw, (min-width: 640px) 45vw, 90vw"
+                  className="h-auto max-h-full w-full object-contain drop-shadow-[0_22px_18px_rgba(21,21,20,0.28)]"
+                />
+              </motion.div>
+            </AnimatePresence>
           </motion.div>
-        </AnimatePresence>
+        </motion.div>
 
         <div className="absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 rounded-full bg-night/80 p-0.5 text-[0.68rem] font-medium backdrop-blur">
           {(["front", "angle"] as const).map((v) => (
