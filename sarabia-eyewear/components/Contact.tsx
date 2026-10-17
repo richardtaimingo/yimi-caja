@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent, type MouseEvent } from "react";
 import { Clock, Instagram, Mail, MapPin, MessageCircle } from "lucide-react";
 import { site, whatsappLink } from "@/lib/site";
 import { Reveal, SectionHeading } from "./ui";
@@ -11,11 +11,20 @@ export function Contact() {
   const [name, setName] = useState("");
   const [reason, setReason] = useState(reasons[0]);
   const [message, setMessage] = useState("");
+  const formRef = useRef<HTMLFormElement>(null);
+  const linkRef = useRef<HTMLAnchorElement>(null);
 
+  const text = `Hola Sarabia Eyewear, soy ${name.trim() || "un cliente"}.\nMotivo: ${reason}.${message.trim() ? `\n${message.trim()}` : ""}`;
+
+  // Se usa un enlace real (no window.open) para que funcione en navegadores dentro de apps
+  // y con bloqueadores de ventanas emergentes.
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
-    const text = `Hola Sarabia Eyewear, soy ${name.trim() || "un cliente"}.\nMotivo: ${reason}.${message.trim() ? `\n${message.trim()}` : ""}`;
-    window.open(whatsappLink(text), "_blank", "noopener,noreferrer");
+    linkRef.current?.click();
+  };
+
+  const onLinkClick = (e: MouseEvent<HTMLAnchorElement>) => {
+    if (!formRef.current?.reportValidity()) e.preventDefault();
   };
 
   return (
@@ -39,7 +48,7 @@ export function Contact() {
           </div>
 
           <Reveal className="bg-ink-soft p-8 sm:p-12 lg:p-16">
-            <form onSubmit={onSubmit} className="space-y-5">
+            <form ref={formRef} onSubmit={onSubmit} className="space-y-5">
               <label className="block">
                 <span className="text-sm font-medium text-bone/70">Nombre</span>
                 <input
@@ -77,9 +86,16 @@ export function Contact() {
                   className="field resize-none"
                 />
               </label>
-              <button type="submit" className="btn-light h-14 w-full text-base">
+              <a
+                ref={linkRef}
+                href={whatsappLink(text)}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={onLinkClick}
+                className="btn-light h-14 w-full text-base"
+              >
                 <MessageCircle className="h-5 w-5" /> Enviar por WhatsApp
-              </button>
+              </a>
               <p className="text-center text-xs text-bone/50">Respondemos en menos de 15 minutos en horario de tienda.</p>
             </form>
           </Reveal>
