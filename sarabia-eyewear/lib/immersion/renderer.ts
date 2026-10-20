@@ -421,6 +421,6 @@ export class ImmersionRenderer {
     gl.deleteBuffer(this.instances);
     gl.deleteVertexArray(this.sceneVao);
     gl.deleteVertexArray(this.particleVao);
-    gl.getExtension("WEBGL_lose_context")?.loseContext();
+    // Sin loseContext(): el mismo canvas puede volver a montarse (StrictMode) y recibiría un contexto perdido
   }
 }
