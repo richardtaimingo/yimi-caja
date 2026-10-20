@@ -152,7 +152,7 @@ export function writeParticles(out: Float32Array, p: number, t: number, aspect: 
   if (splash > 0 && splash < 3) {
     const g = 3.2;
     for (let i = 0; i < DROPLETS; i++) {
-      const crown = i < 50;
+      const crown = i < 22;
       const side = rand(i, 0) < 0.5 ? -1 : 1;
       const delay = crown ? rand(i, 4) * 0.08 : 0.04 + rand(i, 4) * 0.22;
       const tau = (splash - delay) * 0.5;
@@ -167,7 +167,8 @@ export function writeParticles(out: Float32Array, p: number, t: number, aspect: 
       if (y < 0) continue;
       const x = ox + vx * tau;
       if (y > top) continue;
-      const size = (crown ? lerp(0.004, 0.011, rand(i, 5)) : lerp(0.003, 0.014, Math.pow(rand(i, 5), 2))) * scale;
+      // Gotas finas y variadas (pulverizado), no racimos grandes
+      const size = (crown ? lerp(0.0025, 0.0065, rand(i, 5)) : lerp(0.0012, 0.0075, Math.pow(rand(i, 5), 2.5))) * scale;
       const alpha = (crown ? 0.62 : 0.9) * smooth(0, 0.04, tau) * (1 - smooth(1.6, 2.6, splash));
       push(x, y, size, Kind.Droplet, vx, vy0 - g * tau, alpha, rand(i, 6));
     }
