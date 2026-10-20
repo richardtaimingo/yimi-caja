@@ -8,6 +8,7 @@ import { LitFrame } from "./LitFrame";
 import { useShop } from "./ShopProvider";
 import { products } from "@/lib/products";
 import { GRAIN } from "@/lib/textures";
+import { CharReveal } from "./CharReveal";
 import { Reveal } from "./ui";
 
 /**
@@ -104,7 +105,7 @@ export function Campaign() {
         <Reveal className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
           <div>
             <p className="eyebrow">Campaña 2026</p>
-            <h2 className="display mt-4 text-[1.7rem] text-white sm:text-4xl lg:text-5xl">Ve más allá</h2>
+            <CharReveal as="h2" text="Ve más allá" className="display mt-4 text-[1.7rem] text-white sm:text-4xl lg:text-5xl" />
           </div>
           <p className="max-w-sm text-[0.7rem] uppercase leading-[1.8] tracking-[0.14em] text-paper/55">
             Seis armazones reales bajo la luz de estudio. Toca cualquiera para probártelo en vivo con tu cámara.
@@ -114,7 +115,7 @@ export function Campaign() {
 
       {/* Móvil: carrusel deslizable · tablet y escritorio: rejilla de pósters */}
       <div className="container mt-10">
-        <div className="-mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-2 [scrollbar-width:none] md:mx-0 md:grid md:grid-cols-2 md:overflow-visible md:px-0 lg:grid-cols-3 [&::-webkit-scrollbar]:hidden">
+        <div data-fab-avoid className="-mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-2 [scrollbar-width:none] md:mx-0 md:grid md:grid-cols-2 md:overflow-visible md:px-0 lg:grid-cols-3 [&::-webkit-scrollbar]:hidden">
           {POSTERS.map((poster, i) => (
             <PosterTile key={poster.productId} poster={poster} index={i} />
           ))}
@@ -145,7 +146,7 @@ function PosterTile({ poster, index }: { poster: Poster; index: number }) {
     >
       {/* Luz y textura */}
       <div className="absolute inset-0 -z-10 transition-transform duration-700 group-hover:scale-110" style={{ backgroundImage: poster.light }} />
-      <div className="pointer-events-none absolute inset-0 -z-10 opacity-[0.16] mix-blend-overlay" style={{ backgroundImage: GRAIN }} />
+      <div className="pointer-events-none absolute inset-0 -z-10 opacity-[0.06]" style={{ backgroundImage: GRAIN }} />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_90%_at_50%_45%,transparent_55%,rgba(0,0,0,0.55))]" />
 
       {poster.layout === "watermark" && (
@@ -186,7 +187,7 @@ function PosterType({ poster, productName, colorName }: { poster: Poster; produc
   const copy = <p className="min-w-0 max-w-[58%] text-[clamp(0.625rem,2.1cqw,0.6875rem)] uppercase leading-[1.7] tracking-[0.1em] text-paper/75 [@container(max-width:300px)]:hidden">{poster.copy}</p>;
   const wordmark = <p className="shrink-0 font-display text-[clamp(1.2rem,8cqw,2.4rem)] uppercase leading-none tracking-[0.05em] text-white [margin-left:-0.06em]">Sarabia</p>;
   const model = (
-    <span className="flex shrink-0 flex-col items-end gap-1 whitespace-nowrap text-right text-[clamp(0.625rem,2.1cqw,0.6875rem)] font-semibold uppercase tracking-[0.16em]">
+    <span className="flex min-w-0 flex-col items-end gap-1 whitespace-nowrap text-right text-[clamp(0.625rem,2.1cqw,0.6875rem)] font-semibold uppercase tracking-[0.16em]">
       <span className="text-paper/80">{poster.corner}</span>
       <span className="inline-flex items-center gap-1 text-volt-ice opacity-85 transition group-hover:opacity-100">
         {productName} <ArrowUpRight className="h-3 w-3" aria-hidden />
@@ -201,7 +202,7 @@ function PosterType({ poster, productName, colorName }: { poster: Poster; produc
         <div className="absolute left-[6%] top-[6%]">{headline}</div>
         <div className="absolute inset-x-[6%] bottom-[6%] space-y-4">
           {copy}
-          <div className="flex items-end justify-between gap-4">
+          <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
             {wordmark}
             {model}
           </div>

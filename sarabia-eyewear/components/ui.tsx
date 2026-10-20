@@ -3,6 +3,7 @@
 import { motion, type HTMLMotionProps } from "framer-motion";
 import clsx from "clsx";
 import type { ReactNode } from "react";
+import { CharReveal } from "./CharReveal";
 
 export function Reveal({ children, className, delay = 0, ...rest }: HTMLMotionProps<"div"> & { delay?: number }) {
   return (
@@ -35,7 +36,11 @@ export function SectionHeading({
     <Reveal className={clsx("max-w-2xl", className)}>
       <p className="eyebrow">{eyebrow}</p>
       {/* Titulares de campaña sin punto final */}
-      <h2 className="display mt-4 text-[1.7rem] text-white sm:text-4xl lg:text-5xl">{typeof title === "string" ? title.replace(/\.$/, "") : title}</h2>
+      {typeof title === "string" ? (
+        <CharReveal as="h2" text={title.replace(/\.$/, "")} className="display mt-4 text-[1.7rem] text-white sm:text-4xl lg:text-5xl" />
+      ) : (
+        <h2 className="display mt-4 text-[1.7rem] text-white sm:text-4xl lg:text-5xl">{title}</h2>
+      )}
       {description && <p className="mt-5 max-w-lg text-base leading-relaxed text-paper/60 sm:text-lg">{description}</p>}
     </Reveal>
   );

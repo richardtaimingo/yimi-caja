@@ -1,5 +1,7 @@
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
+import { Immersion } from "@/components/Immersion";
+import { Proof } from "@/components/Proof";
 import { Campaign } from "@/components/Campaign";
 import { Catalog } from "@/components/Catalog";
 import { ArtOfSeeing } from "@/components/ArtOfSeeing";
@@ -54,6 +56,8 @@ export default function Home() {
       <Header />
       <main>
         <Hero />
+        <Immersion />
+        <Proof />
         <Campaign />
         <ArtOfSeeing />
         <Catalog />

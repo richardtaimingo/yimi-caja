@@ -6,6 +6,8 @@ const config: Config = {
   corePlugins: { container: false },
   theme: {
     extend: {
+      // Teléfono en horizontal: el hero se reorganiza en dos columnas para caber en ~390 px de alto.
+      screens: { short: { raw: "(orientation: landscape) and (max-height: 500px)" } },
       colors: {
         // Fondo: tinta azul casi negra, en tres niveles de superficie.
         night: { DEFAULT: "#03050B", 2: "#070B16", 3: "#0C1324" },
@@ -40,12 +42,15 @@ const config: Config = {
           from: { transform: "translate3d(-1.5%,1%,0) scale(1)" },
           to: { transform: "translate3d(2%,-1.5%,0) scale(1.06)" },
         },
+        // Indicación de scroll: una luz que baja por una línea fina.
+        hint: { from: { transform: "translate3d(0,-100%,0)" }, to: { transform: "translate3d(0,200%,0)" } },
       },
       animation: {
         marquee: "marquee 40s linear infinite",
         float: "float 6s ease-in-out infinite",
         "float-shadow": "float-shadow 6s ease-in-out infinite",
         drift: "drift 22s ease-in-out infinite alternate",
+        hint: "hint 1.8s cubic-bezier(0.65,0,0.35,1) infinite",
       },
     },
   },

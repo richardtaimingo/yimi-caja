@@ -14,7 +14,7 @@ export function FAQ() {
     <section className="bg-night-2 py-20 md:py-28">
       <div className="container grid gap-12 lg:grid-cols-[1fr_1.4fr]">
         <SectionHeading eyebrow="Preguntas frecuentes" title="Sin letras chiquitas." description="¿Te quedó alguna duda? Escríbenos por WhatsApp y te contestamos en minutos." />
-        <div className="divide-y divide-paper/10 border-y border-paper/10">
+        <div data-fab-avoid className="divide-y divide-paper/10 border-y border-paper/10">
           {faqs.map((f, i) => {
             const isOpen = open === i;
             return (

@@ -198,8 +198,7 @@ function ProductCard({ product, intent }: { product: Product; intent: Intent }) 
   });
 
   return (
-    // content-visibility: el navegador omite pintar las tarjetas fuera de pantalla (scroll fluido en móvil)
-    <article className="group flex h-full flex-col [contain-intrinsic-block-size:auto_640px] [content-visibility:auto]">
+    <article className="group flex h-full flex-col">
       <div
         className="stage-blue relative aspect-[5/4] overflow-hidden rounded-3xl [perspective:900px]"
         onPointerMove={(e) => {
@@ -319,7 +318,7 @@ function ProductCard({ product, intent }: { product: Product; intent: Intent }) 
         </div>
       </dl>
 
-      <div className="mt-auto flex flex-col gap-2 pt-4">
+      <div data-fab-avoid className="mt-auto flex flex-col gap-2 pt-4">
         <TryOnButton productId={product.id} colorId={color.id} />
         <a
           href={whatsappLink(message)}

@@ -42,7 +42,7 @@ export function Configurator() {
           <div className="space-y-6">
             {/* Paso 1 */}
             <Step number={1} title="Elige tu armazón favorito" done>
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              <div data-fab-avoid className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                 {products.map((p) => {
                   const selected = p.id === product.id;
                   return (
@@ -96,7 +96,7 @@ export function Configurator() {
 
             {/* Paso 2 */}
             <Step number={2} title="Selecciona tu tipo de mica" done={Boolean(lens)}>
-              <div className={clsx("grid gap-2", options.length === 3 ? "sm:grid-cols-3" : "sm:grid-cols-2")}>
+              <div data-fab-avoid className={clsx("grid gap-2", options.length === 3 ? "sm:grid-cols-3" : "sm:grid-cols-2")}>
                 {options.map((o) => {
                   const selected = o.id === lens?.id;
                   return (

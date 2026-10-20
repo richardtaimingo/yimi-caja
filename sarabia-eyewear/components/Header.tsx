@@ -6,7 +6,7 @@ import { Menu, MessageCircle, X } from "lucide-react";
 import clsx from "clsx";
 import { Magnetic } from "./Magnetic";
 import { nav, site, whatsappLink } from "@/lib/site";
-import { lockScroll, unlockScroll } from "@/lib/scroll";
+import { lockScroll, scrollToTarget, unlockScroll } from "@/lib/scroll";
 
 const ORDER_MESSAGE = "Hola Sarabia Eyewear, quiero hacer un pedido. ¿Me ayudan?";
 
@@ -24,34 +24,87 @@ export function Logo({ className }: { className?: string }) {
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
+  const [hidden, setHidden] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const scrolledRef = useRef(false);
+  const state = useRef({ scrolled: false, hidden: false, last: 0, dir: 0, anchor: 0 });
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
   const { scrollY } = useScroll();
 
-  // Se lee dentro del ciclo de Framer (sin forzar layout) y sólo re-renderiza al cruzar el umbral
+  // Se lee dentro del ciclo de Framer (sin forzar layout) y sólo re-renderiza al cambiar de estado.
+  // Al bajar se retira (las escenas a pantalla completa quedan limpias); al subir 48 px vuelve.
   useMotionValueEvent(scrollY, "change", (y) => {
-    const next = y > 12;
-    if (next !== scrolledRef.current) {
-      scrolledRef.current = next;
-      setScrolled(next);
+    const s = state.current;
+    const nextScrolled = y > 12;
+    if (nextScrolled !== s.scrolled) {
+      s.scrolled = nextScrolled;
+      setScrolled(nextScrolled);
+    }
+    const delta = y - s.last;
+    s.last = y;
+    if (delta !== 0) {
+      const dir = delta > 0 ? 1 : -1;
+      if (dir !== s.dir) {
+        s.dir = dir;
+        s.anchor = y - delta; // el umbral se mide desde el último cambio de dirección
+      }
+    }
+    let nextHidden = s.hidden;
+    if (y < 160) nextHidden = false;
+    else if (s.dir === 1 && y - s.anchor > 8) nextHidden = true;
+    else if (s.dir === -1 && s.anchor - y > 48) nextHidden = false;
+    if (nextHidden !== s.hidden) {
+      s.hidden = nextHidden;
+      setHidden(nextHidden);
     }
   });
 
   useEffect(() => {
     if (!menuOpen) return;
     lockScroll();
-    const onKey = (event: KeyboardEvent) => event.key === "Escape" && setMenuOpen(false);
+    const returnTo = menuButtonRef.current;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setMenuOpen(false);
+        return;
+      }
+      // Foco atrapado dentro del menú mientras está abierto
+      if (event.key !== "Tab" || !dialogRef.current) return;
+      const focusable = dialogRef.current.querySelectorAll<HTMLElement>("a[href], button:not([disabled])");
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last?.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first?.focus();
+      }
+    };
     window.addEventListener("keydown", onKey);
     return () => {
       window.removeEventListener("keydown", onKey);
       unlockScroll();
+      returnTo?.focus({ preventScroll: true });
     };
   }, [menuOpen]);
+
+  // Enlaces del menú móvil: primero se cierra (y se libera el scroll) y luego se desplaza al destino
+  const goTo = (event: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    event.preventDefault();
+    setMenuOpen(false);
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        scrollToTarget(document.getElementById(href.slice(1)));
+        history.pushState(null, "", href);
+      }),
+    );
+  };
 
   return (
     <>
       {/* Aviso superior: en móvil se oculta para dar la pantalla completa al hero */}
-      <div className="relative z-40 hidden border-b border-white/[0.06] text-paper/70 sm:block">
+      <div className="relative z-40 hidden border-b border-white/[0.06] text-paper/70 sm:block short:hidden">
         <div className="container flex h-9 items-center justify-center gap-3 whitespace-nowrap text-[0.66rem] font-medium uppercase tracking-[0.18em]">
           <span>Envíos rápidos a todo México</span>
           <span className="h-1 w-1 rounded-full bg-volt-soft" aria-hidden />
@@ -62,14 +115,16 @@ export function Header() {
       </div>
 
       <header
+        onFocusCapture={() => hidden && setHidden(false)}
         className={clsx(
-          "sticky top-0 z-40 border-b transition-[background-color,border-color,box-shadow] duration-300",
+          "sticky top-0 z-40 border-b transition-[background-color,border-color,box-shadow,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
+          hidden && !menuOpen && "-translate-y-full",
           scrolled
             ? "border-white/[0.06] bg-[linear-gradient(180deg,rgba(3,5,11,0.82),rgba(3,5,11,0.66))] shadow-[inset_0_-1px_0_rgba(134,168,255,0.06)] backdrop-blur-[18px] backdrop-saturate-150"
             : "border-transparent bg-transparent",
         )}
       >
-        <div className="container flex h-16 items-center justify-between gap-3 sm:gap-6 md:h-[4.5rem]">
+        <div className="container flex h-16 items-center justify-between gap-3 sm:gap-6 md:h-[4.5rem] short:h-16">
           <Logo />
 
           <nav className="hidden items-center gap-8 lg:flex" aria-label="Principal">
@@ -89,6 +144,7 @@ export function Header() {
               </a>
             </Magnetic>
             <button
+              ref={menuButtonRef}
               type="button"
               className="inline-flex h-11 w-11 items-center justify-center rounded-full transition-colors hover:bg-white/10 lg:hidden"
               onClick={() => setMenuOpen(true)}
@@ -104,6 +160,7 @@ export function Header() {
       <AnimatePresence>
         {menuOpen && (
           <motion.div
+            ref={dialogRef}
             role="dialog"
             aria-modal="true"
             aria-label="Menú"
@@ -131,7 +188,7 @@ export function Header() {
                 <motion.a
                   key={item.href}
                   href={item.href}
-                  onClick={() => setMenuOpen(false)}
+                  onClick={(event) => goTo(event, item.href)}
                   initial={{ opacity: 0, transform: "translateY(16px)" }}
                   animate={{ opacity: 1, transform: "translateY(0px)" }}
                   transition={{ delay: 0.05 * i + 0.08, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}

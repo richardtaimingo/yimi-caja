@@ -142,7 +142,7 @@ export function ArtOfSeeing() {
       <div className="sticky top-0 h-[100svh] overflow-hidden [container-type:size]">
         {/* Bloque de luz azul que barre la escena en el capítulo II */}
         <motion.div className="absolute inset-0 will-change-transform" style={{ x: blueX, display: blueGate, backgroundImage: MICAS_BG }} aria-hidden />
-        <div className="pointer-events-none absolute inset-0 opacity-[0.09] mix-blend-overlay" style={{ backgroundImage: GRAIN }} aria-hidden />
+        <div className="pointer-events-none absolute inset-0 opacity-[0.04]" style={{ backgroundImage: GRAIN }} aria-hidden />
 
         <div aria-hidden>
           <ChapterNumeral p={p} />

@@ -7,27 +7,46 @@ import { whatsappLink } from "@/lib/site";
 
 /**
  * Asesoría por WhatsApp. Aparece cuando el hero ya salió de pantalla (el hero y el header tienen su
- * propio acceso) y se retira junto al formulario de contacto y mientras hay un modal o menú abierto,
- * para no tapar textos ni competir con el CTA principal. Respeta las áreas seguras del teléfono.
+ * propio acceso). No interrumpe la secuencia de Inmersión y se retira junto al formulario de contacto,
+ * cuando un control marcado con data-fab-avoid pasa por su franja y mientras hay un modal o menú
+ * abierto, para no tapar textos ni competir con otros CTA. Respeta las áreas seguras del teléfono.
  */
 export function WhatsAppFab() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const watched = ["top", "contacto"].map((id) => document.getElementById(id)).filter((el): el is HTMLElement => Boolean(el));
-    const onScreen = new Set<Element>();
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) onScreen.add(entry.target);
-          else onScreen.delete(entry.target);
-        }
-        setVisible(onScreen.size === 0);
-      },
-      { rootMargin: "0px 0px -30% 0px" },
-    );
-    watched.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
+    // 1. Secciones donde no aparece: hero, la secuencia de Inmersión y contacto
+    const sections = ["top", "inmersion", "contacto"].map((id) => document.getElementById(id)).filter((el): el is HTMLElement => Boolean(el));
+    const inSection = new Set<Element>();
+    // 2. Controles que pasan por la franja inferior donde vive el botón (CTA de tarjetas, FAQ, opciones)
+    const inBand = new Set<Element>();
+    const update = () => setVisible(inSection.size === 0 && inBand.size === 0);
+    const track = (set: Set<Element>) => (entries: IntersectionObserverEntry[]) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) set.add(entry.target);
+        else set.delete(entry.target);
+      }
+      update();
+    };
+
+    const sectionObserver = new IntersectionObserver(track(inSection), { rootMargin: "0px 0px -30% 0px" });
+    sections.forEach((el) => sectionObserver.observe(el));
+
+    let bandObserver: IntersectionObserver | null = null;
+    const observeBand = () => {
+      bandObserver?.disconnect();
+      inBand.clear();
+      bandObserver = new IntersectionObserver(track(inBand), { rootMargin: `-${Math.max(0, window.innerHeight - 96)}px 0px 0px 0px` });
+      document.querySelectorAll("[data-fab-avoid]").forEach((el) => bandObserver!.observe(el));
+    };
+    observeBand();
+    window.addEventListener("resize", observeBand);
+
+    return () => {
+      sectionObserver.disconnect();
+      bandObserver?.disconnect();
+      window.removeEventListener("resize", observeBand);
+    };
   }, []);
 
   return (

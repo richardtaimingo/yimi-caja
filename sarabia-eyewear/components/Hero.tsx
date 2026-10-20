@@ -114,21 +114,21 @@ export function Hero() {
       <div>
         {/* A sangre en todos los tamaños. En móvil mide exactamente la pantalla (svh no cambia al ocultarse
             la barra del navegador: el CTA nunca queda cortado ni salta al hacer scroll). */}
-        <div className="relative isolate flex min-h-[36rem] flex-col overflow-hidden [contain:paint] max-sm:h-[100svh] max-sm:max-h-[60rem] sm:min-h-[100svh] lg:min-h-[max(100svh,680px)]">
+        <div className="relative isolate flex min-h-[36rem] flex-col overflow-hidden [contain:paint] max-sm:h-[100svh] max-sm:max-h-[60rem] sm:min-h-[100svh] lg:min-h-[max(100svh,680px)] short:h-[100svh] short:min-h-0">
           <Atmosphere />
 
           {/* Contenido alineado con el logo (mismos márgenes que el contenedor del encabezado) */}
-          <div className="relative z-10 mx-auto flex w-full max-w-[1360px] flex-1 flex-col px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-[calc(var(--chrome-h)+1.5rem)] sm:px-6 sm:pb-12 sm:pt-[calc(var(--chrome-h)+2.5rem)] lg:px-8 lg:pb-14 lg:pt-[calc(var(--chrome-h)+3rem)]">
+          <div className="relative z-10 mx-auto flex w-full max-w-[1360px] flex-1 flex-col px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-[calc(var(--chrome-h)+1.5rem)] sm:px-6 sm:pb-12 sm:pt-[calc(var(--chrome-h)+2.5rem)] lg:px-8 lg:pb-14 lg:pt-[calc(var(--chrome-h)+3rem)] short:pb-4 short:pt-[calc(var(--chrome-h)+0.75rem)]">
             {/* Titular, texto y selector */}
             <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between lg:gap-10">
               <div className="max-w-[36rem]">
-                <p className="eyebrow">Colección 2026 · Diseñada en México</p>
-                <Stack active={active} className="mt-3 sm:mt-4">
+                <p className="eyebrow short:hidden">Colección 2026 · Diseñada en México</p>
+                <Stack active={active} className="mt-3 sm:mt-4 short:mt-0">
                   {(key) => (
                     <p className="display max-w-[16ch] text-[clamp(1.375rem,1.05rem+1.45vw,2.5rem)] text-white [letter-spacing:0.02em]">{intents[key].headline}</p>
                   )}
                 </Stack>
-                <Stack active={active} className="mt-3 max-w-[34ch] max-sm:[@media(max-height:719px)]:hidden">
+                <Stack active={active} className="mt-3 max-w-[34ch] max-sm:[@media(max-height:719px)]:hidden short:hidden">
                   {(key) => <p className="text-[clamp(0.9375rem,0.9rem+0.15vw,1.0625rem)] leading-[1.55] text-paper/75">{intents[key].copy}</p>}
                 </Stack>
               </div>
@@ -165,7 +165,7 @@ export function Hero() {
 
             {/* Escenario del producto: tamaño fijo, la foto cambia con crossfade sin mover el layout */}
             <div
-              className="relative my-3 min-h-[8.5rem] flex-1 touch-pan-y [container-type:size] [perspective:1200px] sm:my-6 sm:h-[22rem] sm:flex-none lg:absolute lg:left-[61%] lg:top-[54%] lg:my-0 lg:aspect-[16/8] lg:h-auto lg:w-[48%] lg:-translate-x-1/2 lg:-translate-y-1/2"
+              className="relative my-3 min-h-[8.5rem] flex-1 touch-pan-y [container-type:size] [perspective:1200px] sm:my-6 sm:h-[22rem] sm:flex-none lg:absolute lg:left-[61%] lg:top-[54%] lg:my-0 lg:aspect-[16/8] lg:h-auto lg:w-[48%] lg:-translate-x-1/2 lg:-translate-y-1/2 short:absolute short:left-[71%] short:top-[54%] short:my-0 short:h-[58%] short:min-h-0 short:w-[40%] short:-translate-x-1/2 short:-translate-y-1/2"
               onMouseEnter={() => setHovering(true)}
               onMouseLeave={() => setHovering(false)}
             >
@@ -196,7 +196,7 @@ export function Hero() {
             </div>
 
             {/* Móvil y tablet: modelo en foco en una sola línea + CTAs */}
-            <div className="relative lg:hidden">
+            <div className="relative lg:hidden short:hidden">
               <div className="flex h-11 items-center justify-between gap-3">
                 <p className="micro min-w-0 truncate">
                   <span className="tabular-nums text-paper/50">
@@ -216,14 +216,14 @@ export function Hero() {
             </div>
 
             {/* Wordmark y CTAs · modelo en foco (escritorio) */}
-            <div className="relative mt-3 flex flex-col gap-5 sm:mt-6 lg:mt-auto lg:flex-row lg:items-end lg:justify-between">
+            <div className="relative mt-3 flex flex-col gap-5 sm:mt-6 lg:mt-auto lg:flex-row lg:items-end lg:justify-between short:mt-auto">
               <div>
-                <h1 className="font-display text-[clamp(2.75rem,1.7rem+5vw,6.25rem)] uppercase leading-[0.92] tracking-[0.05em] text-white [margin-left:-0.06em]">
+                <h1 className="font-display text-[clamp(2.75rem,1.7rem+5vw,6.25rem)] uppercase leading-[0.92] tracking-[0.05em] text-white [margin-left:-0.06em] short:text-[2.25rem]">
                   Sarabia
                   <span className="sr-only"> Eyewear: armazones oftálmicos y de sol de autor</span>
                 </h1>
-                <p className="eyebrow mt-3 text-volt-ice">Eyewear · By Jennifer Sarabia</p>
-                <div className="mt-5 grid grid-cols-[1fr_auto] gap-3 sm:flex sm:items-center lg:mt-7">
+                <p className="eyebrow mt-3 text-volt-ice short:hidden">Eyewear · By Jennifer Sarabia</p>
+                <div className="mt-5 grid grid-cols-[1fr_auto] gap-3 sm:flex sm:items-center lg:mt-7 short:mt-3">
                   <Magnetic className="min-w-0">
                     <button type="button" onClick={goToCatalog} className="btn-primary h-12 w-full px-7 text-[0.9375rem] sm:w-auto">
                       Ver modelos <ArrowRight className="h-4 w-4" aria-hidden />
@@ -380,7 +380,8 @@ function Atmosphere() {
     <div aria-hidden className="atmos pointer-events-none absolute inset-0 -z-10 overflow-hidden">
       <div className="atmos-key motion-safe:animate-drift [will-change:transform]" />
       <div className="absolute inset-0 bg-[linear-gradient(112deg,transparent_38%,rgba(134,168,255,0.07)_48%,transparent_60%)]" />
-      <div className="absolute inset-0 opacity-[0.1] mix-blend-overlay" style={{ backgroundImage: GRAIN }} />
+      {/* Grano con mezcla normal: el modo overlay sobre la luz que deriva obligaba a recomponer cada frame */}
+      <div className="absolute inset-0 opacity-[0.045]" style={{ backgroundImage: GRAIN }} />
       <div className="absolute inset-x-0 bottom-0 h-[24%] bg-[linear-gradient(to_bottom,rgba(3,5,11,0),rgba(3,5,11,0.65)_60%,#03050B)]" />
       <span className="display absolute left-[58%] top-[44%] hidden -translate-x-1/2 -translate-y-1/2 select-none whitespace-nowrap text-[12.5rem] leading-none text-white/[0.035] lg:block">
         Sarabia

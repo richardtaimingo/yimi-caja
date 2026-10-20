@@ -30,8 +30,15 @@
       --chrome-h: calc(6.75rem + 2px); /* aviso 36 px + barra 72 px + bordes */
     }
   }
+  @media (orientation: landscape) and (max-height: 500px) {
+    :root {
+      --chrome-h: calc(4rem + 1px); /* teléfono en horizontal: sin aviso y barra de 64 px */
+    }
+  }
 
   html {
+    /* Reserva el canal de la barra de scroll: bloquear el scroll (menú, probador) no mueve la página */
+    scrollbar-gutter: stable;
     -webkit-tap-highlight-color: transparent;
     -webkit-text-size-adjust: 100%;
     color-scheme: dark;
@@ -117,6 +124,22 @@
       inset 0 1px 0 rgb(255 255 255 / 0.12),
       inset 0 -1px 0 rgb(0 0 0 / 0.25);
   }
+  /* Tarjeta de vidrio esmerilado sobre la escena de "Inmersión". El desenfoque del fondo sólo en tablet y
+     escritorio; en móvil el degradado translúcido basta y no recalcula el desenfoque en cada frame. */
+  .glass-card {
+    border-radius: 14px;
+    background: linear-gradient(180deg, rgb(222 232 255 / 0.14), rgb(222 232 255 / 0.05));
+    border: 1px solid rgb(255 255 255 / 0.16);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.16),
+      0 24px 60px -28px rgb(0 0 0 / 0.7);
+  }
+  @media (min-width: 768px) {
+    .glass-card {
+      -webkit-backdrop-filter: blur(14px) saturate(140%);
+      backdrop-filter: blur(14px) saturate(140%);
+    }
+  }
   /* Escenario de estudio para las fotos de producto (catálogo, configurador, probador). */
   .stage-blue {
     background:
@@ -163,7 +186,9 @@
   .btn-paper,
   .btn-volt,
   .btn-glass,
-  .btn-outline {
+  .btn-outline,
+  .btn-ink,
+  .btn-line-ink {
     position: relative;
     isolation: isolate;
     display: inline-flex;
@@ -185,7 +210,9 @@
   .btn-paper:active,
   .btn-volt:active,
   .btn-glass:active,
-  .btn-outline:active {
+  .btn-outline:active,
+  .btn-ink:active,
+  .btn-line-ink:active {
     transform: scale(0.975);
   }
 
@@ -220,6 +247,19 @@
     box-shadow:
       inset 0 1px 0 rgb(255 255 255 / 0.14),
       0 8px 24px -12px rgb(0 0 0 / 0.6);
+  }
+
+  /* Sobre paneles claros: tinta llena (18:1) y contorno de tinta. */
+  .btn-ink {
+    background-color: #03050b;
+    color: #e8eeff;
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.12),
+      0 12px 30px -14px rgb(3 5 11 / 0.6);
+  }
+  .btn-line-ink {
+    color: #03050b;
+    border: 1px solid rgb(3 5 11 / 0.22);
   }
 
   /* Brillo perimetral de 1.5 px que recorre el borde (sólo al pasar el cursor o con foco). */
@@ -260,6 +300,13 @@
     .btn-volt:hover {
       background-image: linear-gradient(180deg, #2f5bea 0%, #2149d2 52%, #1d3fba 100%);
     }
+    .btn-ink:hover {
+      background-color: #0c1838;
+    }
+    .btn-line-ink:hover {
+      border-color: rgb(3 5 11 / 0.5);
+      background-color: rgb(3 5 11 / 0.04);
+    }
     .btn-glass:hover,
     .btn-outline:hover {
       border-color: rgb(255 255 255 / 0.26);
@@ -271,6 +318,27 @@
       opacity: 1;
       animation-play-state: running;
     }
+  }
+
+  /* Paneles claros: el foco pasa a cobalto (el hielo no se vería). */
+  .on-light :focus-visible {
+    outline-color: #1b47c9;
+    box-shadow: 0 0 0 6px rgb(27 71 201 / 0.14);
+  }
+
+  /* Titulares que se revelan letra por letra en orden aleatorio (CharReveal). Armado sin transición para
+     que ocultar no se vea; la transición sólo corre al revelar. */
+  .char-reveal__glyphs > span > span {
+    display: inline-block;
+  }
+  .char-reveal.is-armed:not(.is-on) .char-reveal__glyphs > span > span {
+    opacity: 0;
+    filter: blur(8px);
+  }
+  .char-reveal.is-on .char-reveal__glyphs > span > span {
+    transition:
+      opacity 0.6s cubic-bezier(0.2, 0.8, 0.2, 1),
+      filter 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 
   .field {
