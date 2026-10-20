@@ -22,6 +22,8 @@ export type Colorway = {
 export type ProductPhoto = {
   /** Recorte WebP con fondo transparente, vista frontal (catálogo, hero y probador virtual). */
   front: string;
+  /** Silueta ligera (sólo alfa, 640 px) para los efectos de luz con CSS mask-image. */
+  mask?: string;
   /** Vista en ángulo 3/4 (opcional). */
   angle?: string;
   /** Versión para el probador sin las varillas que se ven a través de micas claras. */

@@ -8,6 +8,7 @@ import { LitFrame } from "./LitFrame";
 import { useShop } from "./ShopProvider";
 import { products } from "@/lib/products";
 import { GRAIN } from "@/lib/textures";
+import { CharReveal } from "./CharReveal";
 import { Reveal } from "./ui";
 
 /**
@@ -38,7 +39,7 @@ const POSTERS: Poster[] = [
     headline: "Precisión en cada línea",
     copy: "Cada curva, bisagra y remache se revisa a mano para un ajuste que dura años.",
     corner: "Acetato pulido a mano",
-    frame: { width: "175%", left: "-4%", top: "22%", rotate: -14 },
+    frame: { width: "150%", left: "-6%", top: "26%", rotate: -14 },
     light: "radial-gradient(90% 70% at 30% 38%, #2A6BFF 0%, #0D37B0 28%, #061646 58%, #02040B 90%)",
     layout: "wordmark-bottom",
   },
@@ -80,7 +81,7 @@ const POSTERS: Poster[] = [
     headline: "Claridad bajo la lluvia",
     copy: "Aviador de doble puente con micas polarizadas: ves nítido aunque el clima cambie.",
     corner: "UV400 · Polarizado",
-    frame: { width: "180%", left: "-48%", top: "20%", rotate: 12 },
+    frame: { width: "160%", left: "-40%", top: "22%", rotate: 12 },
     light: "radial-gradient(90% 70% at 62% 50%, #2A6BFF 0%, #0C35AC 30%, #06154A 60%, #02040B 92%)",
     layout: "headline-bottom",
     droplets: true,
@@ -104,7 +105,7 @@ export function Campaign() {
         <Reveal className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
           <div>
             <p className="eyebrow">Campaña 2026</p>
-            <h2 className="display mt-4 text-[1.7rem] text-white sm:text-4xl lg:text-5xl">Ve más allá</h2>
+            <CharReveal as="h2" text="Ve más allá" className="display mt-4 text-[1.7rem] text-white sm:text-4xl lg:text-5xl" />
           </div>
           <p className="max-w-sm text-[0.7rem] uppercase leading-[1.8] tracking-[0.14em] text-paper/55">
             Seis armazones reales bajo la luz de estudio. Toca cualquiera para probártelo en vivo con tu cámara.
@@ -114,7 +115,7 @@ export function Campaign() {
 
       {/* Móvil: carrusel deslizable · tablet y escritorio: rejilla de pósters */}
       <div className="container mt-10">
-        <div className="-mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-2 [scrollbar-width:none] md:mx-0 md:grid md:grid-cols-2 md:overflow-visible md:px-0 lg:grid-cols-3 [&::-webkit-scrollbar]:hidden">
+        <div data-fab-avoid className="-mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-2 [scrollbar-width:none] md:mx-0 md:grid md:grid-cols-2 md:overflow-visible md:px-0 lg:grid-cols-3 [&::-webkit-scrollbar]:hidden">
           {POSTERS.map((poster, i) => (
             <PosterTile key={poster.productId} poster={poster} index={i} />
           ))}
@@ -135,8 +136,9 @@ function PosterTile({ poster, index }: { poster: Poster; index: number }) {
     <motion.button
       type="button"
       onClick={() => openTryOn(product.id, color.id)}
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      // transform como cadena: entrada por WAAPI, sin re-rasterizar el póster en cada frame
+      initial={{ opacity: 0, transform: "translateY(30px)" }}
+      whileInView={{ opacity: 1, transform: "translateY(0px)" }}
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.8, delay: (index % 3) * 0.08, ease: [0.22, 1, 0.36, 1] }}
       className="group relative isolate aspect-[4/5] w-[82%] shrink-0 snap-center overflow-hidden rounded-2xl bg-night text-left [container-type:inline-size] sm:w-[60%] md:w-auto"
@@ -144,7 +146,7 @@ function PosterTile({ poster, index }: { poster: Poster; index: number }) {
     >
       {/* Luz y textura */}
       <div className="absolute inset-0 -z-10 transition-transform duration-700 group-hover:scale-110" style={{ backgroundImage: poster.light }} />
-      <div className="pointer-events-none absolute inset-0 -z-10 opacity-[0.16] mix-blend-overlay" style={{ backgroundImage: GRAIN }} />
+      <div className="pointer-events-none absolute inset-0 -z-10 opacity-[0.06]" style={{ backgroundImage: GRAIN }} />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_90%_at_50%_45%,transparent_55%,rgba(0,0,0,0.55))]" />
 
       {poster.layout === "watermark" && (
@@ -169,8 +171,7 @@ function PosterTile({ poster, index }: { poster: Poster; index: number }) {
             grade="blue"
             droplets={poster.droplets}
             reflection={poster.reflection}
-            sizes="(min-width: 1024px) 60vw, (min-width: 768px) 80vw, 150vw"
-            className="drop-shadow-[0_30px_30px_rgba(0,0,0,0.65)]"
+            sizes="(min-width: 1024px) 55vw, (min-width: 768px) 75vw, 135vw"
           />
         </div>
       </div>
@@ -182,15 +183,16 @@ function PosterTile({ poster, index }: { poster: Poster; index: number }) {
 }
 
 function PosterType({ poster, productName, colorName }: { poster: Poster; productName: string; colorName: string }) {
-  const headline = <p className="display max-w-[86%] text-[clamp(0.9rem,6.2cqw,1.65rem)] leading-[1.12] text-white">{poster.headline}</p>;
-  const copy = <p className="min-w-0 max-w-[58%] text-[clamp(0.48rem,2.1cqw,0.6rem)] uppercase leading-[1.75] tracking-[0.12em] text-paper/70">{poster.copy}</p>;
-  const wordmark = <p className="display shrink-0 text-[clamp(1.2rem,8cqw,2.4rem)] leading-none text-white">Sarabia</p>;
+  const headline = <p className="display max-w-[86%] text-[clamp(0.95rem,6.2cqw,1.65rem)] text-white">{poster.headline}</p>;
+  const copy = <p className="min-w-0 max-w-[58%] text-[clamp(0.625rem,2.1cqw,0.6875rem)] uppercase leading-[1.7] tracking-[0.1em] text-paper/75 [@container(max-width:300px)]:hidden">{poster.copy}</p>;
+  const wordmark = <p className="shrink-0 font-display text-[clamp(1.2rem,8cqw,2.4rem)] uppercase leading-none tracking-[0.05em] text-white [margin-left:-0.06em]">Sarabia</p>;
   const model = (
-    <span className="flex min-w-0 max-w-[50%] flex-col items-end gap-1 text-right">
-      <span className="text-[clamp(0.5rem,2.1cqw,0.6rem)] font-semibold uppercase tracking-[0.2em] text-paper/80">{poster.corner}</span>
-      <span className="inline-flex items-center gap-1 text-[clamp(0.5rem,2.1cqw,0.6rem)] font-semibold uppercase tracking-[0.2em] text-volt-ice opacity-80 transition group-hover:opacity-100">
-        {productName} · {colorName} <ArrowUpRight className="h-3 w-3" />
+    <span className="flex min-w-0 flex-col items-end gap-1 whitespace-nowrap text-right text-[clamp(0.625rem,2.1cqw,0.6875rem)] font-semibold uppercase tracking-[0.16em]">
+      <span className="text-paper/80">{poster.corner}</span>
+      <span className="inline-flex items-center gap-1 text-volt-ice opacity-85 transition group-hover:opacity-100">
+        {productName} <ArrowUpRight className="h-3 w-3" aria-hidden />
       </span>
+      <span className="text-paper/55">{colorName}</span>
     </span>
   );
 
@@ -200,7 +202,7 @@ function PosterType({ poster, productName, colorName }: { poster: Poster; produc
         <div className="absolute left-[6%] top-[6%]">{headline}</div>
         <div className="absolute inset-x-[6%] bottom-[6%] space-y-4">
           {copy}
-          <div className="flex items-end justify-between gap-4">
+          <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
             {wordmark}
             {model}
           </div>
@@ -210,7 +212,7 @@ function PosterType({ poster, productName, colorName }: { poster: Poster; produc
     "headline-bottom": (
       <>
         <div className="absolute left-[6%] top-[6%] max-w-[60%]">
-          <p className="text-[clamp(0.5rem,2.1cqw,0.6rem)] font-semibold uppercase tracking-[0.22em] text-paper/70">Sarabia Eyewear</p>
+          <p className="text-[clamp(0.625rem,2.1cqw,0.6875rem)] font-semibold uppercase tracking-[0.2em] text-paper/75">Sarabia Eyewear</p>
         </div>
         <div className="absolute inset-x-[6%] bottom-[6%] space-y-3">
           {headline}
@@ -226,7 +228,7 @@ function PosterType({ poster, productName, colorName }: { poster: Poster; produc
         <div className="absolute inset-x-[6%] bottom-[6%] flex items-end justify-between gap-4">
           {copy}
           <div className="flex flex-col items-end gap-3 text-right">
-            <p className="display max-w-[16ch] text-[clamp(0.95rem,6cqw,1.6rem)] leading-[1.12] text-white">{poster.headline}</p>
+            <p className="display max-w-[18ch] text-[clamp(0.95rem,6cqw,1.6rem)] text-white">{poster.headline}</p>
             {model}
           </div>
         </div>

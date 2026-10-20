@@ -27,6 +27,7 @@ import {
 } from "@/lib/tryon/geometry";
 import { drawMannequin } from "@/lib/tryon/mannequin";
 import type { FaceTracker } from "@/lib/tryon/faceTracker";
+import { lockScroll, unlockScroll } from "@/lib/scroll";
 
 type Mode = "intro" | "camera" | "photo" | "mannequin";
 type TrackerState = "idle" | "loading" | "ready" | "failed";
@@ -471,11 +472,10 @@ export function TryOnModal({ initialProductId, initialColorId, onClose }: Props)
       if (event.key === "Escape") close();
     };
     window.addEventListener("keydown", onKey);
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    lockScroll(); // detiene también Lenis: el fondo no se mueve detrás del probador
     return () => {
       window.removeEventListener("keydown", onKey);
-      document.body.style.overflow = previous;
+      unlockScroll();
     };
   }, [close]);
 
@@ -509,11 +509,12 @@ export function TryOnModal({ initialProductId, initialColorId, onClose }: Props)
       role="dialog"
       aria-modal="true"
       aria-label={`Probador virtual: ${product.name}`}
+      data-lenis-prevent
     >
       <motion.div
-        initial={{ y: 28, scale: 0.98 }}
-        animate={{ y: 0, scale: 1 }}
-        exit={{ y: 28, scale: 0.98 }}
+        initial={{ transform: "translateY(28px) scale(0.98)" }}
+        animate={{ transform: "translateY(0px) scale(1)" }}
+        exit={{ transform: "translateY(28px) scale(0.98)" }}
         transition={{ type: "spring", bounce: 0.12, duration: 0.5 }}
         className="relative flex h-[100dvh] w-full flex-col overflow-y-auto bg-night-2 text-paper lg:h-[min(88vh,820px)] lg:max-w-6xl lg:flex-row lg:overflow-hidden lg:rounded-[2rem] lg:shadow-lift"
       >
