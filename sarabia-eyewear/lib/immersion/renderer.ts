@@ -233,7 +233,9 @@ in float vAlpha;
 uniform float uFade;
 out vec4 outColor;
 void main() {
-  float d = length(vUv);
+  // Las gotas son lágrimas: cabeza redonda en el sentido del movimiento y cola que se afila
+  vec2 uv = vKind > 0.5 && vKind < 1.5 ? vec2(vUv.x * mix(2.2, 1.0, smoothstep(-1.0, 0.4, vUv.y)), vUv.y) : vUv;
+  float d = length(uv);
   if (d > 1.0) discard;
   float a;
   if (vKind < 0.5) {
@@ -243,8 +245,11 @@ void main() {
     float lo = smoothstep(0.5, 1.0, d) * smoothstep(0.0, -0.8, vUv.y) * 0.35;
     a = rim * 0.75 + 0.1 * (1.0 - d) + hi * 0.95 + lo;
   } else if (vKind < 1.5) {
-    float hi = exp(-pow(length(vUv - vec2(-0.3, 0.3)) * 3.0, 2.0));
-    a = smoothstep(1.0, 0.0, d) * 0.75 + hi * 0.4;
+    // Gota: cuerpo casi transparente, borde refractado brillante, destello y estela de movimiento
+    float rim = smoothstep(0.5, 0.92, d) * smoothstep(1.0, 0.9, d);
+    float hi = exp(-pow(length(uv - vec2(-0.3, 0.45)) * 3.2, 2.0));
+    float tail = 0.55 + 0.45 * smoothstep(-1.0, 0.3, vUv.y);
+    a = (rim * 0.8 + (1.0 - d) * 0.24 + hi * 0.75) * tail;
   } else {
     // Bokeh: disco desenfocado con borde apenas marcado
     a = exp(-d * d * 3.2) * 0.32 + smoothstep(0.62, 0.9, d) * smoothstep(1.0, 0.9, d) * 0.08;
