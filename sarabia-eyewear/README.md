@@ -27,7 +27,9 @@ Todos los componentes con Framer Motion o estado llevan `"use client"`.
 | --- | --- | --- |
 | 1 | Header sticky + botón "Pedir por WhatsApp" | `components/Header.tsx` |
 | 2 | Hero tipo póster de campaña con selector rápido (Para Ver / De Sol / Blue Block) y armazón flotante | `components/Hero.tsx` |
-| 2b | Campaña en 6 pósters (fotos reales con gradación azul; cada uno abre el probador) | `components/Campaign.tsx` |
+| 2a | "Inmersión": secuencia controlada por scroll, el Costa real cae al agua (ver abajo) | `components/Immersion.tsx`, `lib/immersion/*` |
+| 2b | Telón "Diseñados en México. Ajustados a ti." con cifras, que sube sobre la escena | `components/Proof.tsx` |
+| 2c | Campaña en 6 pósters (fotos reales con gradación azul; cada uno abre el probador) | `components/Campaign.tsx` |
 | 3 | Scrollytelling "El Arte de Ver Bien" en 4 capítulos (ver abajo) | `components/ArtOfSeeing.tsx` |
 | 4 | Catálogo con filtros por estilo y material, swatches, vista frente/ángulo con inclinación 3D | `components/Catalog.tsx` |
 | 5 | Configurador en 3 clics (armazón → mica → receta/confirmación) | `components/Configurator.tsx` |
@@ -64,7 +66,7 @@ Campaña monocroma azul de aire lujoso:
   - Se detiene con `lockScroll()` / `unlockScroll()` (`lib/scroll.ts`) mientras hay un modal o menú abierto.
 - **Hero:**
   - En móvil ocupa exactamente `100svh` menos el header: el CTA siempre queda visible y no salta al ocultarse la barra
-    del navegador.
+    del navegador. En teléfonos en horizontal (variante `short:`) se acomoda en dos columnas.
   - Escenario de tamaño fijo con crossfade y textos de cada pestaña apilados, para CLS 0.
   - La levitación y la deriva de luz son animaciones CSS del compositor.
   - La primera imagen se renderiza visible desde el servidor (LCP).
@@ -72,8 +74,38 @@ Campaña monocroma azul de aire lujoso:
 - **Scrollytelling:**
   - Sin `useSpring` (Lenis ya suaviza) y las escenas fuera de rango usan `display: none`.
   - La colección vuela con transform (no mueve el layout).
+- **Header:** se retira al bajar y vuelve al subir, para que las escenas a pantalla completa queden limpias.
+- **Botón de WhatsApp:** no aparece sobre el hero, Inmersión ni contacto, y se aparta cuando un control marcado con
+  `data-fab-avoid` pasa por su franja.
 - **Fuente:** Michroma va incrustada (`app/fonts/michroma.css`), así que no hay cambio de fuente que mueva el layout.
 - **Imágenes:** sólo WebP (el alfa queda sin pérdida), calidad 90 en los armazones y `deviceSizes` pensados para 2x/3x.
+
+### Inmersión (secuencia controlada por scroll)
+
+Sección de 500svh con una escena fija de 100svh. Los primeros 300svh de scroll recorren la secuencia y los últimos
+100svh son el telón: `Proof.tsx` tiene `-mt-[100svh]` y sube por encima de la escena.
+
+1. El Costa en carey (foto real) levita sobre el agua con tres tarjetas de vidrio.
+2. Cae, toca el agua y salpica: gotas, espuma, ondas y una bolsa de aire que se cierra en burbujas.
+3. Se hunde mientras la cámara lo sigue. Aparecen tarjetas a los lados, la marca SARABIA gigante y, al final, el modelo
+   con sus CTA.
+
+Cómo está hecha:
+- **Render:** `lib/immersion/renderer.ts` dibuja con WebGL2, sin dependencias, a la resolución de la pantalla (hasta 2x,
+  con tope de píxeles y calidad adaptativa).
+  - Una pasada de pantalla completa: aire, superficie con oleaje, agua con rayos de luz y cáusticas, cavidad y la foto del
+    armazón con refracción y absorción.
+  - Una pasada instanciada: gotas, burbujas y bokeh.
+- **Línea de tiempo:** `lib/immersion/timeline.ts` calcula todo el estado como función pura del avance del scroll (y del
+  reloj sólo para el oleaje). La secuencia se puede recorrer hacia atrás cuadro por cuadro, como un video.
+- **Sincronía:** el canvas y los textos se actualizan en el mismo frame de Framer Motion que mueve Lenis. Los textos sólo
+  cambian `opacity` y `transform`, y cada tarjeta de vidrio anima su propia opacidad para no perder el `backdrop-filter`.
+- **Carga:** los shaders y la foto se preparan cuando la sección está a 1.5 pantallas, y sólo se dibuja mientras está a
+  la vista.
+- **Respaldos:** sin WebGL2 se muestran la foto y las tarjetas sobre un degradado. Con "reducir movimiento" se dibuja un
+  solo cuadro, sin pin.
+- **Títulos:** `components/CharReveal.tsx` revela letra por letra, en orden aleatorio estable, los titulares de sección y
+  del telón. El texto completo queda para lectores de pantalla.
 
 ### Scrollytelling "El Arte de Ver Bien"
 
