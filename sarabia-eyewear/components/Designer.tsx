@@ -16,25 +16,25 @@ import { scrollToTarget } from "@/lib/scroll";
  * entre las secciones oscuras. Cada tarjeta abre el probador con ese armazón.
  */
 
-type Tone = "cobalt" | "paper" | "ink";
+type Tone = "studio" | "paper" | "ink";
 type Tile = { productId: string; colorId: string; tone: Tone; x: number; y: number; z: number; rx: number; ry: number; rz: number; w: number };
 
 // Posiciones en % de la caja y profundidad en px: una composición, no una rejilla
 const TILES: Tile[] = [
-  { productId: "costa", colorId: "negro-humo", tone: "cobalt", x: 6, y: 4, z: 110, rx: 16, ry: -26, rz: -8, w: 36 },
+  { productId: "costa", colorId: "negro-humo", tone: "studio", x: 6, y: 4, z: 110, rx: 16, ry: -26, rz: -8, w: 36 },
   { productId: "roma", colorId: "oro-g15", tone: "paper", x: 50, y: -2, z: -70, rx: -12, ry: 30, rz: 6, w: 32 },
   { productId: "gata", colorId: "negro", tone: "ink", x: 60, y: 30, z: 150, rx: 10, ry: -18, rz: 10, w: 38 },
   { productId: "valeria", colorId: "verde", tone: "paper", x: 16, y: 36, z: -130, rx: -18, ry: 24, rz: -12, w: 30 },
-  { productId: "olivia", colorId: "carey-cafe", tone: "cobalt", x: 36, y: 60, z: 60, rx: 22, ry: -10, rz: 4, w: 38 },
+  { productId: "olivia", colorId: "carey-cafe", tone: "studio", x: 36, y: 60, z: 60, rx: 22, ry: -10, rz: 4, w: 38 },
   { productId: "tulum", colorId: "negro-oro", tone: "ink", x: 0, y: 70, z: -40, rx: -8, ry: 28, rz: -6, w: 28 },
-  { productId: "mateo", colorId: "carey", tone: "cobalt", x: 70, y: 68, z: -110, rx: 14, ry: -28, rz: 9, w: 28 },
+  { productId: "mateo", colorId: "carey", tone: "studio", x: 70, y: 68, z: -110, rx: 14, ry: -28, rz: 9, w: 28 },
   { productId: "brava", colorId: "miel", tone: "paper", x: 30, y: 14, z: 230, rx: -6, ry: 12, rz: -3, w: 24 },
 ];
 
 const TONES: Record<Tone, string> = {
-  cobalt: "bg-[radial-gradient(90%_75%_at_50%_40%,#2F6BFF_0%,#0E3BB8_36%,#071A55_74%,#030712_100%)]",
-  paper: "bg-[linear-gradient(160deg,#FFFFFF,#DCE4F7)] ring-1 ring-night/10",
-  ink: "bg-[radial-gradient(90%_75%_at_50%_35%,#16224A_0%,#070B16_80%)]",
+  studio: "bg-[radial-gradient(90%_80%_at_50%_38%,#FFFFFF_0%,#F1F1EE_52%,#E2E2DC_100%)] ring-1 ring-ink/[0.06]",
+  paper: "bg-white ring-1 ring-ink/10",
+  ink: "bg-[radial-gradient(90%_80%_at_50%_35%,#2A2A2E_0%,#151517_60%,#0B0B0C_100%)]",
 };
 
 export function Designer() {
@@ -62,7 +62,7 @@ export function Designer() {
       ref={ref}
       id="disenadora"
       aria-labelledby="disenadora-title"
-      className="on-light relative overflow-hidden bg-[#EEF2F8] py-20 text-night md:py-28"
+      className="relative overflow-hidden bg-canvas-2 py-20 text-ink md:py-28"
       onPointerMove={(event) => {
         if (event.pointerType !== "mouse" || reduced) return;
         const box = event.currentTarget.getBoundingClientRect();
@@ -76,21 +76,21 @@ export function Designer() {
     >
       <div className="container grid items-center gap-12 lg:grid-cols-[1fr_1.05fr] lg:gap-8">
         <div className="relative z-10">
-          <div className="flex items-center gap-4 font-mono text-[0.6875rem] uppercase leading-[1.7] tracking-[0.12em] text-night/60">
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-night font-display text-[0.75rem] tracking-[0.08em] text-ice">JS</span>
+          <div className="flex items-center gap-4 font-mono text-[0.6875rem] uppercase leading-[1.7] tracking-[0.12em] text-ink/60">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-ink font-display text-[0.75rem] tracking-[0.08em] text-white">JS</span>
             <p>
-              <span className="text-night">Diseñadora y fundadora</span>
+              <span className="text-ink">Diseñadora y fundadora</span>
               <br />
               Ciudad de México
             </p>
           </div>
-          <p className="mt-10 text-[1.0625rem] text-night/70">Directora creativa de Sarabia Eyewear</p>
+          <p className="mt-10 text-[1.0625rem] text-ink/70">Directora creativa de Sarabia Eyewear</p>
           <h2 id="disenadora-title" className="mt-2 text-[clamp(3.25rem,1.8rem+6vw,8.5rem)] font-light leading-[0.88] tracking-[-0.055em]">
             Jennifer
             <br />
             Sarabia
           </h2>
-          <p className="mt-8 max-w-[46ch] text-[0.9375rem] leading-relaxed text-night/70 sm:text-base">
+          <p className="mt-8 max-w-[46ch] text-[0.9375rem] leading-relaxed text-ink/70 sm:text-base">
             Cada armazón Sarabia empieza como un trazo de Jennifer: proporciones pensadas para rostros reales, acetatos de alta densidad y
             titanio, y un ajuste que se revisa a mano antes de llegar a ti.
           </p>
@@ -101,7 +101,7 @@ export function Designer() {
               rel="noopener noreferrer"
               className="btn-ink h-12 px-6 text-[0.9375rem]"
             >
-              <MessageCircle className="h-4 w-4 text-[#25D366]" aria-hidden /> Agenda una asesoría
+              <MessageCircle className="h-4 w-4 text-whatsapp" aria-hidden /> Agenda una asesoría
             </a>
             <button
               type="button"
@@ -137,7 +137,7 @@ export function Designer() {
                 <span className="absolute inset-0 motion-safe:animate-float" style={{ animationDelay: `${-i * 0.8}s`, animationDuration: `${6 + (i % 3)}s` }}>
                 <span
                   className={clsx(
-                    "absolute inset-0 flex items-center justify-center overflow-hidden rounded-xl p-[10%] shadow-[0_24px_50px_-24px_rgba(3,5,11,0.55)] transition-transform duration-500 ease-out group-hover:scale-[1.05]",
+                    "absolute inset-0 flex items-center justify-center overflow-hidden rounded-xl p-[10%] shadow-[0_24px_50px_-26px_rgba(11,11,12,0.4)] transition-transform duration-500 ease-out group-hover:scale-[1.05]",
                     TONES[tile.tone],
                   )}
                 >
@@ -148,10 +148,10 @@ export function Designer() {
                       width={tile.color.photo.width}
                       height={tile.color.photo.height}
                       sizes="(min-width: 1024px) 18vw, 40vw"
-                      className={clsx("h-auto w-full [filter:drop-shadow(0_10px_10px_rgba(0,3,15,0.35))]", tile.tone === "ink" && "grade-duotone")}
+                      className={clsx("h-auto w-full [filter:drop-shadow(0_10px_10px_rgba(11,11,12,0.2))]", tile.tone === "ink" && "grade-duotone")}
                     />
                   )}
-                  <span className={clsx("absolute bottom-2 left-3 font-mono text-[0.5625rem] uppercase tracking-[0.14em]", tile.tone === "paper" ? "text-night/55" : "text-white/70")}>
+                  <span className={clsx("absolute bottom-2 left-3 font-mono text-[0.5625rem] uppercase tracking-[0.14em]", tile.tone === "ink" ? "text-white/70" : "text-ink/60")}>
                     {tile.product.name}
                   </span>
                 </span>

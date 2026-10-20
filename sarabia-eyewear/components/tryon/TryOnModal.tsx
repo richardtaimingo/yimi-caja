@@ -516,10 +516,10 @@ export function TryOnModal({ initialProductId, initialColorId, onClose }: Props)
         animate={{ transform: "translateY(0px) scale(1)" }}
         exit={{ transform: "translateY(28px) scale(0.98)" }}
         transition={{ type: "spring", bounce: 0.12, duration: 0.5 }}
-        className="relative flex h-[100dvh] w-full flex-col overflow-y-auto bg-night-2 text-paper lg:h-[min(88vh,820px)] lg:max-w-6xl lg:flex-row lg:overflow-hidden lg:rounded-[2rem] lg:shadow-lift"
+        className="relative flex h-[100dvh] w-full flex-col overflow-y-auto bg-white text-ink lg:h-[min(88vh,820px)] lg:max-w-6xl lg:flex-row lg:overflow-hidden lg:rounded-[2rem] lg:shadow-lift"
       >
         {/* Escenario */}
-        <div ref={stageRef} className="relative min-h-[60dvh] flex-1 overflow-hidden bg-[#0d0d0c] lg:min-h-0">
+        <div ref={stageRef} className="on-dark relative min-h-[60dvh] flex-1 overflow-hidden bg-[#0d0d0c] lg:min-h-0">
           <canvas
             ref={canvasRef}
             className={clsx("absolute inset-0 h-full w-full select-none", draggable && "cursor-grab touch-none active:cursor-grabbing")}
@@ -548,7 +548,7 @@ export function TryOnModal({ initialProductId, initialColorId, onClose }: Props)
                       onClick={onClick}
                       className={clsx(
                         "flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition sm:text-sm",
-                        mode === id ? "bg-paper text-night" : "text-paper/80 hover:text-paper",
+                        mode === id ? "bg-white text-ink" : "text-white/80 hover:text-white",
                       )}
                     >
                       <Icon className="h-3.5 w-3.5" />
@@ -559,7 +559,7 @@ export function TryOnModal({ initialProductId, initialColorId, onClose }: Props)
                 {status && (
                   <p
                     aria-live="polite"
-                    className="flex items-center gap-2 rounded-full bg-black/55 px-3 py-1.5 text-xs font-medium text-paper/90 backdrop-blur"
+                    className="flex items-center gap-2 rounded-full bg-black/55 px-3 py-1.5 text-xs font-medium text-white/90 backdrop-blur"
                   >
                     {status.tone === "busy" ? (
                       <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -567,7 +567,7 @@ export function TryOnModal({ initialProductId, initialColorId, onClose }: Props)
                       <span
                         className={clsx(
                           "h-2 w-2 rounded-full",
-                          status.tone === "ok" ? "bg-[#25D366]" : status.tone === "warn" ? "bg-volt" : "bg-paper/50",
+                          status.tone === "ok" ? "bg-[#25D366]" : status.tone === "warn" ? "bg-[#F6B40E]" : "bg-white/50",
                         )}
                       />
                     )}
@@ -576,7 +576,7 @@ export function TryOnModal({ initialProductId, initialColorId, onClose }: Props)
                 )}
               </div>
             ) : (
-              <p className="eyebrow pt-2 text-paper/60">Probador virtual</p>
+              <p className="eyebrow pt-2 text-white/65">Probador virtual</p>
             )}
             <button
               type="button"
@@ -592,20 +592,20 @@ export function TryOnModal({ initialProductId, initialColorId, onClose }: Props)
           {mode === "intro" && (
             <div className="absolute inset-0 z-10 flex items-center justify-center overflow-y-auto p-6 pt-16">
               <div className="w-full max-w-sm text-center">
-                <div className="stage-blue mx-auto w-52 rounded-3xl px-6 py-5 sm:w-60 [@media(max-height:700px)]:w-36 [@media(max-height:700px)]:py-3">
+                <div className="stage-studio mx-auto w-52 rounded-3xl px-6 py-5 sm:w-60 [@media(max-height:700px)]:w-36 [@media(max-height:700px)]:py-3">
                   <ProductImage product={product} color={color} sizes="240px" className="h-auto w-full" />
                 </div>
                 <h2 className="display mt-6 text-balance text-lg leading-snug sm:text-xl">
                   Activa tu cámara para probarte los {product.name} en tiempo real
                 </h2>
-                <p className="mt-3 text-sm leading-relaxed text-paper/60">
+                <p className="mt-3 text-sm leading-relaxed text-white/65">
                   Tu imagen se procesa en tu dispositivo: no se guarda ni se envía a ningún servidor.
                 </p>
 
                 {cameraError && (
-                  <div role="alert" className="mt-5 rounded-2xl border border-volt/30 bg-white/[0.06] p-4 text-left text-sm">
+                  <div role="alert" className="mt-5 rounded-2xl border border-white/20 bg-white/[0.06] p-4 text-left text-sm">
                     <p className="font-semibold">No pudimos usar tu cámara</p>
-                    <p className="mt-1 leading-relaxed text-paper/70">{cameraError}</p>
+                    <p className="mt-1 leading-relaxed text-white/70">{cameraError}</p>
                   </div>
                 )}
 
@@ -621,7 +621,7 @@ export function TryOnModal({ initialProductId, initialColorId, onClose }: Props)
                     >
                       <UserRound className="h-4 w-4" /> Verlos en el maniquí 3D
                     </button>
-                    <button type="button" onClick={() => void startCamera()} className="mt-1 text-sm font-medium text-paper/60 underline-offset-4 hover:text-paper hover:underline">
+                    <button type="button" onClick={() => void startCamera()} className="mt-1 text-sm font-medium text-white/65 underline-offset-4 hover:text-white hover:underline">
                       Intentar de nuevo con la cámara
                     </button>
                   </div>
@@ -657,7 +657,7 @@ export function TryOnModal({ initialProductId, initialColorId, onClose }: Props)
           {manualActive && (
             <div className="absolute inset-x-3 bottom-24 z-10 mx-auto grid max-w-sm gap-2 rounded-2xl bg-black/60 p-3 text-xs backdrop-blur">
               <label className="flex items-center gap-3">
-                <span className="w-20 text-paper/70">Tamaño</span>
+                <span className="w-20 text-white/70">Tamaño</span>
                 <input
                   type="range"
                   min={0.08}
@@ -669,7 +669,7 @@ export function TryOnModal({ initialProductId, initialColorId, onClose }: Props)
                 />
               </label>
               <label className="flex items-center gap-3">
-                <span className="w-20 text-paper/70">Inclinación</span>
+                <span className="w-20 text-white/70">Inclinación</span>
                 <input
                   type="range"
                   min={-0.35}
@@ -709,12 +709,12 @@ export function TryOnModal({ initialProductId, initialColorId, onClose }: Props)
         </div>
 
         {/* Panel de producto */}
-        <aside className="flex shrink-0 flex-col gap-4 border-t border-white/10 bg-night-2 p-4 sm:p-5 lg:w-[380px] lg:overflow-y-auto lg:border-l lg:border-t-0 lg:p-6">
+        <aside className="flex shrink-0 flex-col gap-4 border-t border-ink/10 bg-white p-4 sm:p-5 lg:w-[380px] lg:overflow-y-auto lg:border-l lg:border-t-0 lg:p-6">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
-              <p className="hidden text-xs font-semibold uppercase tracking-[0.2em] text-paper/50 lg:block">Probador virtual</p>
+              <p className="hidden text-xs font-semibold uppercase tracking-[0.2em] text-ink/60 lg:block">Probador virtual</p>
               <h3 className="font-display text-lg uppercase lg:mt-2 lg:text-2xl">{product.name}</h3>
-              <p className="truncate text-sm text-paper/60">
+              <p className="truncate text-sm text-ink/60">
                 {color.name} · {materialLabels[product.material].badge}
               </p>
             </div>
@@ -732,8 +732,8 @@ export function TryOnModal({ initialProductId, initialColorId, onClose }: Props)
                 title={c.name}
                 onClick={() => setSelected((prev) => ({ ...prev, colorId: c.id }))}
                 className={clsx(
-                  "h-8 w-8 rounded-full ring-offset-2 ring-offset-night transition",
-                  c.id === color.id ? "ring-2 ring-paper" : "ring-1 ring-white/20 hover:ring-white/50",
+                  "h-8 w-8 rounded-full ring-offset-2 ring-offset-white transition",
+                  c.id === color.id ? "ring-2 ring-ink" : "ring-1 ring-ink/20 hover:ring-ink/50",
                 )}
                 style={swatchStyle(c)}
               />
@@ -741,7 +741,7 @@ export function TryOnModal({ initialProductId, initialColorId, onClose }: Props)
           </div>
 
           <div>
-            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-paper/50">Cambia de armazón</p>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-ink/60">Cambia de armazón</p>
             <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:-mx-5 sm:px-5 lg:mx-0 lg:grid lg:grid-cols-4 lg:overflow-visible lg:px-0">
               {products.map((p) => {
                 const isCurrent = p.id === product.id;
@@ -753,10 +753,10 @@ export function TryOnModal({ initialProductId, initialColorId, onClose }: Props)
                     onClick={() => setSelected({ productId: p.id, colorId: p.colors[0].id })}
                     className={clsx(
                       "w-[4.75rem] shrink-0 rounded-2xl p-1.5 text-left transition lg:w-auto",
-                      isCurrent ? "bg-white/15 ring-2 ring-paper" : "bg-white/[0.05] hover:bg-white/10",
+                      isCurrent ? "bg-canvas-2 ring-2 ring-ink" : "bg-canvas-2/60 hover:bg-canvas-2",
                     )}
                   >
-                    <span className="stage-blue block rounded-xl px-1.5 py-2">
+                    <span className="stage-studio block rounded-xl px-1.5 py-2">
                       <ProductImage product={p} color={p.colors[0]} sizes="80px" className="h-5 w-full object-contain" />
                     </span>
                     <span className="mt-1 block truncate px-0.5 text-[0.7rem] font-medium">{p.name}</span>
@@ -768,7 +768,7 @@ export function TryOnModal({ initialProductId, initialColorId, onClose }: Props)
 
           {captures.length > 0 && (
             <div>
-              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-paper/50">Tus capturas para comparar</p>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-ink/60">Tus capturas para comparar</p>
               <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:-mx-5 sm:px-5 lg:mx-0 lg:grid lg:grid-cols-3 lg:px-0">
                 {captures.map((c) => (
                   <a
@@ -791,11 +791,11 @@ export function TryOnModal({ initialProductId, initialColorId, onClose }: Props)
               href={whatsappLink(tryOnMessage(product.name, color.name))}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex h-14 items-center justify-center gap-2 whitespace-nowrap rounded-full bg-[#25D366] px-4 text-[0.92rem] font-semibold text-night transition hover:brightness-95"
+              className="inline-flex h-14 items-center justify-center gap-2 whitespace-nowrap rounded-full bg-ink px-4 text-[0.92rem] font-semibold text-white transition hover:bg-ink-2"
             >
-              <MessageCircle className="h-5 w-5" /> Comprar este modelo por WhatsApp
+              <MessageCircle className="h-5 w-5 text-whatsapp" /> Comprar este modelo por WhatsApp
             </a>
-            <p className="hidden text-center text-xs text-paper/50 lg:block">
+            <p className="hidden text-center text-xs text-ink/60 lg:block">
               La imagen se procesa en tu dispositivo. Las capturas se guardan sólo en tus descargas.
             </p>
           </div>

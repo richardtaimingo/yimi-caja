@@ -10,7 +10,7 @@ const TryOnModal = dynamic(() => import("./TryOnModal").then((m) => m.TryOnModal
   ssr: false,
   loading: () => (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-sm" role="status">
-      <Loader2 className="h-8 w-8 animate-spin text-paper" />
+      <Loader2 className="h-8 w-8 animate-spin text-white" />
       <span className="sr-only">Abriendo probador virtual…</span>
     </div>
   ),

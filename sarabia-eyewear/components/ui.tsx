@@ -37,11 +37,11 @@ export function SectionHeading({
       <p className="eyebrow">{eyebrow}</p>
       {/* Titulares de campaña sin punto final */}
       {typeof title === "string" ? (
-        <CharReveal as="h2" text={title.replace(/\.$/, "")} className="display mt-4 text-[1.7rem] text-white sm:text-4xl lg:text-5xl" />
+        <CharReveal as="h2" text={title.replace(/\.$/, "")} className="display mt-4 text-[1.7rem] text-ink sm:text-4xl lg:text-5xl" />
       ) : (
-        <h2 className="display mt-4 text-[1.7rem] text-white sm:text-4xl lg:text-5xl">{title}</h2>
+        <h2 className="display mt-4 text-[1.7rem] text-ink sm:text-4xl lg:text-5xl">{title}</h2>
       )}
-      {description && <p className="mt-5 max-w-lg text-base leading-relaxed text-paper/60 sm:text-lg">{description}</p>}
+      {description && <p className="mt-5 max-w-lg text-base leading-relaxed text-ink/65 sm:text-lg">{description}</p>}
     </Reveal>
   );
 }

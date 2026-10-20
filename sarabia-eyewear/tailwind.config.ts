@@ -8,15 +8,13 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Fondo: tinta azul casi negra, en tres niveles de superficie.
-        night: { DEFAULT: "#03050B", 2: "#070B16", 3: "#0C1324" },
-        // Texto (blanco frío).
-        paper: "#EEF2F8",
-        // Luz de campaña. DEFAULT es el cobalto del CTA de acento; ice, el azul claro de detalles.
-        volt: { DEFAULT: "#2F5BEA", deep: "#1B47C9", soft: "#86A8FF", ice: "#B9CCFF" },
-        // Blanco hielo: botón principal, foco y brillos especulares.
-        ice: "#E8EEFF",
-        cobalt: { 950: "#050E2E", 800: "#0B2470", 600: "#1B47C9", 500: "#2F5BEA" },
+        // Sistema blanco de lujo: lienzo blanco con dos grises cálidos de apoyo y tinta casi negra.
+        // Sin azul: el único color de la interfaz es el producto (y el verde de WhatsApp en su icono).
+        canvas: { DEFAULT: "#FFFFFF", 2: "#F6F6F3", 3: "#ECECE7" },
+        ink: { DEFAULT: "#0B0B0C", 2: "#1F1F22", 3: "#38383C" },
+        // Texto secundario sobre blanco (5.4:1); para texto pequeño nunca menos que esto.
+        mute: "#6A6A6F",
+        whatsapp: { DEFAULT: "#25D366", ink: "#0E7A41" },
       },
       fontFamily: {
         sans: ["var(--font-geist-sans)", "ui-sans-serif", "system-ui", "sans-serif"],
@@ -25,9 +23,10 @@ const config: Config = {
       },
       letterSpacing: { tightest: "-0.055em" },
       boxShadow: {
-        card: "0 1px 2px rgba(0,0,0,0.3), 0 18px 40px -24px rgba(0,0,0,0.7)",
-        lift: "0 40px 80px -40px rgba(0,0,0,0.85)",
-        glow: "0 12px 28px -12px rgba(27,71,201,0.8)",
+        // Sombras de estudio: suaves, cálidas y bajas (nada de halos)
+        card: "0 1px 2px rgba(11,11,12,0.06), 0 12px 32px -18px rgba(11,11,12,0.22)",
+        lift: "0 30px 60px -30px rgba(11,11,12,0.35)",
+        float: "0 2px 6px rgba(11,11,12,0.06), 0 24px 48px -20px rgba(11,11,12,0.28)",
       },
       keyframes: {
         marquee: { from: { transform: "translate3d(0,0,0)" }, to: { transform: "translate3d(-50%,0,0)" } },

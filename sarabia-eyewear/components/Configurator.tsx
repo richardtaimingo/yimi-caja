@@ -30,7 +30,7 @@ export function Configurator() {
     : "";
 
   return (
-    <section id="como-funciona" className="scroll-mt-20 bg-night-2 py-20 md:py-28">
+    <section id="como-funciona" className="scroll-mt-20 bg-canvas-2 py-20 md:py-28">
       <div className="container">
         <SectionHeading
           eyebrow="Cómo funciona"
@@ -59,17 +59,17 @@ export function Configurator() {
                       }
                       className={clsx(
                         "rounded-2xl border p-3 text-left transition",
-                        selected ? "border-paper bg-night-2 shadow-card" : "border-paper/10 bg-night hover:border-paper/40",
+                        selected ? "border-ink bg-canvas-2 shadow-card" : "border-ink/10 bg-white hover:border-ink/40",
                       )}
                     >
-                      <span className="stage-blue flex h-14 items-center justify-center rounded-xl px-2">
+                      <span className="stage-studio flex h-14 items-center justify-center rounded-xl px-2">
                         <ProductImage product={p} color={p.colors[0]} sizes="120px" className="max-h-10 w-full object-contain" />
                       </span>
                       <span className="mt-2 flex items-baseline justify-between gap-1">
                         <span className="text-sm font-semibold">{p.name}</span>
-                        <span className="text-[0.68rem] text-paper/55">{p.category === "sol" ? "Sol" : "Ver"}</span>
+                        <span className="text-[0.68rem] text-ink/60">{p.category === "sol" ? "Sol" : "Ver"}</span>
                       </span>
-                      <span className="text-xs text-paper/55">{currency.format(p.price)}</span>
+                      <span className="text-xs text-ink/60">{currency.format(p.price)}</span>
                     </button>
                   );
                 })}
@@ -84,13 +84,13 @@ export function Configurator() {
                     aria-pressed={c.id === color.id}
                     onClick={() => setSelection({ colorId: c.id })}
                     className={clsx(
-                      "h-8 w-8 rounded-full ring-offset-2 ring-offset-night transition",
-                      c.id === color.id ? "ring-2 ring-paper" : "ring-1 ring-paper/20 hover:ring-paper/50",
+                      "h-8 w-8 rounded-full ring-offset-2 ring-offset-white transition",
+                      c.id === color.id ? "ring-2 ring-ink" : "ring-1 ring-ink/20 hover:ring-ink/50",
                     )}
                     style={swatchStyle(c)}
                   />
                 ))}
-                <span className="text-sm text-paper/55">{color.name}</span>
+                <span className="text-sm text-ink/60">{color.name}</span>
               </div>
             </Step>
 
@@ -107,7 +107,7 @@ export function Configurator() {
                       onClick={() => setSelection({ lensId: o.id })}
                       className={clsx(
                         "flex flex-col rounded-2xl border p-4 text-left transition",
-                        selected ? "border-paper bg-night-2 shadow-card" : "border-paper/10 bg-night hover:border-paper/40",
+                        selected ? "border-ink bg-canvas-2 shadow-card" : "border-ink/10 bg-white hover:border-ink/40",
                       )}
                     >
                       <span className="flex items-start justify-between gap-2">
@@ -115,13 +115,13 @@ export function Configurator() {
                         <span
                           className={clsx(
                             "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border",
-                            selected ? "border-paper bg-paper text-night" : "border-paper/25",
+                            selected ? "border-ink bg-ink text-white" : "border-ink/25",
                           )}
                         >
                           {selected && <Check className="h-3 w-3" strokeWidth={3} />}
                         </span>
                       </span>
-                      <span className="mt-1 flex-1 text-xs leading-relaxed text-paper/55">{o.description}</span>
+                      <span className="mt-1 flex-1 text-xs leading-relaxed text-ink/60">{o.description}</span>
                       <span className="mt-3 text-sm font-medium">{o.price ? `+${currency.format(o.price)}` : "Sin costo extra"}</span>
                     </button>
                   );
@@ -133,7 +133,7 @@ export function Configurator() {
           {/* Paso 3 · Resumen */}
           <div className="lg:sticky lg:top-24">
             <Step number={3} title="Envía tu receta o confirma tu pedido" done={false} highlight>
-              <div className="stage-blue rounded-2xl p-4">
+              <div className="stage-studio rounded-2xl p-4">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={`${product.id}-${color.id}`}
@@ -146,7 +146,7 @@ export function Configurator() {
                       product={product}
                       color={color}
                       sizes="(min-width: 1024px) 280px, 70vw"
-                      className="mx-auto h-auto w-3/5 drop-shadow-[0_18px_18px_rgba(0,0,0,0.5)]"
+                      className="mx-auto h-auto w-3/5 drop-shadow-[0_14px_14px_rgba(11,11,12,0.2)]"
                     />
                   </motion.div>
                 </AnimatePresence>
@@ -160,7 +160,7 @@ export function Configurator() {
                 <Row label={materialLabels[product.material].badge} value={`${product.specs.lens}□${product.specs.bridge}-${product.specs.temple}`} muted />
                 <Row label={lens ? `Micas: ${lens.name}` : "Micas: elige una opción"} value={lens ? (lens.price ? `+${currency.format(lens.price)}` : "Incluido") : "—"} />
                 <Row label="Envío" value="Gratis" muted />
-                <div className="flex items-baseline justify-between border-t border-paper/10 pt-3">
+                <div className="flex items-baseline justify-between border-t border-ink/10 pt-3">
                   <dt className="font-semibold">Total</dt>
                   <dd className="text-2xl font-semibold tracking-tight">{currency.format(total)}</dd>
                 </div>
@@ -168,7 +168,7 @@ export function Configurator() {
 
               <div className="mt-5 space-y-2">
                 {!lens ? (
-                  <p className="rounded-2xl border border-dashed border-paper/20 p-4 text-center text-sm text-paper/55">Elige tu tipo de mica en el paso 2 para continuar.</p>
+                  <p className="rounded-2xl border border-dashed border-ink/20 p-4 text-center text-sm text-ink/60">Elige tu tipo de mica en el paso 2 para continuar.</p>
                 ) : lens.needsRx ? (
                   <>
                     <a
@@ -194,7 +194,7 @@ export function Configurator() {
                   </a>
                 )}
               </div>
-              <p className="mt-3 text-center text-xs text-paper/55">Un asesor confirma medidas, forma de pago y fecha de entrega.</p>
+              <p className="mt-3 text-center text-xs text-ink/60">Un asesor confirma medidas, forma de pago y fecha de entrega.</p>
             </Step>
           </div>
         </div>
@@ -205,12 +205,12 @@ export function Configurator() {
 
 function Step({ number, title, done, highlight, children }: { number: number; title: string; done: boolean; highlight?: boolean; children: React.ReactNode }) {
   return (
-    <div className={clsx("rounded-[1.75rem] p-5 sm:p-7", highlight ? "bg-night-2 shadow-lift" : "bg-night")}>
+    <div className={clsx("rounded-[1.75rem] p-5 sm:p-7", highlight ? "bg-canvas-2 shadow-lift" : "bg-white")}>
       <div className="mb-5 flex items-center gap-3">
         <span
           className={clsx(
             "flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold transition-colors",
-            done ? "bg-paper text-night" : "bg-night-3 text-paper",
+            done ? "bg-ink text-white" : "bg-canvas-3 text-ink",
           )}
         >
           {done ? <Check className="h-4 w-4" strokeWidth={2.5} /> : number}
@@ -224,7 +224,7 @@ function Step({ number, title, done, highlight, children }: { number: number; ti
 
 function Row({ label, value, muted }: { label: string; value: string; muted?: boolean }) {
   return (
-    <div className={clsx("flex items-baseline justify-between gap-4", muted && "text-paper/55")}>
+    <div className={clsx("flex items-baseline justify-between gap-4", muted && "text-ink/60")}>
       <dt>{label}</dt>
       <dd className="shrink-0 font-medium">{value}</dd>
     </div>

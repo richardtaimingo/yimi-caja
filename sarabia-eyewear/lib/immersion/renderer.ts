@@ -105,24 +105,26 @@ void main() {
   float water = 1.0 - smoothstep(-px, px, sd);
   float D = max(-wp.y, 0.0);
 
-  // Aire: tinta arriba, luz cobalto al acercarse al agua y halo de estudio detrás del armazón
-  vec3 air = mix(vec3(0.05, 0.11, 0.33), vec3(0.012, 0.02, 0.043), smoothstep(0.0, 0.7, sd));
+  // Aire: estudio blanco, apenas más cálido y gris cerca del agua, con luz principal detrás del armazón
+  vec3 air = mix(vec3(0.945, 0.945, 0.93), vec3(1.0, 1.0, 0.995), smoothstep(0.0, 0.7, sd));
   vec2 kd = (wp - uFrame.xy) * vec2(0.85, 1.5);
-  air += vec3(0.10, 0.20, 0.58) * exp(-dot(kd, kd) * 7.0) * 0.9;
-  air += vec3(0.16, 0.30, 0.80) * exp(-max(sd, 0.0) / 0.035) * 0.08;
+  air = mix(air, vec3(1.0), exp(-dot(kd, kd) * 7.0) * 0.6);
 
-  // Agua: cobalto luminoso bajo la superficie que se apaga con la profundidad (nunca negro)
-  vec3 wcol = mix(vec3(0.14, 0.34, 0.92), vec3(0.06, 0.17, 0.56), smoothstep(0.0, 0.7, D));
-  wcol = mix(wcol, vec3(0.03, 0.08, 0.27), smoothstep(0.6, 2.4, D));
-  wcol *= 0.86 + 0.22 * smoothstep(-0.5, 0.5, p.y);
-  wcol += vec3(0.32, 0.52, 1.0) * rays(wp, t) * 0.2 * exp(-D * 1.2) * smoothstep(0.0, 0.05, -sd);
-  wcol += vec3(0.5, 0.72, 1.0) * caustic(wp * vec2(6.0, 9.0) + vec2(0.0, t * 0.05), t * 0.7) * 0.045 * exp(-D * 3.2);
+  // Agua cristalina neutra: casi blanca bajo la superficie y gris perla con la profundidad (sin azul)
+  vec3 wcol = mix(vec3(0.885, 0.9, 0.905), vec3(0.8, 0.82, 0.83), smoothstep(0.0, 0.8, D));
+  wcol = mix(wcol, vec3(0.72, 0.74, 0.755), smoothstep(0.7, 2.4, D));
+  wcol *= 0.95 + 0.07 * smoothstep(-0.5, 0.5, p.y);
+  // Rayos y cáusticas: luz blanca que entra desde la superficie
+  wcol = mix(wcol, vec3(1.0), rays(wp, t) * 0.32 * exp(-D * 1.1) * smoothstep(0.0, 0.05, -sd));
+  float cs = caustic(wp * vec2(6.0, 9.0) + vec2(0.0, t * 0.05), t * 0.7) * exp(-D * 2.6);
+  wcol = mix(wcol, vec3(1.0), cs * 0.16);
+  // Partículas en suspensión: polvo gris (se ve sobre el agua clara)
   float sn = snow(wp, 22.0, t) + 0.6 * snow(wp + 3.7, 34.0, t * 0.7);
-  wcol += vec3(0.6, 0.75, 1.0) * sn * 0.16 * (0.4 + 0.6 * exp(-D * 0.8));
-  // Reflexión total bajo la superficie: banda clara y ondulada
+  wcol -= vec3(0.16, 0.16, 0.15) * sn * 0.5 * (0.4 + 0.6 * exp(-D * 0.8));
+  // Reflexión total bajo la superficie: banda plateada y ondulada
   float band = exp(-max(-sd, 0.0) / 0.024);
   float streak = 0.5 + 0.5 * sin(wp.x * 85.0 + 3.0 * sin(wp.x * 12.0 + t) + t * 0.8);
-  wcol += vec3(0.3, 0.55, 1.0) * band * (0.08 + 0.12 * streak);
+  wcol = mix(wcol, vec3(0.72, 0.74, 0.75), band * (0.18 + 0.16 * streak));
 
   // Espuma del impacto: agua blanca turbulenta junto a la superficie
   float age = uImpact.y;
@@ -132,7 +134,9 @@ void main() {
     float reach = fw * (0.55 + age * 0.18);
     foam = smoothstep(reach, reach * 0.4, dx) * exp(-max(-sd, 0.0) / (0.02 + 0.03 * age)) * exp(-age * 0.9) * smoothstep(0.0, 0.06, age);
     foam *= 0.45 + 0.9 * fbm(vec2(wp.x * 38.0, wp.y * 60.0 - age * 3.0));
-    wcol += vec3(0.7, 0.84, 1.0) * foam * 0.8;
+    // Espuma: burbujeo blanco con sombra gris de su propia turbulencia
+    wcol = mix(wcol, vec3(0.78, 0.8, 0.8), foam * 0.35);
+    wcol = mix(wcol, vec3(1.0), foam * 0.55 * fbm(vec2(wp.x * 90.0, wp.y * 120.0)));
   }
 
   vec3 col = mix(air, wcol, water);
@@ -141,7 +145,7 @@ void main() {
   if (age > 0.0) {
     float dx = (wp.x - uImpact.x) / (fw * 0.7);
     float dy = max(sd, 0.0) / (0.06 + age * 0.08);
-    col += vec3(0.55, 0.72, 1.0) * 0.2 * exp(-(dx * dx + dy * dy)) * (1.0 - water) * smoothstep(0.0, 0.05, age) * exp(-age * 1.4);
+    col -= vec3(0.05, 0.05, 0.045) * exp(-(dx * dx + dy * dy)) * (1.0 - water) * smoothstep(0.0, 0.05, age) * exp(-age * 1.4);
   }
   float frameAlpha = 0.0;
 
@@ -160,10 +164,12 @@ void main() {
       if (tx.a > 0.002) {
         float edge = clamp(tx.a - texture(uTex, uv + vec2(0.0, 0.014)).a, 0.0, 1.0);
         vec3 fc = tx.rgb;
-        vec3 wet = fc * exp(-vec3(0.55, 0.28, 0.1) * (0.25 + D * 0.3)) + vec3(0.01, 0.035, 0.11) * tx.a;
-        wet += tx.a * vec3(0.55, 0.75, 1.0) * caustic(q * 11.0 + vec2(0.0, t * 0.1), t * 0.9) * 0.15 * exp(-D * 0.6);
+        // Bajo el agua: un poco menos de contraste y saturación, y luz de cáusticas encima
+        float luma = dot(fc, vec3(0.299, 0.587, 0.114));
+        vec3 wet = mix(fc, vec3(luma), 0.18) * (0.93 - D * 0.05) + vec3(0.03) * tx.a;
+        wet += tx.a * vec3(1.0) * caustic(q * 11.0 + vec2(0.0, t * 0.1), t * 0.9) * 0.12 * exp(-D * 0.6);
         fc = mix(fc, wet, uw * 0.85);
-        fc += vec3(0.6, 0.78, 1.0) * edge * (0.12 + 0.16 * uw) * tx.a;
+        fc += vec3(1.0) * edge * (0.08 + 0.1 * uw) * tx.a;
         col = col * (1.0 - tx.a) + fc;
         frameAlpha = tx.a;
       }
@@ -172,14 +178,16 @@ void main() {
 
   // Menisco: la línea de la superficie pasa por delante de todo
   // Menisco fino y contenido (nunca cruza el armazón) con un filo oscuro de refracción justo debajo
-  col += vec3(0.78, 0.9, 1.0) * exp(-abs(sd) / (0.0009 + px)) * 0.42 * (1.0 - frameAlpha);
-  col *= 1.0 - 0.16 * exp(-abs(sd + 0.006) / 0.004) * water * (1.0 - frameAlpha);
+  // Sobre blanco el menisco se ve como una línea gris fina con un brillo justo debajo
+  col = mix(col, vec3(0.36, 0.38, 0.39), exp(-abs(sd) / (0.0009 + px)) * 0.7 * (1.0 - frameAlpha));
+  col = mix(col, vec3(1.0), exp(-abs(sd + 0.004) / 0.0025) * 0.6 * water * (1.0 - frameAlpha));
 
-  // Viñeta suave y grano de película
+  // Viñeta de estudio muy suave y grano fino
   float v = length(p * vec2(0.75, 1.0));
-  col *= 1.0 - 0.32 * smoothstep(0.35, 0.95, v);
-  col += (hash(gl_FragCoord.xy + fract(t * 7.0) * 100.0) - 0.5) * 0.022;
-  col *= 1.0 - uFade;
+  col *= 1.0 - 0.07 * smoothstep(0.35, 0.95, v);
+  col += (hash(gl_FragCoord.xy + fract(t * 7.0) * 100.0) - 0.5) * 0.012;
+  // Con el telón la escena se funde hacia el gris cálido del sitio
+  col = mix(col, vec3(0.965, 0.965, 0.953), uFade);
   outColor = vec4(col, 1.0);
 }`;
 
@@ -224,24 +232,28 @@ void main() {
   float d = length(uv);
   if (d > 1.0) discard;
   float a;
+  float hi = 0.0;
   if (vKind < 0.5) {
     // Burbuja: aro fino, brillo especular arriba y borde inferior más claro (refracción)
     float rim = smoothstep(0.6, 0.94, d) * smoothstep(1.0, 0.92, d);
-    float hi = exp(-pow(length(vUv - vec2(-0.35, 0.38)) * 4.0, 2.0));
-    float lo = smoothstep(0.5, 1.0, d) * smoothstep(0.0, -0.8, vUv.y) * 0.35;
-    a = rim * 0.75 + 0.1 * (1.0 - d) + hi * 0.95 + lo;
+    hi = exp(-pow(length(vUv - vec2(-0.35, 0.38)) * 4.0, 2.0));
+    float lo = smoothstep(0.5, 1.0, d) * smoothstep(0.0, -0.8, vUv.y) * 0.3;
+    a = rim * 0.55 + 0.05 * (1.0 - d) + hi * 0.9 + lo;
   } else if (vKind < 1.5) {
     // Gota: cuerpo casi transparente, borde refractado brillante, destello y estela de movimiento
     float rim = smoothstep(0.5, 0.92, d) * smoothstep(1.0, 0.9, d);
-    float hi = exp(-pow(length(uv - vec2(-0.3, 0.45)) * 3.2, 2.0));
+    hi = exp(-pow(length(uv - vec2(-0.3, 0.45)) * 3.2, 2.0));
     float tail = 0.55 + 0.45 * smoothstep(-1.0, 0.3, vUv.y);
-    a = (rim * 0.8 + (1.0 - d) * 0.24 + hi * 0.75) * tail;
+    a = (rim * 0.7 + (1.0 - d) * 0.12 + hi * 0.7) * tail;
   } else {
     // Bokeh: disco desenfocado con borde apenas marcado
-    a = exp(-d * d * 3.2) * 0.32;
+    a = exp(-d * d * 3.2) * 0.12;
+    hi = 0.0;
   }
   a = clamp(a, 0.0, 1.0) * vAlpha * (1.0 - uFade);
-  outColor = vec4(vec3(0.86, 0.92, 1.0) * a, a);
+  // Sobre agua clara: borde refractado gris grafito y destello blanco
+  vec3 tint = mix(vec3(0.36, 0.38, 0.4), vec3(1.0), clamp(hi * 1.4, 0.0, 1.0));
+  outColor = vec4(tint * a, a);
 }`;
 
 function compile(gl: WebGL2RenderingContext, vs: string, fs: string) {

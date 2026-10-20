@@ -41,21 +41,29 @@ El filtro del Hero, el catálogo, el configurador y el probador comparten estado
 
 ### Dirección visual
 
-Campaña monocroma azul de aire lujoso:
-- **Paleta:** tinta casi negra (`night`), cobalto (`cobalt`/`volt`) y blanco hielo (`ice`).
-- **Tipografía:** titulares en mayúsculas con la sans extendida Michroma (`.display`, interlineado 1.16 para que no
-  choquen los acentos) y etiquetas de 11 px como mínimo (`.eyebrow`, `.micro`).
+Blanco de lujo editorial (sin azul). El único color de la interfaz es el producto, más el verde de WhatsApp en su icono.
+- **Paleta** (`tailwind.config.ts`):
+  - `canvas`: blanco, con dos grises cálidos de apoyo (`canvas-2`, `canvas-3`).
+  - `ink`: tinta casi negra para el texto y los botones llenos.
+  - `mute`: texto secundario.
+  - Los textos pequeños nunca bajan de `ink/60`, unos 5:1 de contraste.
+- **Ritmo:** secciones blancas y gris cálido, con momentos en grafito (pósters alternos, el capítulo de Micas, el reverso
+  de la espiral) y el footer en tinta.
+- **Tipografía:**
+  - Titulares editoriales en grotesca ligera (`.headline`: hero, telón, diseñadora).
+  - Marca y titulares de sección en la sans extendida Michroma (`.display`).
+  - Etiquetas de 11 px como mínimo (`.eyebrow`, `.micro`) y fichas técnicas en Geist Mono.
 - **Botones** (`app/globals.css`):
-  - Hielo (`.btn-primary`, uno solo lleno por pantalla).
-  - Cobalto (`.btn-volt`, para comprar por WhatsApp).
-  - Vidrio (`.btn-glass`).
+  - Tinta llena (`.btn-primary`, `.btn-volt` para comprar por WhatsApp).
+  - Contorno (`.btn-outline`).
+  - Blanco lleno sobre fondos oscuros (`.btn-paper`).
   - Los llenos tienen un brillo perimetral (`@property --beam`) y los CTA principales, atracción magnética
     (`components/Magnetic.tsx`).
-- **Iluminación del hero:** capas de luz (`.atmos`) con una luz principal que deriva sólo con transform.
+- **Foco:** contorno de tinta con halo blanco. En zonas oscuras, la clase `.on-dark` lo pasa a blanco.
 - **Fotos:**
-  - `components/LitFrame.tsx` ilumina las fotos reales como en un set y aplica el duotono de campaña (filtro SVG
-    `#sb-duotone` en `app/layout.tsx`).
-  - `.stage-blue` es el fondo de estudio del catálogo, el configurador y el probador.
+  - `.stage-studio` es el estudio gris cálido del catálogo, el configurador, el probador y las tarjetas.
+  - `components/LitFrame.tsx` añade luz de contorno, y `.grade-duotone` (filtro SVG `#sb-duotone` en `app/layout.tsx`)
+    da un blanco y negro editorial.
 
 ### Rendimiento y estabilidad
 
@@ -85,7 +93,7 @@ Campaña monocroma azul de aire lujoso:
 Sección de 500svh con una escena fija de 100svh. Los primeros 300svh de scroll recorren la secuencia y los últimos
 100svh son el telón: `Proof.tsx` tiene `-mt-[100svh]` y sube por encima de la escena.
 
-1. El Costa en carey (foto real) levita sobre el agua con tres tarjetas de vidrio.
+1. El Costa en carey (foto real) levita en un estudio blanco sobre agua cristalina, con tres tarjetas de vidrio.
 2. Cae, toca el agua y salpica: gotas, espuma, ondas y una bolsa de aire que se cierra en burbujas.
 3. Se hunde mientras la cámara lo sigue. Aparecen tarjetas a los lados, la marca SARABIA gigante y, al final, el modelo
    con sus CTA.
