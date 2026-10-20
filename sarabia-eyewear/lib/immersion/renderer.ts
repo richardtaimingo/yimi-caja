@@ -110,22 +110,33 @@ void main() {
   vec2 kd = (wp - uFrame.xy) * vec2(0.85, 1.5);
   air = mix(air, vec3(1.0), exp(-dot(kd, kd) * 7.0) * 0.6);
 
-  // Agua cristalina neutra: casi blanca bajo la superficie y gris perla con la profundidad (sin azul)
-  vec3 wcol = mix(vec3(0.885, 0.9, 0.905), vec3(0.8, 0.82, 0.83), smoothstep(0.0, 0.8, D));
-  wcol = mix(wcol, vec3(0.72, 0.74, 0.755), smoothstep(0.7, 2.4, D));
-  wcol *= 0.95 + 0.07 * smoothstep(-0.5, 0.5, p.y);
-  // Rayos y cáusticas: luz blanca que entra desde la superficie
-  wcol = mix(wcol, vec3(1.0), rays(wp, t) * 0.32 * exp(-D * 1.1) * smoothstep(0.0, 0.05, -sd));
-  float cs = caustic(wp * vec2(6.0, 9.0) + vec2(0.0, t * 0.05), t * 0.7) * exp(-D * 2.6);
-  wcol = mix(wcol, vec3(1.0), cs * 0.16);
-  // Partículas en suspensión: polvo gris (se ve sobre el agua clara)
+  // Agua cristalina: gris perla apenas frío (absorción real del agua), más oscura con la profundidad
+  // y con el fondo del estudio visto a través de ella, deformado por el oleaje (refracción).
+  vec2 wn = vec2(fbm(vec2(wp.x * 5.0 + t * 0.15, wp.y * 3.0 - t * 0.1)), fbm(vec2(wp.x * 4.0 - t * 0.12, wp.y * 6.0 + 3.0))) - 0.5;
+  vec2 rp = wp + wn * 0.06;
+  vec3 wcol = mix(vec3(0.9, 0.915, 0.918), vec3(0.79, 0.815, 0.825), smoothstep(0.0, 0.9, D));
+  wcol = mix(wcol, vec3(0.66, 0.69, 0.705), smoothstep(0.8, 2.6, D));
+  wcol *= 0.94 + 0.08 * smoothstep(-0.5, 0.5, p.y);
+  wcol += (fbm(rp * vec2(2.2, 1.4)) - 0.5) * 0.035;
+  // Rayos de luz suaves que entran desde la superficie
+  wcol = mix(wcol, vec3(1.0), rays(wp + wn * 0.04, t) * 0.22 * exp(-D * 1.3) * smoothstep(0.0, 0.06, -sd));
+  // Ondulación de luz bajo la superficie (cáustica difusa en el volumen, sin red de líneas)
+  float ripple = smoothstep(0.35, 0.9, fbm(vec2(rp.x * 9.0 + t * 0.4, rp.y * 5.0 - t * 0.3)));
+  wcol = mix(wcol, vec3(1.0), ripple * 0.12 * exp(-max(-sd, 0.0) / 0.12));
+  // Partículas en suspensión: polvo fino gris
   float sn = snow(wp, 22.0, t) + 0.6 * snow(wp + 3.7, 34.0, t * 0.7);
-  wcol -= vec3(0.16, 0.16, 0.15) * sn * 0.5 * (0.4 + 0.6 * exp(-D * 0.8));
-  // Reflexión total bajo la superficie: banda plateada y ondulada
-  float band = exp(-max(-sd, 0.0) / 0.024);
-  float streak = 0.5 + 0.5 * sin(wp.x * 85.0 + 3.0 * sin(wp.x * 12.0 + t) + t * 0.8);
-  wcol = mix(wcol, vec3(0.72, 0.74, 0.75), band * (0.18 + 0.16 * streak));
-
+  wcol -= vec3(0.12, 0.12, 0.11) * sn * 0.4 * (0.4 + 0.6 * exp(-D * 0.8));
+  // Reflexión total interna bajo la superficie: espejo plateado y movido que refleja el estudio,
+  // cortado por las líneas oscuras de las crestas (el detalle que delata agua real)
+  float under = max(-sd, 0.0);
+  float tir = exp(-under / 0.024);
+  // Crestas alargadas en horizontal y comprimidas hacia la superficie (perspectiva rasante)
+  float warp = fbm(vec2(wp.x * 6.0 + t * 0.3, t * 0.2)) * 0.6;
+  float crest = fbm(vec2(wp.x * 9.0 + warp + t * 0.45, sqrt(under) * 26.0 - t * 0.25));
+  float mirror = smoothstep(0.4, 0.58, crest);
+  float dark = smoothstep(0.5, 0.36, crest) * smoothstep(0.0, 0.004, under);
+  wcol = mix(wcol, mix(vec3(0.7, 0.72, 0.73), vec3(1.0), mirror), tir * 0.7);
+  wcol = mix(wcol, vec3(0.55, 0.58, 0.6), dark * tir * 0.35);
   // Espuma del impacto: agua blanca turbulenta junto a la superficie
   float age = uImpact.y;
   float foam = 0.0;
@@ -158,7 +169,8 @@ void main() {
     // Mojado continuo: aumenta en los primeros milímetros bajo la superficie (sin costura en la línea de agua)
     float uw = smoothstep(0.0, -0.03, sd);
     vec2 uv = q / vec2(fw, fh) + 0.5;
-    uv += uw * vec2(sin(wp.y * 55.0 + t * 2.2), sin(wp.x * 48.0 - t * 1.9)) * 0.0028 / vec2(fw, fh);
+    // Refracción: la parte sumergida se ve desplazada y ligeramente ondulada (efecto "popote en el vaso")
+    uv += uw * (vec2(0.0, -0.012) + wn * 0.006 + vec2(sin(wp.y * 55.0 + t * 2.2), sin(wp.x * 48.0 - t * 1.9)) * 0.0016) / vec2(fw, fh);
     if (uv.x > 0.0 && uv.x < 1.0 && uv.y > 0.0 && uv.y < 1.0) {
       vec4 tx = texture(uTex, uv);
       if (tx.a > 0.002) {
@@ -167,7 +179,8 @@ void main() {
         // Bajo el agua: un poco menos de contraste y saturación, y luz de cáusticas encima
         float luma = dot(fc, vec3(0.299, 0.587, 0.114));
         vec3 wet = mix(fc, vec3(luma), 0.18) * (0.93 - D * 0.05) + vec3(0.03) * tx.a;
-        wet += tx.a * vec3(1.0) * caustic(q * 11.0 + vec2(0.0, t * 0.1), t * 0.9) * 0.12 * exp(-D * 0.6);
+        // Luz ondulante sobre el armazón (cáustica suave, sin celdas)
+        wet += tx.a * vec3(1.0) * smoothstep(0.5, 0.85, fbm(q * 14.0 + vec2(t * 0.5, -t * 0.4))) * 0.07 * exp(-D * 0.6);
         fc = mix(fc, wet, uw * 0.85);
         fc += vec3(1.0) * edge * (0.08 + 0.1 * uw) * tx.a;
         col = col * (1.0 - tx.a) + fc;
@@ -178,6 +191,10 @@ void main() {
 
   // Menisco: la línea de la superficie pasa por delante de todo
   // Menisco fino y contenido (nunca cruza el armazón) con un filo oscuro de refracción justo debajo
+  // Cara superior del agua vista casi de canto: una franja fina que refleja el estudio con brillos
+  float topBand = (1.0 - water) * exp(-max(sd, 0.0) / 0.006) * (1.0 - frameAlpha);
+  float glint = smoothstep(0.55, 0.8, fbm(vec2(wp.x * 40.0 - t * 0.8, t * 0.3)));
+  col = mix(col, mix(vec3(0.8, 0.82, 0.83), vec3(1.0), glint), topBand * 0.6);
   // Sobre blanco el menisco se ve como una línea gris fina con un brillo justo debajo
   col = mix(col, vec3(0.36, 0.38, 0.39), exp(-abs(sd) / (0.0009 + px)) * 0.7 * (1.0 - frameAlpha));
   col = mix(col, vec3(1.0), exp(-abs(sd + 0.004) / 0.0025) * 0.6 * water * (1.0 - frameAlpha));
@@ -208,7 +225,7 @@ void main() {
     float speed = length(aB.xy);
     vec2 dir = speed > 1e-4 ? aB.xy / speed : vec2(0.0, 1.0);
     vec2 nrm = vec2(-dir.y, dir.x);
-    offset = dir * aCorner.y * aA.z * (1.0 + speed * 2.2) + nrm * aCorner.x * aA.z;
+    offset = dir * aCorner.y * aA.z * (1.0 + speed * 3.4) + nrm * aCorner.x * aA.z;
   } else {
     offset = aCorner * aA.z;
   }
