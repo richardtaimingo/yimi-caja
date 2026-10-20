@@ -21,15 +21,15 @@ const benefits = [
 
 export function Benefits() {
   return (
-    <section aria-label="Beneficios" className="border-b border-paper/10 py-16 md:py-20">
+    <section aria-label="Beneficios" className="border-b border-ink/10 py-16 md:py-20">
       <div className="container grid gap-4 md:grid-cols-3">
         {benefits.map(({ icon: Icon, title, body }, i) => (
-          <Reveal key={title} delay={i * 0.08} className="rounded-3xl bg-night-2 p-5 shadow-card sm:p-7">
-            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-volt/15 text-volt-ice ring-1 ring-volt/40">
+          <Reveal key={title} delay={i * 0.08} className="rounded-3xl bg-canvas-2 p-5 shadow-card sm:p-7">
+            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-ink text-white">
               <Icon className="h-5 w-5" strokeWidth={1.75} />
             </span>
             <h3 className="mt-5 font-display text-sm uppercase tracking-[0.08em]">{title}</h3>
-            <p className="mt-2 text-sm leading-relaxed text-paper/55">{body}</p>
+            <p className="mt-2 text-sm leading-relaxed text-ink/65">{body}</p>
           </Reveal>
         ))}
       </div>

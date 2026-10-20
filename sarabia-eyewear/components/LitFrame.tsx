@@ -61,8 +61,8 @@ export function LitFrame({
         style={{
           ...silhouette,
           backgroundImage: campaign
-            ? "linear-gradient(170deg, rgba(200,216,255,0.55) 0%, rgba(134,168,255,0.18) 22%, transparent 44%), linear-gradient(104deg, transparent 34%, rgba(160,190,255,0.28) 46%, transparent 58%)"
-            : "linear-gradient(170deg, rgba(200,216,255,0.32) 0%, rgba(134,168,255,0.1) 24%, transparent 46%, transparent 80%, rgba(27,71,201,0.22) 100%)",
+            ? "linear-gradient(170deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.15) 22%, transparent 44%), linear-gradient(104deg, transparent 34%, rgba(255,255,255,0.25) 46%, transparent 58%)"
+            : "linear-gradient(170deg, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0.1) 24%, transparent 46%)",
         }}
       />
       {droplets && <Droplets photo={photo} />}
@@ -99,9 +99,9 @@ function Droplets({ photo }: { photo: ProductPhoto }) {
       <defs>
         <radialGradient id={id} cx="45%" cy="40%" r="60%">
           <stop offset="0%" stopColor="rgba(255,255,255,0.05)" />
-          <stop offset="70%" stopColor="rgba(150,190,255,0.12)" />
-          <stop offset="88%" stopColor="rgba(0,8,30,0.18)" />
-          <stop offset="100%" stopColor="rgba(190,215,255,0.5)" />
+          <stop offset="70%" stopColor="rgba(255,255,255,0.14)" />
+          <stop offset="88%" stopColor="rgba(11,11,12,0.16)" />
+          <stop offset="100%" stopColor="rgba(255,255,255,0.65)" />
         </radialGradient>
       </defs>
       {drops.map((d, i) => (

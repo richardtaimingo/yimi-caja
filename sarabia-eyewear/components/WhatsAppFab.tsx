@@ -64,13 +64,13 @@ export function WhatsAppFab() {
           transition={{ type: "spring", stiffness: 260, damping: 22 }}
           className="group fixed bottom-[max(1rem,calc(env(safe-area-inset-bottom)+0.5rem))] right-[max(1rem,env(safe-area-inset-right))] z-30 flex items-center gap-3 transition-opacity [html[data-scroll-locked]_&]:pointer-events-none [html[data-scroll-locked]_&]:opacity-0 lg:bottom-6 lg:right-6"
         >
-          <span className="hidden items-center gap-2 rounded-full border border-white/[0.12] bg-[rgba(7,11,22,0.72)] py-2 pl-3 pr-4 text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-paper/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] backdrop-blur-[16px] transition-colors group-hover:text-white lg:flex">
-            <span className="h-2 w-2 rounded-full bg-[#25D366]" aria-hidden />
+          <span className="hidden items-center gap-2 rounded-full bg-ink py-2 pl-3 pr-4 text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-white/90 shadow-[0_12px_28px_-14px_rgba(11,11,12,0.6)] transition-colors group-hover:text-white lg:flex">
+            <span className="h-2 w-2 rounded-full bg-whatsapp" aria-hidden />
             Asesoría en línea
           </span>
-          <span className="relative flex h-12 w-12 items-center justify-center rounded-full border border-white/[0.12] bg-[rgba(7,11,22,0.72)] text-[#25D366] shadow-[inset_0_1px_0_rgba(255,255,255,0.14),0_12px_32px_-12px_rgba(0,0,0,0.7)] backdrop-blur-[16px] backdrop-saturate-150 transition-transform duration-300 group-hover:scale-105 group-active:scale-95 lg:h-14 lg:w-14">
+          <span className="relative flex h-12 w-12 items-center justify-center rounded-full bg-ink text-whatsapp shadow-[inset_0_1px_0_rgba(255,255,255,0.14),0_14px_30px_-12px_rgba(11,11,12,0.55)] transition-transform duration-300 group-hover:scale-105 group-active:scale-95 lg:h-14 lg:w-14">
             <MessageCircle className="h-[1.375rem] w-[1.375rem] lg:h-6 lg:w-6" aria-hidden />
-            <span className="absolute right-0.5 top-0.5 h-2.5 w-2.5 rounded-full bg-[#25D366] ring-2 ring-night" aria-hidden />
+            <span className="absolute right-0.5 top-0.5 h-2.5 w-2.5 rounded-full bg-whatsapp ring-2 ring-ink" aria-hidden />
           </span>
         </motion.a>
       )}

@@ -10,7 +10,6 @@ import { ProductImage } from "./ProductImage";
 import { useShop, type Intent } from "./ShopProvider";
 import { materialLabels, products, type Colorway, type Product } from "@/lib/products";
 import { scrollToTarget } from "@/lib/scroll";
-import { GRAIN } from "@/lib/textures";
 import { currency, whatsappLink } from "@/lib/site";
 
 type QuickIntent = Exclude<Intent, "todos">;
@@ -99,7 +98,7 @@ export function Hero() {
     <section
       id="top"
       ref={sectionRef}
-      // El hero sube por detrás del encabezado (transparente arriba): la luz cubre la pantalla de borde a borde
+      // El hero sube por detrás del encabezado (transparente arriba): el estudio cubre la pantalla de borde a borde
       className="relative -mt-[var(--chrome-h)]"
       onPointerMove={(e) => {
         if (e.pointerType !== "mouse" || reduced) return;
@@ -111,179 +110,142 @@ export function Hero() {
         tiltY.set(0);
       }}
     >
-      <div>
-        {/* A sangre en todos los tamaños. En móvil mide exactamente la pantalla (svh no cambia al ocultarse
-            la barra del navegador: el CTA nunca queda cortado ni salta al hacer scroll). */}
-        <div className="relative isolate flex min-h-[36rem] flex-col overflow-hidden [contain:paint] max-sm:h-[100svh] max-sm:max-h-[60rem] sm:min-h-[100svh] lg:min-h-[max(100svh,680px)] short:h-[100svh] short:min-h-0">
-          <Atmosphere />
+      {/* A sangre y exactamente del alto de la pantalla (svh no cambia al ocultarse la barra del navegador) */}
+      <div className="relative isolate flex h-[100svh] min-h-[34rem] flex-col overflow-hidden [contain:paint] max-sm:max-h-[60rem] lg:min-h-[36rem] short:min-h-0">
+        <Atmosphere />
 
-          {/* Contenido alineado con el logo (mismos márgenes que el contenedor del encabezado) */}
-          <div className="relative z-10 mx-auto flex w-full max-w-[1360px] flex-1 flex-col px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-[calc(var(--chrome-h)+1.5rem)] sm:px-6 sm:pb-12 sm:pt-[calc(var(--chrome-h)+2.5rem)] lg:px-8 lg:pb-14 lg:pt-[calc(var(--chrome-h)+3rem)] short:pb-4 short:pt-[calc(var(--chrome-h)+0.75rem)]">
-            {/* Titular, texto y selector */}
-            <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between lg:gap-10">
-              <div className="max-w-[36rem]">
-                <p className="eyebrow short:hidden">Colección 2026 · Diseñada en México</p>
-                <Stack active={active} className="mt-3 sm:mt-4 short:mt-0">
-                  {(key) => (
-                    <p className="display max-w-[16ch] text-[clamp(1.375rem,1.05rem+1.45vw,2.5rem)] text-white [letter-spacing:0.02em]">{intents[key].headline}</p>
-                  )}
-                </Stack>
-                <Stack active={active} className="mt-3 max-w-[34ch] max-sm:[@media(max-height:719px)]:hidden short:hidden">
-                  {(key) => <p className="text-[clamp(0.9375rem,0.9rem+0.15vw,1.0625rem)] leading-[1.55] text-paper/75">{intents[key].copy}</p>}
-                </Stack>
-              </div>
-
-              <div role="tablist" aria-label="¿Qué estás buscando?" className="glass grid h-12 w-full shrink-0 grid-cols-3 rounded-full p-1 sm:inline-grid sm:w-auto sm:self-start">
-                {ORDER.map((key) => {
-                  const Icon = intents[key].icon;
-                  const selected = key === active;
-                  return (
-                    <button
-                      key={key}
-                      role="tab"
-                      aria-selected={selected}
-                      onClick={() => choose(key)}
-                      className={clsx(
-                        "relative flex h-10 items-center justify-center gap-1.5 whitespace-nowrap rounded-full px-2 text-[0.6875rem] font-semibold uppercase tracking-[0.12em] transition-colors duration-300 min-[380px]:text-[0.72rem] sm:px-4 sm:tracking-[0.14em]",
-                        selected ? "text-night" : "text-paper/75 hover:text-white",
-                      )}
-                    >
-                      {selected && (
-                        <motion.span
-                          layoutId="hero-intent"
-                          className="absolute inset-0 rounded-full bg-ice shadow-[inset_0_1px_0_#fff,0_1px_2px_rgba(0,0,0,0.35),0_6px_16px_-6px_rgba(134,168,255,0.45)]"
-                          transition={{ type: "spring", stiffness: 420, damping: 34 }}
-                        />
-                      )}
-                      <Icon className="relative hidden h-3.5 w-3.5 shrink-0 min-[400px]:block" aria-hidden />
-                      <span className="relative">{intents[key].label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Escenario del producto: tamaño fijo, la foto cambia con crossfade sin mover el layout */}
-            <div
-              className="relative my-3 min-h-[8.5rem] flex-1 touch-pan-y [container-type:size] [perspective:1200px] sm:my-6 sm:h-[22rem] sm:flex-none lg:absolute lg:left-[61%] lg:top-[54%] lg:my-0 lg:aspect-[16/8] lg:h-auto lg:w-[48%] lg:-translate-x-1/2 lg:-translate-y-1/2 short:absolute short:left-[71%] short:top-[54%] short:my-0 short:h-[58%] short:min-h-0 short:w-[40%] short:-translate-x-1/2 short:-translate-y-1/2"
-              onMouseEnter={() => setHovering(true)}
-              onMouseLeave={() => setHovering(false)}
-            >
-              <motion.div className="absolute inset-0" style={{ y: parallaxY, scale: parallaxScale, opacity: parallaxOpacity }}>
-                <motion.div className="absolute inset-0 [transform-style:preserve-3d]" style={reduced ? undefined : { rotateX, rotateY }}>
-                  <AnimatePresence initial={false}>
-                    {[current, next].map((product) => (
-                      <StageItem
-                        key={product.id}
-                        product={product}
-                        color={heroColor(product)}
-                        visible={product.id === current.id}
-                        priority={product.id === list[0].id && active === "ver"}
-                      />
-                    ))}
-                  </AnimatePresence>
-                </motion.div>
-              </motion.div>
-
-              {/* Deslizar para cambiar de modelo (móvil) */}
-              <motion.div
-                className="absolute inset-0 touch-pan-y lg:hidden"
-                onPanEnd={(_, info) => {
-                  if (Math.abs(info.offset.x) > 48 && Math.abs(info.offset.x) > Math.abs(info.offset.y) * 1.2) step(info.offset.x < 0 ? 1 : -1);
-                }}
-                aria-hidden
-              />
-            </div>
-
-            {/* Móvil y tablet: modelo en foco en una sola línea + CTAs */}
-            <div className="relative lg:hidden short:hidden">
-              <div className="flex h-11 items-center justify-between gap-3">
-                <p className="micro min-w-0 truncate">
-                  <span className="tabular-nums text-paper/50">
-                    {pad(position + 1)}/{pad(list.length)}
-                  </span>
-                  <span className="text-white"> · {current.name}</span> · {currency.format(current.price)}
-                </p>
-                <div className="flex shrink-0 gap-2">
-                  <IconButton label="Modelo anterior" onClick={() => step(-1)}>
-                    <ArrowLeft className="h-4 w-4" />
-                  </IconButton>
-                  <IconButton label="Modelo siguiente" onClick={() => step(1)}>
-                    <ArrowRight className="h-4 w-4" />
-                  </IconButton>
-                </div>
-              </div>
-            </div>
-
-            {/* Wordmark y CTAs · modelo en foco (escritorio) */}
-            <div className="relative mt-3 flex flex-col gap-5 sm:mt-6 lg:mt-auto lg:flex-row lg:items-end lg:justify-between short:mt-auto">
-              <div>
-                <h1 className="font-display text-[clamp(2.75rem,1.7rem+5vw,6.25rem)] uppercase leading-[0.92] tracking-[0.05em] text-white [margin-left:-0.06em] short:text-[2.25rem]">
-                  Sarabia
-                  <span className="sr-only"> Eyewear: armazones oftálmicos y de sol de autor</span>
-                </h1>
-                <p className="eyebrow mt-3 text-volt-ice short:hidden">Eyewear · By Jennifer Sarabia</p>
-                <div className="mt-5 grid grid-cols-[1fr_auto] gap-3 sm:flex sm:items-center lg:mt-7 short:mt-3">
-                  <Magnetic className="min-w-0">
-                    <button type="button" onClick={goToCatalog} className="btn-primary h-12 w-full px-7 text-[0.9375rem] sm:w-auto">
-                      Ver modelos <ArrowRight className="h-4 w-4" aria-hidden />
-                    </button>
-                  </Magnetic>
-                  <button type="button" onClick={() => openTryOn(current.id, color.id)} className="btn-glass h-12 px-4 text-[0.8125rem] lg:hidden">
-                    <ScanFace className="h-4 w-4" aria-hidden /> Pruébatelos
-                  </button>
-                  <a href={whatsappLink(config.message)} target="_blank" rel="noopener noreferrer" className="btn-glass hidden h-12 px-6 text-[0.8125rem] lg:inline-flex">
-                    <MessageCircle className="h-4 w-4 text-[#25D366]" aria-hidden /> Asesoría por WhatsApp
-                  </a>
-                </div>
-                <p className="micro mt-6 hidden lg:block">
-                  Desde {currency.format(Math.min(...products.map((p) => p.price)))} · Envíos rápidos · Garantía de ajuste
-                </p>
-              </div>
-
-              <div className="hidden min-w-[300px] flex-col items-end text-right lg:flex">
-                <p className="micro tabular-nums">
-                  {pad(position + 1)} / {pad(list.length)}
-                </p>
-                <div className="grid">
-                  {Array.from(new Set(ORDER.flatMap((k) => intents[k].ids))).map((id) => {
-                    const product = productById(id);
-                    const shown = id === current.id;
-                    return (
-                      <motion.div
-                        key={id}
-                        aria-hidden={!shown}
-                        className="[grid-area:1/1]"
-                        initial={false}
-                        animate={shown ? { opacity: 1, transform: "translateY(0px)" } : { opacity: 0, transform: "translateY(8px)" }}
-                        transition={{ duration: 0.45, ease: EASE }}
-                      >
-                        <p className="mt-2 font-display text-[clamp(1.125rem,0.95rem+0.6vw,1.5rem)] uppercase tracking-[0.06em] text-white">{product.name}</p>
-                        <p className="micro mt-1.5">
-                          {materialLabels[product.material].badge} · {currency.format(product.price)}
-                        </p>
-                      </motion.div>
-                    );
-                  })}
-                </div>
-                <div className="mt-5 flex items-center gap-2">
-                  <IconButton label="Modelo anterior" onClick={() => step(-1)} large>
-                    <ArrowLeft className="h-4 w-4" />
-                  </IconButton>
-                  <IconButton label="Modelo siguiente" onClick={() => step(1)} large>
-                    <ArrowRight className="h-4 w-4" />
-                  </IconButton>
-                  <button type="button" onClick={() => openTryOn(current.id, color.id)} className="btn-glass h-11 px-5 text-[0.8125rem]" aria-label={`Pruébatelos en vivo: ${current.name}`}>
-                    <ScanFace className="h-4 w-4" aria-hidden /> Pruébatelos
-                  </button>
-                </div>
-              </div>
+        <div className="relative z-10 mx-auto flex w-full max-w-[1360px] flex-1 flex-col px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-[calc(var(--chrome-h)+1.25rem)] sm:px-6 sm:pt-[calc(var(--chrome-h)+2rem)] lg:px-8 lg:pb-0 lg:pt-[calc(var(--chrome-h)+2.5rem)] short:pb-3 short:pt-[calc(var(--chrome-h)+0.5rem)]">
+          {/* Columna editorial: en escritorio a la izquierda, centrada en el alto disponible */}
+          <div className="relative z-10 flex flex-col lg:w-[44%] lg:flex-1 lg:justify-center lg:pb-[4.5rem] short:w-[52%]">
+            <p className="eyebrow short:hidden">Colección 2026 · Diseñada en México</p>
+            <h1 className="mt-3 sm:mt-4 short:mt-0">
+              <span className="sr-only">Sarabia Eyewear: </span>
+              <Stack active={active}>
+                {(key) => (
+                  <span className="headline block max-w-[13ch] text-[clamp(2.375rem,1.4rem+3.6vw,5rem)] text-ink short:text-[2rem]">{intents[key].headline}.</span>
+                )}
+              </Stack>
+            </h1>
+            <Stack active={active} className="mt-4 max-w-[38ch] max-sm:[@media(max-height:719px)]:hidden short:hidden lg:mt-6">
+              {(key) => <p className="text-[clamp(0.9375rem,0.9rem+0.2vw,1.0625rem)] leading-relaxed text-ink/65">{intents[key].copy}</p>}
+            </Stack>
+            {/* CTAs (escritorio y horizontal; en móvil van al pie) */}
+            <div className="mt-8 hidden items-center gap-3 lg:flex short:mt-4 short:flex">
+              <Magnetic>
+                <button type="button" onClick={goToCatalog} className="btn-primary h-12 px-7 text-[0.9375rem]">
+                  Ver modelos <ArrowRight className="h-4 w-4" aria-hidden />
+                </button>
+              </Magnetic>
+              <button type="button" onClick={() => openTryOn(current.id, color.id)} className="btn-outline h-12 px-6 text-[0.9375rem]">
+                <ScanFace className="h-4 w-4" aria-hidden /> Pruébatelos en vivo
+              </button>
             </div>
           </div>
 
-          <p className="micro pointer-events-none absolute right-5 top-[54%] z-10 hidden -translate-y-1/2 rotate-180 text-paper/45 [writing-mode:vertical-rl] lg:block" aria-hidden>
-            Visión que define presencia
-          </p>
+          {/* Selector: en escritorio arriba a la derecha, sobre el producto */}
+          <div
+            role="tablist"
+            aria-label="¿Qué estás buscando?"
+            className="glass relative z-20 mt-5 grid h-11 w-full shrink-0 grid-cols-3 rounded-full p-1 sm:inline-grid sm:w-auto sm:self-start lg:absolute lg:right-8 lg:top-[calc(var(--chrome-h)+2.5rem)] lg:mt-0 short:absolute short:right-6 short:top-[calc(var(--chrome-h)+0.5rem)] short:mt-0"
+          >
+            {ORDER.map((key) => {
+              const Icon = intents[key].icon;
+              const selected = key === active;
+              return (
+                <button
+                  key={key}
+                  role="tab"
+                  aria-selected={selected}
+                  onClick={() => choose(key)}
+                  className={clsx(
+                    "relative flex h-9 items-center justify-center gap-1.5 whitespace-nowrap rounded-full px-2 text-[0.6875rem] font-medium uppercase tracking-[0.12em] transition-colors duration-300 min-[380px]:text-[0.72rem] sm:px-4",
+                    selected ? "text-white" : "text-ink/65 hover:text-ink",
+                  )}
+                >
+                  {selected && (
+                    <motion.span
+                      layoutId="hero-intent"
+                      className="absolute inset-0 rounded-full bg-ink shadow-[0_6px_16px_-8px_rgba(11,11,12,0.6)]"
+                      transition={{ type: "spring", stiffness: 420, damping: 34 }}
+                    />
+                  )}
+                  <Icon className="relative hidden h-3.5 w-3.5 shrink-0 min-[400px]:block" aria-hidden />
+                  <span className="relative">{intents[key].label}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Escenario del producto: tamaño fijo, la foto cambia con crossfade sin mover el layout */}
+          <div
+            className="relative my-2 min-h-[8.5rem] flex-1 touch-pan-y [container-type:size] [perspective:1200px] sm:my-4 lg:absolute lg:bottom-[4.5rem] lg:right-0 lg:top-[calc(var(--chrome-h)+5.5rem)] lg:my-0 lg:w-[58%] short:absolute short:bottom-3 short:right-0 short:top-[calc(var(--chrome-h)+3.5rem)] short:my-0 short:w-[48%]"
+            onMouseEnter={() => setHovering(true)}
+            onMouseLeave={() => setHovering(false)}
+          >
+            <motion.div className="absolute inset-0" style={{ y: parallaxY, scale: parallaxScale, opacity: parallaxOpacity }}>
+              <motion.div className="absolute inset-0 [transform-style:preserve-3d]" style={reduced ? undefined : { rotateX, rotateY }}>
+                <AnimatePresence initial={false}>
+                  {[current, next].map((product) => (
+                    <StageItem
+                      key={product.id}
+                      product={product}
+                      color={heroColor(product)}
+                      visible={product.id === current.id}
+                      priority={product.id === list[0].id && active === "ver"}
+                    />
+                  ))}
+                </AnimatePresence>
+              </motion.div>
+            </motion.div>
+
+            {/* Deslizar para cambiar de modelo (móvil) */}
+            <motion.div
+              className="absolute inset-0 touch-pan-y lg:hidden"
+              onPanEnd={(_, info) => {
+                if (Math.abs(info.offset.x) > 48 && Math.abs(info.offset.x) > Math.abs(info.offset.y) * 1.2) step(info.offset.x < 0 ? 1 : -1);
+              }}
+              aria-hidden
+            />
+          </div>
+
+          {/* Barra inferior: modelo en foco, flechas y (en móvil) los CTA */}
+          <div className="relative z-10 lg:absolute lg:inset-x-8 lg:bottom-0 lg:flex lg:h-[4.5rem] lg:items-center lg:justify-between lg:border-t lg:border-ink/10 short:hidden">
+            <div className="flex h-11 items-center justify-between gap-3 lg:h-auto lg:justify-start lg:gap-6">
+              <p className="micro min-w-0 truncate">
+                <span className="tabular-nums">
+                  {pad(position + 1)} / {pad(list.length)}
+                </span>
+                <span className="text-ink"> · {current.name}</span>
+                <span className="hidden sm:inline"> · {materialLabels[current.material].badge}</span> · {currency.format(current.price)}
+              </p>
+              <div className="flex shrink-0 gap-2">
+                <IconButton label="Modelo anterior" onClick={() => step(-1)}>
+                  <ArrowLeft className="h-4 w-4" />
+                </IconButton>
+                <IconButton label="Modelo siguiente" onClick={() => step(1)}>
+                  <ArrowRight className="h-4 w-4" />
+                </IconButton>
+              </div>
+            </div>
+            <div className="mt-3 grid grid-cols-[1fr_auto] gap-3 lg:hidden">
+              <Magnetic className="min-w-0">
+                <button type="button" onClick={goToCatalog} className="btn-primary h-12 w-full px-7 text-[0.9375rem]">
+                  Ver modelos <ArrowRight className="h-4 w-4" aria-hidden />
+                </button>
+              </Magnetic>
+              <button type="button" onClick={() => openTryOn(current.id, color.id)} className="btn-outline h-12 px-4 text-[0.8125rem]">
+                <ScanFace className="h-4 w-4" aria-hidden /> Pruébatelos
+              </button>
+            </div>
+            <a
+              href={whatsappLink(config.message)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="link-underline hidden items-center gap-2 text-[0.8125rem] font-medium text-ink/70 hover:text-ink lg:inline-flex"
+            >
+              <MessageCircle className="h-4 w-4 text-whatsapp-ink" aria-hidden /> Asesoría por WhatsApp
+            </a>
+          </div>
         </div>
       </div>
 
@@ -306,10 +268,10 @@ function StageItem({ product, color, visible, priority }: { product: Product; co
       transition={{ duration: 0.8, ease: EASE }}
     >
       {/* Ancho limitado por el alto del escenario (container query): nunca se sale ni se deforma */}
-      <div className="relative" style={{ width: `min(92cqw, ${(ratio * 76).toFixed(1)}cqh)` }}>
+      <div className="relative" style={{ width: `min(90cqw, ${(ratio * 68).toFixed(1)}cqh)` }}>
         <div
           aria-hidden
-          className="absolute -bottom-[18%] left-[14%] right-[14%] h-[16%] rounded-[50%] bg-[radial-gradient(closest-side,rgba(1,3,12,0.72),rgba(1,3,12,0.3)_60%,transparent)] motion-safe:animate-float-shadow"
+          className="absolute -bottom-[16%] left-[16%] right-[16%] h-[12%] rounded-[50%] bg-[radial-gradient(closest-side,rgba(11,11,12,0.28),rgba(11,11,12,0.1)_60%,transparent)] motion-safe:animate-float-shadow"
         />
         <div className="motion-safe:animate-float [will-change:transform]">
           {/* Giro estático dentro de la capa animada: se rasteriza una sola vez */}
@@ -321,8 +283,8 @@ function StageItem({ product, color, visible, priority }: { product: Product; co
                 priority={priority}
                 fetchPriority={priority ? "high" : "auto"}
                 quality={90}
-                sizes="(min-width: 1024px) min(48vw, 680px), (min-width: 640px) 560px, 92vw"
-                className="[filter:drop-shadow(0_2px_1px_rgba(0,2,10,0.35))_drop-shadow(0_22px_24px_rgba(0,3,15,0.45))]"
+                sizes="(min-width: 1024px) min(52vw, 760px), (min-width: 640px) 560px, 92vw"
+                className="[filter:drop-shadow(0_2px_2px_rgba(11,11,12,0.18))_drop-shadow(0_18px_22px_rgba(11,11,12,0.16))]"
               />
             ) : (
               <ProductImage product={product} color={color} priority={priority} className="h-auto w-full" />
@@ -361,7 +323,7 @@ function IconButton({ label, onClick, large, children }: { label: string; onClic
       onClick={onClick}
       aria-label={label}
       className={clsx(
-        "glass flex items-center justify-center rounded-full text-white transition-colors duration-300 hover:bg-white hover:text-night active:scale-95",
+        "flex items-center justify-center rounded-full border border-ink/15 bg-white/70 text-ink transition-colors duration-300 hover:border-ink hover:bg-ink hover:text-white active:scale-95",
         large ? "h-11 w-11" : "h-10 w-10",
       )}
     >
@@ -371,21 +333,14 @@ function IconButton({ label, onClick, large, children }: { label: string; onClic
 }
 
 /**
- * Iluminación de estudio en capas que cubre todo el hero: costados iluminados (nunca negros), luz
- * principal que deriva muy lento con transform (GPU) y fundido inferior hacia la página, para que el
- * hero no termine en un borde recto.
+ * Estudio blanco a sangre: fondo infinito cálido, una luz principal blanca que deriva muy lento detrás
+ * del producto (transform, GPU) y un piso apenas más gris para asentar la sombra de contacto.
  */
 function Atmosphere() {
   return (
     <div aria-hidden className="atmos pointer-events-none absolute inset-0 -z-10 overflow-hidden">
       <div className="atmos-key motion-safe:animate-drift [will-change:transform]" />
-      <div className="absolute inset-0 bg-[linear-gradient(112deg,transparent_38%,rgba(134,168,255,0.07)_48%,transparent_60%)]" />
-      {/* Grano con mezcla normal: el modo overlay sobre la luz que deriva obligaba a recomponer cada frame */}
-      <div className="absolute inset-0 opacity-[0.045]" style={{ backgroundImage: GRAIN }} />
-      <div className="absolute inset-x-0 bottom-0 h-[24%] bg-[linear-gradient(to_bottom,rgba(3,5,11,0),rgba(3,5,11,0.65)_60%,#03050B)]" />
-      <span className="display absolute left-[58%] top-[44%] hidden -translate-x-1/2 -translate-y-1/2 select-none whitespace-nowrap text-[12.5rem] leading-none text-white/[0.035] lg:block">
-        Sarabia
-      </span>
+      <div className="absolute inset-x-0 bottom-0 h-[38%] bg-[linear-gradient(to_bottom,transparent,rgba(11,11,12,0.03))]" />
     </div>
   );
 }
@@ -396,12 +351,12 @@ function Marquee() {
   return (
     // Líneas finas que se desvanecen en los extremos y texto con fundido lateral: sin cortes rectos
     <div className="relative overflow-hidden py-4 [mask-image:linear-gradient(90deg,transparent,#000_12%,#000_88%,transparent)]" aria-hidden>
-      <span className="absolute inset-x-0 bottom-0 h-px bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.12),transparent)]" />
+      <span className="absolute inset-x-0 bottom-0 h-px bg-ink/10" />
       <div className="flex w-max gap-10 whitespace-nowrap motion-safe:animate-marquee">
         {[...items, ...items].map((t, k) => (
-          <span key={k} className="flex items-center gap-10 font-display text-[0.6875rem] uppercase tracking-[0.24em] text-paper/60">
+          <span key={k} className="flex items-center gap-10 font-display text-[0.6875rem] uppercase tracking-[0.24em] text-ink/60">
             {t}
-            <span className="h-1 w-1 rounded-full bg-volt-soft" />
+            <span className="h-1 w-1 rounded-full bg-ink/30" />
           </span>
         ))}
       </div>

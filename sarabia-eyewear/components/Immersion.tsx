@@ -259,13 +259,13 @@ export function Immersion() {
     <section
       id="inmersion"
       ref={sectionRef}
-      className="relative h-[500svh] bg-night motion-reduce:h-auto"
+      className="relative h-[500svh] bg-canvas motion-reduce:h-auto"
       aria-label={`Inmersión: ${PRODUCT.name} en ${COLOR.name}`}
     >
       <div ref={stageRef} className="sticky top-0 h-[100svh] overflow-hidden motion-reduce:relative">
         <div ref={sceneRef} className="absolute inset-0">
-          {/* Fondo mientras carga (o sin WebGL): mismo aire tinta y agua cobalto de la escena */}
-          <div aria-hidden className="absolute inset-0 bg-[linear-gradient(180deg,#03050B_0%,#0A1A52_68%,#2554DA_70%,#12349E_88%,#0A1F66_100%)]" />
+          {/* Fondo mientras carga (o sin WebGL): mismo estudio blanco y agua clara de la escena */}
+          <div aria-hidden className="absolute inset-0 bg-[linear-gradient(180deg,#FFFFFF_0%,#F2F2EF_69.6%,#8A8C8E_70%,#EBEDEE_70.3%,#D6D9DB_100%)]" />
           <canvas ref={canvasRef} aria-hidden className="absolute inset-0 h-full w-full" />
           {!webgl && (
             <div aria-hidden className="absolute inset-0 flex items-center justify-center">
@@ -319,18 +319,18 @@ export function Immersion() {
               {/* 3. Remate: el modelo y sus CTA (junto al armazón en escritorio, debajo en móvil) */}
               <div className="absolute inset-x-0 top-[60%] flex justify-center wide:inset-x-auto wide:right-0 wide:top-1/2 wide:-translate-y-1/2 short:inset-x-auto short:right-0 short:top-1/2 short:-translate-y-1/2">
                 <div ref={bind("label", LABEL_WINDOW, { still: true })} style={initial(LABEL_WINDOW)} className="flex flex-col items-center text-center wide:items-end wide:text-right short:items-end short:text-right">
-                  <p className="eyebrow text-volt-ice">
+                  <p className="eyebrow">
                     {COLOR.name} · {currency.format(PRODUCT.price)}
                   </p>
-                  <p className="mt-3 font-display text-[clamp(2.25rem,1.2rem+2.6vw,3.75rem)] uppercase leading-none tracking-[0.04em] text-white [margin-right:-0.04em] short:text-[1.75rem]">
+                  <p className="mt-3 font-display text-[clamp(2.25rem,1.2rem+2.6vw,3.75rem)] uppercase leading-none tracking-[0.04em] text-ink [margin-right:-0.04em] short:text-[1.75rem]">
                     {PRODUCT.name}
                   </p>
-                  <p className="mt-3 max-w-[30ch] text-[0.9375rem] leading-relaxed text-paper/70 max-lg:[@media(max-height:719px)]:hidden short:hidden">{PRODUCT.tagline}</p>
+                  <p className="mt-3 max-w-[30ch] text-[0.9375rem] leading-relaxed text-ink/65 max-lg:[@media(max-height:719px)]:hidden short:hidden">{PRODUCT.tagline}</p>
                   <div className="mt-6 flex gap-2.5 whitespace-nowrap short:mt-4">
                     <button type="button" onClick={() => openTryOn(PRODUCT.id, COLOR.id)} className="btn-primary h-12 px-6 text-[0.9375rem] max-[389px]:px-4 max-[389px]:text-[0.8125rem]">
                       <ScanFace className="h-4 w-4" aria-hidden /> Pruébatelos
                     </button>
-                    <button type="button" onClick={goToCatalog} className="btn-glass h-12 px-6 text-[0.9375rem] max-[389px]:px-4 max-[389px]:text-[0.8125rem]">
+                    <button type="button" onClick={goToCatalog} className="btn-outline h-12 px-6 text-[0.9375rem] max-[389px]:px-4 max-[389px]:text-[0.8125rem]">
                       Ver modelos <ArrowRight className="h-4 w-4" aria-hidden />
                     </button>
                   </div>
@@ -340,9 +340,9 @@ export function Immersion() {
               {/* Indicación inicial */}
               <div aria-hidden className="absolute inset-x-0 bottom-[max(1.5rem,4vh)] flex justify-center short:hidden">
                 <div ref={bind("hint", HINT_WINDOW, { blur: false })} style={initial(HINT_WINDOW)} className="flex flex-col items-center gap-3">
-                  <span className="micro text-paper/70">Desliza para sumergirte</span>
-                  <span className="relative h-10 w-px overflow-hidden bg-white/15">
-                    <span className="absolute inset-x-0 top-0 h-1/2 bg-ice motion-safe:animate-hint" />
+                  <span className="micro">Desliza para sumergirte</span>
+                  <span className="relative h-10 w-px overflow-hidden bg-ink/15">
+                    <span className="absolute inset-x-0 top-0 h-1/2 bg-ink motion-safe:animate-hint" />
                   </span>
                 </div>
               </div>
@@ -352,8 +352,8 @@ export function Immersion() {
           {/* Marca gigante translúcida, a sangre */}
           <div ref={wordmarkRef} aria-hidden className="pointer-events-none absolute inset-x-0 bottom-[max(1rem,3vh)] flex justify-center overflow-x-clip">
             <div ref={bind("wordmark", WORDMARK_WINDOW, { dy: 60, blur: false, still: true })} style={initial(WORDMARK_WINDOW)}>
-              {/* Degradado en el texto: hielo arriba que se disuelve en el agua */}
-              <span className="block select-none whitespace-nowrap bg-[linear-gradient(180deg,rgba(232,238,255,0.78)_0%,rgba(200,216,255,0.42)_55%,rgba(200,216,255,0.08)_100%)] bg-clip-text pb-[0.04em] font-display text-[13.4vw] uppercase leading-[0.9] short:text-[10vw] tracking-[0.02em] text-transparent [margin-right:-0.02em]">
+              {/* Degradado en el texto: tinta arriba que se disuelve en el agua */}
+              <span className="block select-none whitespace-nowrap bg-[linear-gradient(180deg,rgba(11,11,12,0.86)_0%,rgba(11,11,12,0.42)_58%,rgba(11,11,12,0.06)_100%)] bg-clip-text pb-[0.04em] font-display text-[13.4vw] uppercase leading-[0.9] short:text-[10vw] tracking-[0.02em] text-transparent [margin-right:-0.02em]">
                 Sarabia
               </span>
             </div>
@@ -381,15 +381,15 @@ function GlassCard({ card, index, beatRef, style }: { card: Card; index: number;
   const Icon = card.icon;
   return (
     <div ref={beatRef} style={style} className="glass-card flex items-start gap-3.5 p-3.5 sm:p-4">
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/[0.1] ring-1 ring-white/20">
-        <Icon className="h-4 w-4 text-ice" strokeWidth={1.75} />
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-ink text-white">
+        <Icon className="h-4 w-4" strokeWidth={1.75} />
       </span>
       <div className="min-w-0 flex-1">
-        <p className="flex items-baseline justify-between gap-3 text-[0.9375rem] font-medium leading-snug text-white">
+        <p className="flex items-baseline justify-between gap-3 text-[0.9375rem] font-medium leading-snug text-ink">
           {card.title}
-          <span className="font-mono text-[0.6875rem] tabular-nums text-paper/45 max-sm:hidden">{pad(index)}</span>
+          <span className="font-mono text-[0.6875rem] tabular-nums text-ink/60 max-sm:hidden">{pad(index)}</span>
         </p>
-        <p className="mt-1 text-[0.8125rem] leading-[1.45] text-paper/70 max-lg:[@media(max-height:719px)]:hidden short:hidden">{card.body}</p>
+        <p className="mt-1 text-[0.8125rem] leading-[1.45] text-ink/70 max-lg:[@media(max-height:719px)]:hidden short:hidden">{card.body}</p>
       </div>
     </div>
   );

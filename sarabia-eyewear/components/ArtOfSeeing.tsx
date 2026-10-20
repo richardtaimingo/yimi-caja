@@ -7,7 +7,7 @@ import { ArrowRight, ScanFace } from "lucide-react";
 import clsx from "clsx";
 import { products, type ProductPhoto } from "@/lib/products";
 import { framePhotos } from "@/lib/framePhotos";
-import { GRAIN, maskOf } from "@/lib/textures";
+import { maskOf } from "@/lib/textures";
 import { useShop } from "./ShopProvider";
 import { scrollToTarget } from "@/lib/scroll";
 
@@ -85,7 +85,7 @@ const CHAPTERS = [
 
 // Bloque de luz azul del capítulo II (el mismo fondo se repite dentro de la mica para alinearse).
 const MICAS_BG =
-  "radial-gradient(30% 26% at 62% 42%, rgba(200,216,255,0.2), transparent 70%), radial-gradient(90% 80% at 62% 45%, #2552D8 0%, #1B47C9 32%, #0B2470 70%, #050E2E 100%)";
+  "radial-gradient(30% 26% at 62% 42%, rgba(255,255,255,0.06), transparent 70%), radial-gradient(90% 80% at 62% 45%, #26262A 0%, #161618 45%, #0B0B0C 100%)";
 
 function useIsMobile() {
   const [mobile, setMobile] = useState(false);
@@ -128,7 +128,7 @@ export function ArtOfSeeing() {
   const blueGate = useGate(p, 0.26, 0.66);
 
   return (
-    <section id="materiales" ref={ref} className="relative h-[640vh] bg-night" aria-label="El Arte de Ver Bien">
+    <section id="materiales" ref={ref} className="relative h-[640vh] bg-canvas" aria-label="El Arte de Ver Bien">
       {/* Texto completo para lectores de pantalla */}
       <ol className="sr-only">
         {BEATS.map((b) => (
@@ -142,7 +142,6 @@ export function ArtOfSeeing() {
       <div className="sticky top-0 h-[100svh] overflow-hidden [container-type:size]">
         {/* Bloque de luz azul que barre la escena en el capítulo II */}
         <motion.div className="absolute inset-0 will-change-transform" style={{ x: blueX, display: blueGate, backgroundImage: MICAS_BG }} aria-hidden />
-        <div className="pointer-events-none absolute inset-0 opacity-[0.04]" style={{ backgroundImage: GRAIN }} aria-hidden />
 
         <div aria-hidden>
           <ChapterNumeral p={p} />
@@ -192,11 +191,11 @@ function StoryText({ beat, onBlue, mobile }: { beat: number; onBlue: boolean; mo
       className={clsx(
         "pointer-events-none absolute z-30 transition-colors duration-500",
         mobile ? "inset-x-0 bottom-0 px-5 pb-6 pt-16" : "left-[max(7cqw,5.5rem)] top-1/2 w-[min(31cqw,440px)] -translate-y-1/2",
-        onBlue ? "text-white" : "text-paper",
+        onBlue ? "on-dark text-white" : "text-ink",
       )}
       style={
         mobile
-          ? { backgroundImage: `linear-gradient(to top, ${onBlue ? "#0A2B92" : "#04070E"} 55%, transparent)` }
+          ? { backgroundImage: `linear-gradient(to top, ${onBlue ? "#0B0B0C" : "#FFFFFF"} 55%, transparent)` }
           : undefined
       }
     >
@@ -204,7 +203,7 @@ function StoryText({ beat, onBlue, mobile }: { beat: number; onBlue: boolean; mo
         <motion.div key={beat} initial="hidden" animate="show" exit="exit" className="pointer-events-auto">
           <motion.p
             variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0 }, exit: { opacity: 0 } }}
-            className="text-[0.68rem] font-semibold uppercase tracking-[0.3em] text-volt-ice"
+            className={clsx("text-[0.68rem] font-semibold uppercase tracking-[0.3em]", onBlue ? "text-white/65" : "text-mute")}
           >
             {b.kicker}
           </motion.p>
@@ -227,7 +226,7 @@ function StoryText({ beat, onBlue, mobile }: { beat: number; onBlue: boolean; mo
           {/* En móvil el párrafo deja libre la esquina del botón flotante de WhatsApp */}
           <motion.p
             variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0, transition: { delay: 0.25 } }, exit: { opacity: 0 } }}
-            className={clsx("mt-4 max-w-md leading-relaxed", mobile ? "pr-14 text-sm" : "text-base", onBlue ? "text-white/80" : "text-paper/70")}
+            className={clsx("mt-4 max-w-md leading-relaxed", mobile ? "pr-14 text-sm" : "text-base", onBlue ? "text-white/80" : "text-ink/70")}
           >
             {b.body}
           </motion.p>
@@ -262,8 +261,8 @@ function ProgressRail({ p, beat, onBlue, onJump }: { p: MotionValue<number>; bea
     <>
       {/* Escritorio: riel vertical */}
       <nav className="pointer-events-auto absolute left-5 top-1/2 z-30 hidden -translate-y-1/2 lg:block" aria-label="Capítulos">
-        <div className={clsx("relative flex flex-col gap-5 border-l pl-3", onBlue ? "border-white/25" : "border-paper/15")}>
-          <motion.span className={clsx("absolute -left-px top-0 h-full w-px origin-top", onBlue ? "bg-white" : "bg-volt-soft")} style={{ scaleY: fill }} />
+        <div className={clsx("relative flex flex-col gap-5 border-l pl-3", onBlue ? "border-white/25" : "border-ink/15")}>
+          <motion.span className={clsx("absolute -left-px top-0 h-full w-px origin-top", onBlue ? "bg-white" : "bg-ink")} style={{ scaleY: fill }} />
           {CHAPTERS.map((c, i) => (
             <button
               key={c.n}
@@ -271,7 +270,7 @@ function ProgressRail({ p, beat, onBlue, onJump }: { p: MotionValue<number>; bea
               onClick={() => onJump(c.start)}
               className={clsx(
                 "flex items-baseline gap-2 text-left transition-colors",
-                i === chapter ? (onBlue ? "text-white" : "text-paper") : onBlue ? "text-white/45 hover:text-white/80" : "text-paper/35 hover:text-paper/70",
+                i === chapter ? (onBlue ? "text-white" : "text-ink") : onBlue ? "text-white/55 hover:text-white/85" : "text-ink/55 hover:text-ink/80",
               )}
             >
               <span className="font-display text-[0.7rem]" title={c.label}>
@@ -295,8 +294,8 @@ function ProgressRail({ p, beat, onBlue, onJump }: { p: MotionValue<number>; bea
 function Segment({ p, a, b, onBlue }: { p: MotionValue<number>; a: number; b: number; onBlue: boolean }) {
   const scaleX = useTransform(p, [a, b], [0, 1]);
   return (
-    <div className={clsx("h-[3px] flex-1 overflow-hidden rounded-full", onBlue ? "bg-white/20" : "bg-paper/15")}>
-      <motion.div className={clsx("h-full origin-left rounded-full", onBlue ? "bg-white" : "bg-volt")} style={{ scaleX }} />
+    <div className={clsx("h-[3px] flex-1 overflow-hidden rounded-full", onBlue ? "bg-white/20" : "bg-ink/15")}>
+      <motion.div className={clsx("h-full origin-left rounded-full", onBlue ? "bg-white" : "bg-ink")} style={{ scaleX }} />
     </div>
   );
 }
@@ -318,7 +317,7 @@ function Numeral({ p, n, a, b, dark }: { p: MotionValue<number>; n: string; a: n
   return (
     <motion.span
       className="display pointer-events-none absolute bottom-[-2cqh] right-[2cqw] select-none text-[34cqh] leading-none text-transparent will-change-transform"
-      style={{ opacity, y, display, WebkitTextStroke: `1.5px ${dark ? "rgba(255,255,255,0.16)" : "rgba(233,239,249,0.07)"}` }}
+      style={{ opacity, y, display, WebkitTextStroke: `1.5px ${dark ? "rgba(255,255,255,0.16)" : "rgba(11,11,12,0.08)"}` }}
     >
       {n}
     </motion.span>
@@ -334,7 +333,7 @@ function Numeral({ p, n, a, b, dark }: { p: MotionValue<number>; n: string; a: n
 function ShinyFrame({ photo, sheen, className, style }: { photo: ProductPhoto; sheen: MotionValue<string>; className?: string; style?: CSSProperties }) {
   return (
     <div className={clsx("relative", className)} style={{ aspectRatio: `${photo.width} / ${photo.height}`, ...style }}>
-      <Image src={photo.front} alt="" fill quality={90} sizes="(min-width: 1024px) 44vw, 86vw" className="object-contain drop-shadow-[0_40px_40px_rgba(0,0,0,0.55)]" />
+      <Image src={photo.front} alt="" fill quality={90} sizes="(min-width: 1024px) 44vw, 86vw" className="object-contain drop-shadow-[0_30px_30px_rgba(11,11,12,0.22)]" />
       <div className="absolute inset-0 overflow-hidden mix-blend-screen" style={maskOf(photo.mask ?? photo.front)}>
         <motion.div
           className="absolute inset-y-0 left-0 w-[280%] bg-[linear-gradient(105deg,transparent_42%,rgba(255,255,255,0.5)_50%,transparent_58%)] will-change-transform"
@@ -392,17 +391,17 @@ function MateriaScene({ p, mobile }: { p: MotionValue<number>; mobile: boolean }
       {/* Palabra gigante contorneada, deslizada por el scroll */}
       <motion.div className="absolute left-0 top-[14cqh] whitespace-nowrap will-change-transform lg:top-[10cqh]" style={{ x: wordX }}>
         <div className="relative">
-          <motion.span className="display block text-[22cqh] text-transparent" style={{ opacity: acetateWord, WebkitTextStroke: "1.5px rgba(233,239,249,0.14)" }}>
+          <motion.span className="display block text-[22cqh] text-transparent" style={{ opacity: acetateWord, WebkitTextStroke: "1.5px rgba(11,11,12,0.12)" }}>
             acetato · acetato · acetato
           </motion.span>
-          <motion.span className="display absolute left-0 top-0 block text-[22cqh] text-transparent" style={{ opacity: titaniumWord, WebkitTextStroke: "1.5px rgba(120,165,255,0.4)" }}>
+          <motion.span className="display absolute left-0 top-0 block text-[22cqh] text-transparent" style={{ opacity: titaniumWord, WebkitTextStroke: "1.5px rgba(11,11,12,0.35)" }}>
             titanio · titanio · titanio
           </motion.span>
         </div>
       </motion.div>
 
       {/* Luz cálida detrás del armazón */}
-      <div className="absolute h-[70cqh] w-[70cqh] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(45,107,255,0.34),transparent_65%)]" style={{ left: frameStyle.left, top: frameStyle.top }} />
+      <div className="absolute h-[70cqh] w-[70cqh] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(11,11,12,0.06),transparent_65%)]" style={{ left: frameStyle.left, top: frameStyle.top }} />
 
       <div className="absolute -translate-x-1/2 -translate-y-1/2 [perspective:1100px]" style={frameStyle}>
         <motion.div style={{ opacity: aOpacity, rotateY: aRotY, rotateX: aRotX, scale: aScale, x: aX }}>
@@ -436,9 +435,9 @@ function SpecStack({ p, show, items, overlay }: { p: MotionValue<number>; show: 
   return (
     <motion.div className={clsx("col-span-3 grid grid-cols-3 gap-4", overlay && "absolute inset-0")} style={{ opacity, y }}>
       {items.map((it) => (
-        <div key={it.label} className="border-t border-paper/15 pt-3">
-          <p className="display whitespace-nowrap text-[clamp(1.05rem,2.3cqw,2.3rem)] tabular-nums text-paper">{it.node}</p>
-          <p className="mt-1 text-[0.7rem] leading-snug text-paper/55 sm:text-xs">{it.label}</p>
+        <div key={it.label} className="border-t border-ink/15 pt-3">
+          <p className="display whitespace-nowrap text-[clamp(1.05rem,2.3cqw,2.3rem)] tabular-nums text-ink">{it.node}</p>
+          <p className="mt-1 text-[0.7rem] leading-snug text-ink/60 sm:text-xs">{it.label}</p>
         </div>
       ))}
     </motion.div>
@@ -468,7 +467,7 @@ function EyeChart({ cx }: { cx: string }) {
             <span className="whitespace-nowrap font-sans font-bold tracking-[0.32em] text-white" style={{ fontSize: `${row.size}cqh`, lineHeight: 1 }}>
               {row.letters}
             </span>
-            <span className="absolute left-full ml-[3cqh] whitespace-nowrap font-mono text-[1.3cqh] text-white/50">{row.label}</span>
+            <span className="absolute left-full ml-[3cqh] whitespace-nowrap font-mono text-[1.3cqh] text-white/60">{row.label}</span>
           </div>
         ))}
       </div>
@@ -562,7 +561,7 @@ function MicasScene({ p, mobile }: { p: MotionValue<number>; mobile: boolean }) 
             <span className="absolute -top-[9cqh] left-[2%] whitespace-nowrap rounded-full bg-white/10 px-3 py-1.5 text-[clamp(0.6rem,1.4cqh,0.78rem)] font-semibold uppercase tracking-[0.14em] text-white/80 backdrop-blur-sm">
               ← {outside}
             </span>
-            <span className="absolute right-[2%] top-[104%] whitespace-nowrap rounded-full bg-white px-3 py-1.5 text-[clamp(0.6rem,1.4cqh,0.78rem)] font-semibold uppercase tracking-[0.14em] text-night">
+            <span className="absolute right-[2%] top-[104%] whitespace-nowrap rounded-full bg-white px-3 py-1.5 text-[clamp(0.6rem,1.4cqh,0.78rem)] font-semibold uppercase tracking-[0.14em] text-ink">
               {inside} ↑
             </span>
           </motion.div>
@@ -596,7 +595,7 @@ function MedidaScene({ p, mobile }: { p: MotionValue<number>; mobile: boolean })
   const box: CSSProperties = mobile
     ? { left: "50cqw", top: "36cqh", width: "84cqw" }
     : { left: "63cqw", top: "46cqh", width: "min(44cqw, 620px)" };
-  const stroke = "#8DB6FF";
+  const stroke = "#0B0B0C";
   const sw = W / 300; // grosor proporcional al tamaño de la foto
 
   return (
@@ -607,17 +606,17 @@ function MedidaScene({ p, mobile }: { p: MotionValue<number>; mobile: boolean })
         style={{
           opacity: grid,
           backgroundImage:
-            "linear-gradient(rgba(246,241,234,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(246,241,234,0.05) 1px, transparent 1px)",
+            "linear-gradient(rgba(11,11,12,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(11,11,12,0.06) 1px, transparent 1px)",
           backgroundSize: "4cqh 4cqh",
         }}
       />
       {/* Luz de mesa de trabajo: separa el carey oscuro del fondo */}
       <motion.div
-        className="absolute aspect-[16/9] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(110,155,255,0.3),rgba(45,107,255,0.08)_55%,transparent)]"
+        className="absolute aspect-[16/9] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(11,11,12,0.07),rgba(11,11,12,0.02)_55%,transparent)]"
         style={{ left: box.left, top: box.top, width: mobile ? "120cqw" : "min(70cqw, 1000px)", opacity: grid }}
       />
       <motion.div className="absolute will-change-transform" style={{ ...box, aspectRatio: `${W} / ${H}`, scale: frameScale, x: "-50%", y: "-50%" }}>
-        <Image src={OPTICAL.tryOn ?? OPTICAL.front} alt="" fill quality={90} sizes="(min-width: 1024px) 44vw, 84vw" className="object-contain drop-shadow-[0_30px_30px_rgba(0,0,0,0.55)]" />
+        <Image src={OPTICAL.tryOn ?? OPTICAL.front} alt="" fill quality={90} sizes="(min-width: 1024px) 44vw, 84vw" className="object-contain drop-shadow-[0_24px_26px_rgba(11,11,12,0.22)]" />
         <svg viewBox={`0 0 ${W} ${H}`} className="absolute inset-0 h-full w-full overflow-visible">
           <g fill="none" stroke={stroke} strokeWidth={sw} strokeLinecap="round">
             {/* Ancho total */}
@@ -645,7 +644,7 @@ function MedidaScene({ p, mobile }: { p: MotionValue<number>; mobile: boolean })
 
       {/* Ficha técnica */}
       <motion.dl
-        className={clsx("absolute grid grid-cols-3 gap-4 text-paper", mobile ? "inset-x-5 top-[62cqh]" : "bottom-[8cqh] left-[45cqw] right-[6cqw]")}
+        className={clsx("absolute grid grid-cols-3 gap-4 text-ink", mobile ? "inset-x-5 top-[62cqh]" : "bottom-[8cqh] left-[45cqw] right-[6cqw]")}
         style={{ opacity: useTransform(p, [0.74, 0.77], [0, 1]) }}
       >
         {[
@@ -653,8 +652,8 @@ function MedidaScene({ p, mobile }: { p: MotionValue<number>; mobile: boolean })
           ["Peso", `${MATEO.specs.weight} g`],
           ["Bisagra", "Flex 5 barriles"],
         ].map(([k, v]) => (
-          <div key={k} className="border-t border-paper/15 pt-3">
-            <dt className="text-[0.7rem] uppercase tracking-[0.18em] text-paper/45">{k}</dt>
+          <div key={k} className="border-t border-ink/15 pt-3">
+            <dt className="text-[0.7rem] uppercase tracking-[0.18em] text-ink/60">{k}</dt>
             <dd className="mt-2 font-display text-sm uppercase sm:text-base">{v}</dd>
           </div>
         ))}
@@ -666,8 +665,8 @@ function MedidaScene({ p, mobile }: { p: MotionValue<number>; mobile: boolean })
 function Dimension({ style, opacity, value, hint, small }: { style: CSSProperties; opacity: MotionValue<number>; value: ReactNode; hint: string; small?: boolean }) {
   return (
     <motion.div className="absolute -translate-x-1/2 -translate-y-1/2 whitespace-nowrap text-center" style={{ ...style, opacity }}>
-      <p className={clsx("display tabular-nums text-volt-ice", small ? "text-[clamp(0.85rem,1.5cqw,1.2rem)]" : "text-[clamp(1rem,2cqw,1.7rem)]")}>{value}</p>
-      <p className="text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-paper/60">{hint}</p>
+      <p className={clsx("display tabular-nums text-ink", small ? "text-[clamp(0.85rem,1.5cqw,1.2rem)]" : "text-[clamp(1rem,2cqw,1.7rem)]")}>{value}</p>
+      <p className="text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-ink/60">{hint}</p>
     </motion.div>
   );
 }
@@ -748,10 +747,10 @@ function FlyingFrame({
       aria-label={`Probarte ${item.product.name}`}
     >
       <span className="relative block" style={{ aspectRatio: `${photo.width} / ${photo.height}` }}>
-        <Image src={photo.front} alt="" fill quality={90} sizes="(min-width: 1024px) 12vw, 28vw" className="object-contain drop-shadow-[0_16px_14px_rgba(0,0,0,0.5)] transition-transform duration-300 group-hover:-translate-y-1 group-hover:scale-105" />
+        <Image src={photo.front} alt="" fill quality={90} sizes="(min-width: 1024px) 12vw, 28vw" className="object-contain drop-shadow-[0_14px_12px_rgba(11,11,12,0.2)] transition-transform duration-300 group-hover:-translate-y-1 group-hover:scale-105" />
       </span>
-      <span className="mt-[0.8cqh] block font-display text-[clamp(0.58rem,1.3cqh,0.82rem)] uppercase tracking-[0.06em] text-paper">{item.product.name}</span>
-      <span className="block text-[clamp(0.55rem,1.15cqh,0.72rem)] font-semibold uppercase tracking-[0.18em] text-volt-ice opacity-0 transition-opacity group-hover:opacity-100">
+      <span className="mt-[0.8cqh] block font-display text-[clamp(0.58rem,1.3cqh,0.82rem)] uppercase tracking-[0.06em] text-ink">{item.product.name}</span>
+      <span className="block text-[clamp(0.55rem,1.15cqh,0.72rem)] font-semibold uppercase tracking-[0.18em] text-ink/60 opacity-0 transition-opacity group-hover:opacity-100">
         Pruébatelos
       </span>
     </motion.button>
@@ -765,7 +764,7 @@ function CtaTile({ p, style }: { p: MotionValue<number>; style: CSSProperties })
   return (
     <motion.a
       href="#catalogo"
-      className="pointer-events-auto absolute flex flex-col items-start justify-between rounded-2xl bg-volt p-[min(1.6cqh,2.4cqw)] text-white shadow-glow transition-colors hover:bg-volt-deep"
+      className="pointer-events-auto absolute flex flex-col items-start justify-between rounded-2xl bg-ink p-[min(1.6cqh,2.4cqw)] text-white shadow-float transition-colors hover:bg-ink-2"
       style={{ ...style, opacity, scale, x: "-50%", y: "-50%" }}
     >
       <span className="display text-[clamp(0.5rem,min(1.9cqh,2.2cqw),1.25rem)] leading-[1.2]">Encuentra tu par</span>

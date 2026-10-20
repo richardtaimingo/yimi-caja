@@ -92,7 +92,7 @@ export function ModelIndex() {
 
         <ol
           data-fab-avoid
-          className="mt-12 border-t border-white/[0.08] md:mt-16"
+          className="mt-12 border-t border-ink/10 md:mt-16"
           onMouseEnter={() => setHovering(true)}
           onMouseLeave={() => {
             setHovering(false);
@@ -111,7 +111,7 @@ export function ModelIndex() {
                 ref={(el) => {
                   rows.current[i] = el;
                 }}
-                className="border-b border-white/[0.08]"
+                className="border-b border-ink/10"
                 style={{ "--indent": INDENT[i % INDENT.length] } as CSSProperties}
               >
                 <button
@@ -122,13 +122,13 @@ export function ModelIndex() {
                   aria-label={`${product.name}: ${materialLabels[product.material].label}, ${currency.format(product.price)}. Pruébatelos en vivo`}
                   className="group relative flex min-h-[4.25rem] w-full items-center gap-3 py-3 text-left sm:gap-5 lg:pl-[var(--indent)]"
                 >
-                  <span className="w-6 shrink-0 font-mono text-[0.6875rem] tabular-nums text-paper/40">{pad(i + 1)}</span>
+                  <span className="w-6 shrink-0 font-mono text-[0.6875rem] tabular-nums text-ink/60">{pad(i + 1)}</span>
                   <span className="relative min-w-0">
                     {/* Barra de luz que recorre el nombre */}
                     <span
                       aria-hidden
                       className={clsx(
-                        "absolute -inset-x-[0.18em] inset-y-[0.04em] origin-left bg-ice transition-transform duration-500 ease-[cubic-bezier(0.65,0,0.35,1)]",
+                        "absolute -inset-x-[0.18em] inset-y-[0.04em] origin-left bg-ink transition-transform duration-500 ease-[cubic-bezier(0.65,0,0.35,1)]",
                         on ? "scale-x-100" : "scale-x-0",
                       )}
                     />
@@ -139,13 +139,13 @@ export function ModelIndex() {
                       aria-hidden
                       className={clsx(
                         "relative block whitespace-nowrap font-mono text-[clamp(2rem,1.1rem+3.6vw,4.25rem)] font-medium uppercase leading-[1.05] tracking-[-0.04em] transition-colors duration-300",
-                        on ? "text-night" : "text-paper",
+                        on ? "text-white" : "text-ink",
                       )}
                     >
                       {product.name}
                     </span>
                   </span>
-                  <span className={clsx("hidden font-mono text-[0.6875rem] uppercase leading-[1.6] tracking-[0.12em] transition-colors sm:block", on ? "text-paper" : "text-paper/45")}>
+                  <span className={clsx("hidden font-mono text-[0.6875rem] uppercase leading-[1.6] tracking-[0.12em] transition-colors sm:block", on ? "text-ink" : "text-ink/60")}>
                     {materialLabels[product.material].label}
                     <br />
                     {currency.format(product.price)}
@@ -154,14 +154,14 @@ export function ModelIndex() {
                   <span
                     aria-hidden
                     className={clsx(
-                      "ml-auto flex h-14 w-24 shrink-0 items-center justify-center rounded-lg bg-[radial-gradient(90%_75%_at_50%_40%,#2F6BFF_0%,#0E3BB8_40%,#071A55_100%)] p-2 transition-all duration-500 [@media(pointer:fine)]:hidden",
+                      "ml-auto flex h-14 w-24 shrink-0 items-center justify-center rounded-lg bg-[radial-gradient(90%_80%_at_50%_38%,#FFFFFF_0%,#F1F1EE_52%,#E2E2DC_100%)] p-2 ring-1 ring-ink/[0.06] transition-all duration-500 [@media(pointer:fine)]:hidden",
                       on ? "scale-100 opacity-100" : "scale-90 opacity-0",
                     )}
                   >
                     {color.photo && <Image src={color.photo.front} alt="" width={color.photo.width} height={color.photo.height} sizes="96px" className="h-auto w-full" />}
                   </span>
                   <ArrowUpRight
-                    className={clsx("hidden h-5 w-5 shrink-0 transition-all duration-300 [@media(pointer:fine)]:ml-auto [@media(pointer:fine)]:block", on ? "text-ice opacity-100" : "opacity-0")}
+                    className={clsx("hidden h-5 w-5 shrink-0 transition-all duration-300 [@media(pointer:fine)]:ml-auto [@media(pointer:fine)]:block", on ? "text-ink opacity-100" : "opacity-0")}
                     aria-hidden
                   />
                 </button>
@@ -180,7 +180,7 @@ export function ModelIndex() {
         animate={{ opacity: hovering && active !== null ? 1 : 0, scale: hovering && active !== null ? 1 : 0.92 }}
         transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
       >
-        <div className="relative h-full w-full overflow-hidden rounded-2xl bg-[radial-gradient(90%_75%_at_50%_40%,#2F6BFF_0%,#0E3BB8_34%,#071A55_72%,#030712_100%)] shadow-[0_30px_60px_-24px_rgba(0,0,0,0.8)] ring-1 ring-white/10">
+        <div className="relative h-full w-full overflow-hidden rounded-2xl bg-[radial-gradient(90%_80%_at_50%_38%,#FFFFFF_0%,#F1F1EE_52%,#E2E2DC_100%)] shadow-[0_30px_60px_-28px_rgba(11,11,12,0.4)] ring-1 ring-ink/10">
           {ROWS.map(({ product, color }, i) =>
             color.photo ? (
               <div
@@ -188,11 +188,11 @@ export function ModelIndex() {
                 className="absolute inset-0 flex items-center justify-center p-6 transition-[opacity,transform] duration-300"
                 style={{ opacity: active === i ? 1 : 0, transform: active === i ? "scale(1) rotate(-4deg)" : "scale(0.94) rotate(-4deg)" }}
               >
-                <Image src={color.photo.front} alt="" width={color.photo.width} height={color.photo.height} sizes="288px" className="h-auto w-full [filter:drop-shadow(0_14px_14px_rgba(0,3,15,0.5))]" />
+                <Image src={color.photo.front} alt="" width={color.photo.width} height={color.photo.height} sizes="288px" className="h-auto w-full [filter:drop-shadow(0_14px_14px_rgba(11,11,12,0.2))]" />
               </div>
             ) : null,
           )}
-          <span className="absolute bottom-3 left-4 font-mono text-[0.625rem] uppercase tracking-[0.14em] text-white/80">
+          <span className="absolute bottom-3 left-4 font-mono text-[0.625rem] uppercase tracking-[0.14em] text-ink/70">
             {active !== null ? `${ROWS[active].product.name} — ${ROWS[active].color.name}` : ""}
           </span>
         </div>
