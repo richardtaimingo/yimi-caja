@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import plugin from "tailwindcss/plugin";
 
 const config: Config = {
   content: ["./app/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./lib/**/*.{ts,tsx}"],
@@ -6,8 +7,6 @@ const config: Config = {
   corePlugins: { container: false },
   theme: {
     extend: {
-      // Teléfono en horizontal: el hero se reorganiza en dos columnas para caber en ~390 px de alto.
-      screens: { short: { raw: "(orientation: landscape) and (max-height: 500px)" } },
       colors: {
         // Fondo: tinta azul casi negra, en tres niveles de superficie.
         night: { DEFAULT: "#03050B", 2: "#070B16", 3: "#0C1324" },
@@ -54,7 +53,15 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    // Variantes propias (no "screens": una pantalla "raw" desactiva todas las variantes max-*).
+    plugin(({ addVariant }) => {
+      // Teléfono en horizontal: el hero se reorganiza en dos columnas para caber en ~390 px de alto.
+      addVariant("short", "@media (orientation: landscape) and (max-height: 500px)");
+      // Pantalla ancha de verdad (no una tablet vertical de 1024 px): composiciones a dos columnas.
+      addVariant("wide", "@media (min-width: 1024px) and (min-aspect-ratio: 11/10)");
+    }),
+  ],
 };
 
 export default config;

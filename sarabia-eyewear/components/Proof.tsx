@@ -31,7 +31,7 @@ export function Proof() {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "start start"] });
   const scale = useTransform(scrollYProgress, [0, 1], [reduced ? 1 : 1.18, 1]);
-  const lift = useTransform(scrollYProgress, [0, 1], [reduced ? "0%" : "8%", "0%"]);
+  const lift = useTransform(scrollYProgress, [0, 1], [reduced ? "0%" : "-6%", "0%"]);
 
   const goToCatalog = () => {
     setIntent("todos");
@@ -47,7 +47,8 @@ export function Proof() {
       <div className="grid lg:min-h-[100svh] lg:grid-cols-2">
         {/* Estudio cobalto */}
         <div className="stage-blue relative isolate h-[56svh] min-h-[22rem] overflow-hidden lg:h-auto">
-          <motion.div className="absolute inset-0 flex items-center justify-center" style={{ scale, y: lift }}>
+          {/* En escritorio el armazón va arriba: se ve en cuanto el panel asoma, continuando la escena del agua */}
+          <motion.div className="absolute inset-0 flex items-center justify-center lg:items-start lg:pt-[20svh]" style={{ scale, y: lift }}>
             <div className="w-[80%] max-w-[40rem] [transform:rotate(-6deg)]">
               <LitFrame
                 photo={COLOR.photo!}
@@ -81,7 +82,8 @@ export function Proof() {
               as="h2"
               id="proof-title"
               text="Diseñados en México. Ajustados a ti."
-              className="display mt-5 max-w-[15ch] text-[clamp(1.75rem,1.2rem+2.2vw,3.25rem)] text-night"
+              // Grotesca ligera (como la referencia): contrasta con la Michroma de la marca y cabe en 2–3 líneas
+              className="mt-5 block max-w-[16ch] text-balance text-[clamp(2.25rem,1.5rem+2.6vw,4rem)] font-light leading-[1.02] tracking-[-0.035em] text-night"
             />
             <p className="mt-6 max-w-[44ch] text-[0.9375rem] leading-relaxed text-night/70 sm:text-base">
               Armazones de autor por Jennifer Sarabia, con micas de laboratorio y ajuste garantizado. Elige tu modelo y lo personalizamos
@@ -92,9 +94,9 @@ export function Proof() {
           <dl className="mt-12 lg:mt-10">
             {STATS.map((stat, i) => (
               <div key={stat.label} className="relative grid grid-cols-[1fr_auto] items-baseline gap-4 py-4 sm:py-5">
-                <dt className="order-2 text-right text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-night/55">{stat.label}</dt>
+                <dt className="order-2 max-w-[11rem] text-right text-[0.6875rem] font-semibold uppercase leading-[1.5] tracking-[0.16em] text-night/55 sm:max-w-none">{stat.label}</dt>
                 <dd className="order-1">
-                  <CharReveal text={stat.value} delay={0.2 + i * 0.12} spread={0.5} className="font-display text-[clamp(1.375rem,1rem+1.4vw,2.25rem)] uppercase tracking-[0.02em] text-night" />
+                  <CharReveal text={stat.value} delay={0.2 + i * 0.12} spread={0.5} className="whitespace-nowrap text-[clamp(1.75rem,1.2rem+1.6vw,2.75rem)] font-light tracking-[-0.03em] text-night" />
                 </dd>
                 <motion.span
                   aria-hidden

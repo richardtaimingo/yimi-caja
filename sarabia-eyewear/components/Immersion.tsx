@@ -8,7 +8,7 @@ import { useShop } from "./ShopProvider";
 import { products } from "@/lib/products";
 import { currency } from "@/lib/site";
 import { scrollToTarget } from "@/lib/scroll";
-import { MAX_PARTICLES, STRIDE, sceneAt, windowed, writeParticles } from "@/lib/immersion/timeline";
+import { MAX_PARTICLES, STRIDE, defaultCameraStart, frameWidth, sceneAt, windowed, writeParticles } from "@/lib/immersion/timeline";
 import { ImmersionRenderer } from "@/lib/immersion/renderer";
 
 /**
@@ -27,6 +27,7 @@ import { ImmersionRenderer } from "@/lib/immersion/renderer";
 const PRODUCT = products.find((p) => p.id === "costa")!;
 const COLOR = PRODUCT.colors.find((c) => c.id === "carey-degradado")!;
 const PHOTO = COLOR.photo!;
+const PHOTO_ASPECT = PHOTO.width / PHOTO.height;
 /** Cuadro que se muestra fijo con "reducir movimiento". */
 const STILL = 0.92;
 
@@ -49,7 +50,9 @@ const DIVE: (Card & { side: "left" | "right"; at: Window4 })[] = [
 const SURFACE_WINDOW = (i: number): Window4 => [-2, -1, 0.05 + i * 0.014, 0.12 + i * 0.014];
 const HINT_WINDOW: Window4 = [-2, -1, 0.015, 0.05];
 const WORDMARK_WINDOW: Window4 = [0.44, 0.6, 2, 3];
-const LABEL_WINDOW: Window4 = [0.82, 0.9, 2, 3];
+const LABEL_WINDOW: Window4 = [0.74, 0.82, 2, 3];
+/** Media anchura máxima del armazón en pantalla (ver frameWidth) más aire: las tarjetas laterales se colocan respecto a él. */
+const SIDE = "min(15vw,28svh)";
 
 type Beat = { el: HTMLElement; win: Window4; dy: number; blur: boolean; still: boolean; last: number };
 
@@ -82,6 +85,9 @@ export function Immersion() {
   const stageRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const surfaceRef = useRef<HTMLDivElement>(null);
+  const overlaysRef = useRef<HTMLDivElement>(null);
+  const wordmarkRef = useRef<HTMLDivElement>(null);
   const beats = useRef(new Map<string, Beat>());
   const [webgl, setWebgl] = useState(true);
 
@@ -99,7 +105,10 @@ export function Immersion() {
     const stage = stageRef.current;
     const canvas = canvasRef.current;
     const sceneLayer = sceneRef.current;
-    if (!section || !stage || !canvas || !sceneLayer) return;
+    const surface = surfaceRef.current;
+    const wordmark = wordmarkRef.current;
+    const overlays = overlaysRef.current;
+    if (!section || !stage || !canvas || !sceneLayer || !surface || !wordmark || !overlays) return;
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const blurOk = window.matchMedia("(pointer: fine)").matches;
@@ -110,6 +119,7 @@ export function Immersion() {
     let height = 0;
     let vw = 1;
     let vh = 1;
+    let cameraStart = 0.2;
     let quality = 1;
     let smoothP = -1;
     let curtain = 0;
@@ -121,7 +131,7 @@ export function Immersion() {
     const draw = (p: number, curtain: number, time: number) => {
       if (!renderer || renderer.lost) return;
       const aspect = vw / vh;
-      const scene = sceneAt(p, time, aspect);
+      const scene = sceneAt(p, time, aspect, PHOTO_ASPECT, cameraStart);
       const count = writeParticles(particles, p, time, aspect, scene);
       renderer.render(scene, particles, count, time, curtain * 0.55);
     };
@@ -141,6 +151,11 @@ export function Immersion() {
       height = section.offsetHeight;
       vw = stage.clientWidth;
       vh = stage.clientHeight;
+      // El armazón arranca al menos 24 px por debajo de las tarjetas iniciales, sin que el agua salga de cuadro
+      const aspect = vw / vh;
+      const cardsBottom = surface.offsetTop + surface.offsetHeight;
+      const needed = (cardsBottom + 24) / vh - 0.3 + frameWidth(aspect) / PHOTO_ASPECT / 2 + 0.012;
+      cameraStart = Math.min(0.4, Math.max(defaultCameraStart(aspect), needed));
       renderer?.resize(vw, vh, Math.max(1, pixelRatio(vw, vh) * quality));
       // Cambiar el tamaño del canvas lo borra: se vuelve a dibujar en el mismo frame (sin parpadeo)
       if (reduced) showStill();
@@ -179,11 +194,8 @@ export function Immersion() {
       // Amortiguación ligera: en táctil el scroll llega a saltos; un salto grande (ancla) no se anima
       smoothP = smoothP < 0 || Math.abs(target - smoothP) > 0.2 ? target : smoothP + (target - smoothP) * (1 - Math.exp(-delta / 80));
 
-      draw(smoothP, curtain, time);
-      for (const beat of beats.current.values()) applyBeat(beat, smoothP, blurOk);
-      sceneLayer.style.transform = curtain > 0 ? `translate3d(0,${(-curtain * 0.2 * vh).toFixed(1)}px,0)` : "";
-
-      // Calidad adaptativa: si el GPU no llega a ~40 fps se baja la resolución (nunca de 1x)
+      // Calidad adaptativa: si el GPU no llega a ~40 fps se baja la resolución (nunca de 1x). Va antes de
+      // dibujar porque cambiar el tamaño del canvas lo borra.
       if (renderer && delta > 0) {
         sampled += 1;
         if (delta > 26) slow += 1;
@@ -196,6 +208,15 @@ export function Immersion() {
           slow = 0;
         }
       }
+
+      draw(smoothP, curtain, time);
+      for (const beat of beats.current.values()) applyBeat(beat, smoothP, blurOk);
+      sceneLayer.style.transform = curtain > 0 ? `translate3d(0,${(-curtain * 0.2 * vh).toFixed(1)}px,0)` : "";
+      // Con el telón: los textos se retiran y la marca sube con el borde del panel en vez de quedar cortada
+      overlays.style.opacity = curtain > 0 ? String(Math.max(0, 1 - curtain * 2)) : "";
+      wordmark.style.transform = curtain > 0 ? `translate3d(0,${(-curtain * 0.65 * vh).toFixed(1)}px,0)` : "";
+      wordmark.style.opacity = curtain > 0 ? String(Math.max(0, 1 - curtain * 1.4)) : "";
+
     };
 
     const start = () => {
@@ -244,22 +265,35 @@ export function Immersion() {
       <div ref={stageRef} className="sticky top-0 h-[100svh] overflow-hidden motion-reduce:relative">
         <div ref={sceneRef} className="absolute inset-0">
           {/* Fondo mientras carga (o sin WebGL): mismo aire tinta y agua cobalto de la escena */}
-          <div aria-hidden className="absolute inset-0 bg-[linear-gradient(180deg,#03050B_0%,#08143F_58%,#9DB8FF_70%,#2554DA_70.3%,#12349E_88%,#0A1F66_100%)]" />
+          <div aria-hidden className="absolute inset-0 bg-[linear-gradient(180deg,#03050B_0%,#0A1A52_68%,#2554DA_70%,#12349E_88%,#0A1F66_100%)]" />
           <canvas ref={canvasRef} aria-hidden className="absolute inset-0 h-full w-full" />
           {!webgl && (
-            <div aria-hidden className="absolute inset-x-0 top-1/2 mx-auto w-[min(80vw,40rem)] -translate-y-1/2 motion-safe:animate-float">
-              <img src={PHOTO.front} alt="" width={PHOTO.width} height={PHOTO.height} className="h-auto w-full" decoding="async" />
+            <div aria-hidden className="absolute inset-0 flex items-center justify-center">
+              <div className="w-[min(70vw,28rem)] motion-safe:animate-float">
+                <img src={PHOTO.front} alt="" width={PHOTO.width} height={PHOTO.height} className="h-auto w-full" decoding="async" />
+              </div>
             </div>
           )}
 
           {/* Textos sobre la escena (en la retícula del sitio) */}
-          <div className="container h-full">
+          <div ref={overlaysRef} className="container h-full">
             <div className="relative h-full">
               {/* 1. Tres tarjetas sobre el agua */}
-              <div aria-hidden className="absolute inset-x-0 top-[calc(var(--chrome-h)+1.5rem)] grid gap-2.5 sm:gap-3 lg:top-[13vh] lg:grid-cols-3 lg:gap-5 short:top-[calc(var(--chrome-h)+0.75rem)] short:grid-cols-3">
+              <div
+                ref={surfaceRef}
+                aria-hidden
+                className="absolute inset-x-0 top-[calc(var(--chrome-h)+1.25rem)] flex flex-col gap-2.5 sm:gap-3 wide:top-[12vh] wide:flex-row wide:items-start wide:justify-between short:top-[calc(var(--chrome-h)+0.5rem)] short:flex-row short:gap-3"
+              >
                 {SURFACE.map((card, i) => (
-                  <div key={card.title} className={clsx("max-lg:w-[86%] short:w-auto", i === 1 && "max-lg:ml-auto", i === 1 && "lg:mt-[4vh]", i === 2 && "lg:mt-[7vh]")}>
-                    <GlassCard card={card} index={i + 1} beatRef={bind(`surface-${i}`, SURFACE_WINDOW(i), { blur: false, still: true })} style={initial(SURFACE_WINDOW(i))} />
+                  <div
+                    key={card.title}
+                    className={clsx(
+                      "w-[88%] max-w-[26rem] wide:w-[min(21rem,31%)] short:w-auto short:flex-1",
+                      i === 1 && "self-end wide:mt-[3vh] wide:self-auto short:self-auto",
+                      i === 2 && "wide:mt-[6vh]",
+                    )}
+                  >
+                    <GlassCard card={card} index={i + 1} beatRef={bind(`surface-${i}`, SURFACE_WINDOW(i), { blur: false })} style={initial(SURFACE_WINDOW(i))} />
                   </div>
                 ))}
               </div>
@@ -269,28 +303,34 @@ export function Immersion() {
                 <div
                   key={card.title}
                   aria-hidden
+                  // Escritorio y horizontal: a los lados del armazón (medido desde el centro), nunca encima
                   className={clsx(
-                    "absolute w-[min(23rem,86%)]",
-                    card.side === "left" ? "left-0 top-[calc(var(--chrome-h)+1.5rem)] lg:top-[24%]" : "right-0 top-[72%] lg:top-[52%] short:top-[64%]",
+                    "absolute w-[min(23rem,88%)] wide:w-[min(21rem,calc(50%-var(--side)-2.5rem))] short:w-[calc(50%-var(--side)-1rem)]",
+                    card.side === "left"
+                      ? "left-0 top-[calc(var(--chrome-h)+1.25rem)] wide:left-auto wide:right-[calc(50%+var(--side)+2.5rem)] wide:top-[27%] short:left-auto short:right-[calc(50%+var(--side)+1rem)] short:top-[30%]"
+                      : "right-0 top-[72%] wide:left-[calc(50%+var(--side)+2.5rem)] wide:right-auto wide:top-[50%] short:left-[calc(50%+var(--side)+1rem)] short:right-auto short:top-[46%]",
                   )}
+                  style={{ "--side": SIDE } as CSSProperties}
                 >
                   <GlassCard card={card} index={SURFACE.length + i + 1} beatRef={bind(`dive-${i}`, card.at, { blur: false })} style={initial(card.at)} />
                 </div>
               ))}
 
               {/* 3. Remate: el modelo y sus CTA (junto al armazón en escritorio, debajo en móvil) */}
-              <div className="absolute inset-x-0 top-[60%] flex justify-center lg:inset-x-auto lg:right-0 lg:top-1/2 lg:-translate-y-1/2 short:inset-x-auto short:right-0 short:top-[42%] short:-translate-y-1/2">
-                <div ref={bind("label", LABEL_WINDOW, { still: true })} style={initial(LABEL_WINDOW)} className="flex flex-col items-center text-center lg:items-end lg:text-right short:items-end short:text-right">
-                  <p className="eyebrow text-volt-ice">Modelo {PRODUCT.name}</p>
-                  <p className="mt-2 font-display text-[clamp(1.25rem,1rem+1vw,1.75rem)] uppercase tracking-[0.06em] text-white">{COLOR.name}</p>
-                  <p className="micro mt-2">
-                    {currency.format(PRODUCT.price)} · {PRODUCT.tagline.replace(/\.$/, "")}
+              <div className="absolute inset-x-0 top-[60%] flex justify-center wide:inset-x-auto wide:right-0 wide:top-1/2 wide:-translate-y-1/2 short:inset-x-auto short:right-0 short:top-1/2 short:-translate-y-1/2">
+                <div ref={bind("label", LABEL_WINDOW, { still: true })} style={initial(LABEL_WINDOW)} className="flex flex-col items-center text-center wide:items-end wide:text-right short:items-end short:text-right">
+                  <p className="eyebrow text-volt-ice">
+                    {COLOR.name} · {currency.format(PRODUCT.price)}
                   </p>
-                  <div className="mt-5 flex gap-2.5">
-                    <button type="button" onClick={() => openTryOn(PRODUCT.id, COLOR.id)} className="btn-primary h-11 px-5 text-[0.8125rem]">
+                  <p className="mt-3 font-display text-[clamp(2.25rem,1.2rem+2.6vw,3.75rem)] uppercase leading-none tracking-[0.04em] text-white [margin-right:-0.04em] short:text-[1.75rem]">
+                    {PRODUCT.name}
+                  </p>
+                  <p className="mt-3 max-w-[30ch] text-[0.9375rem] leading-relaxed text-paper/70 max-lg:[@media(max-height:719px)]:hidden short:hidden">{PRODUCT.tagline}</p>
+                  <div className="mt-6 flex gap-2.5 whitespace-nowrap short:mt-4">
+                    <button type="button" onClick={() => openTryOn(PRODUCT.id, COLOR.id)} className="btn-primary h-12 px-6 text-[0.9375rem] max-[389px]:px-4 max-[389px]:text-[0.8125rem]">
                       <ScanFace className="h-4 w-4" aria-hidden /> Pruébatelos
                     </button>
-                    <button type="button" onClick={goToCatalog} className="btn-glass h-11 px-5 text-[0.8125rem]">
+                    <button type="button" onClick={goToCatalog} className="btn-glass h-12 px-6 text-[0.9375rem] max-[389px]:px-4 max-[389px]:text-[0.8125rem]">
                       Ver modelos <ArrowRight className="h-4 w-4" aria-hidden />
                     </button>
                   </div>
@@ -298,7 +338,7 @@ export function Immersion() {
               </div>
 
               {/* Indicación inicial */}
-              <div aria-hidden className="absolute inset-x-0 bottom-[max(1.5rem,4vh)] flex justify-center">
+              <div aria-hidden className="absolute inset-x-0 bottom-[max(1.5rem,4vh)] flex justify-center short:hidden">
                 <div ref={bind("hint", HINT_WINDOW, { blur: false })} style={initial(HINT_WINDOW)} className="flex flex-col items-center gap-3">
                   <span className="micro text-paper/70">Desliza para sumergirte</span>
                   <span className="relative h-10 w-px overflow-hidden bg-white/15">
@@ -310,7 +350,7 @@ export function Immersion() {
           </div>
 
           {/* Marca gigante translúcida, a sangre */}
-          <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-[max(1rem,3vh)] flex justify-center overflow-hidden">
+          <div ref={wordmarkRef} aria-hidden className="pointer-events-none absolute inset-x-0 bottom-[max(1rem,3vh)] flex justify-center overflow-x-clip">
             <div ref={bind("wordmark", WORDMARK_WINDOW, { dy: 60, blur: false, still: true })} style={initial(WORDMARK_WINDOW)}>
               {/* Degradado en el texto: hielo arriba que se disuelve en el agua */}
               <span className="block select-none whitespace-nowrap bg-[linear-gradient(180deg,rgba(232,238,255,0.78)_0%,rgba(200,216,255,0.42)_55%,rgba(200,216,255,0.08)_100%)] bg-clip-text pb-[0.04em] font-display text-[13.4vw] uppercase leading-[0.9] short:text-[10vw] tracking-[0.02em] text-transparent [margin-right:-0.02em]">
@@ -340,16 +380,16 @@ export function Immersion() {
 function GlassCard({ card, index, beatRef, style }: { card: Card; index: number; beatRef: (el: HTMLElement | null) => void; style?: CSSProperties }) {
   const Icon = card.icon;
   return (
-    <div ref={beatRef} style={style} className="glass-card flex items-start gap-3.5 p-3.5 sm:p-4 lg:block lg:p-5">
-      <div className="flex shrink-0 items-start justify-between lg:gap-4">
-        <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/[0.08] ring-1 ring-white/15">
-          <Icon className="h-4 w-4 text-volt-ice" strokeWidth={1.75} />
-        </span>
-        <span className="micro hidden tabular-nums text-paper/45 lg:block">{pad(index)}</span>
-      </div>
-      <div className="min-w-0">
-        <p className="text-[0.9375rem] font-medium leading-snug text-white lg:mt-6 lg:text-[1.0625rem]">{card.title}</p>
-        <p className="micro mt-1 leading-[1.6] text-paper/65 lg:mt-2 short:hidden">{card.body}</p>
+    <div ref={beatRef} style={style} className="glass-card flex items-start gap-3.5 p-3.5 sm:p-4">
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/[0.1] ring-1 ring-white/20">
+        <Icon className="h-4 w-4 text-ice" strokeWidth={1.75} />
+      </span>
+      <div className="min-w-0 flex-1">
+        <p className="flex items-baseline justify-between gap-3 text-[0.9375rem] font-medium leading-snug text-white">
+          {card.title}
+          <span className="font-mono text-[0.6875rem] tabular-nums text-paper/45 max-sm:hidden">{pad(index)}</span>
+        </p>
+        <p className="mt-1 text-[0.8125rem] leading-[1.45] text-paper/70 max-lg:[@media(max-height:719px)]:hidden short:hidden">{card.body}</p>
       </div>
     </div>
   );

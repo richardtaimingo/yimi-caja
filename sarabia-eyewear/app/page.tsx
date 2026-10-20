@@ -2,7 +2,10 @@ import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { Immersion } from "@/components/Immersion";
 import { Proof } from "@/components/Proof";
+import { CollectionHelix } from "@/components/CollectionHelix";
 import { Campaign } from "@/components/Campaign";
+import { ModelIndex } from "@/components/ModelIndex";
+import { Designer } from "@/components/Designer";
 import { Catalog } from "@/components/Catalog";
 import { ArtOfSeeing } from "@/components/ArtOfSeeing";
 import { Configurator } from "@/components/Configurator";
@@ -58,10 +61,13 @@ export default function Home() {
         <Hero />
         <Immersion />
         <Proof />
+        <CollectionHelix />
         <Campaign />
         <ArtOfSeeing />
+        <ModelIndex />
         <Catalog />
         <Configurator />
+        <Designer />
         <Benefits />
         <Testimonials />
         <FAQ />

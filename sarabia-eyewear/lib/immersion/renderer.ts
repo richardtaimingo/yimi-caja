@@ -3,7 +3,7 @@ import { MAX_PARTICLES, STRIDE, type Scene } from "./timeline";
 /**
  * Render en tiempo real de "Inmersión" con WebGL2 (sin dependencias):
  * - Pasada 1 (pantalla completa): aire, superficie con oleaje y ondas del impacto, agua con rayos de
- *   luz, cáusticas y partículas en suspensión, cavidad de aire y el armazón real (foto) con refracción,
+ *   luz, cáusticas, espuma y partículas en suspensión, y el armazón real (foto) con refracción,
  *   absorción del agua y luz cenital sobre los bordes.
  * - Pasada 2 (instanciada): gotas, burbujas y bokeh.
  * Se dibuja a la resolución nativa de la pantalla (hasta 2x), así que se ve nítido en Retina.
@@ -20,7 +20,7 @@ uniform float uTime;
 uniform float uCamY;
 uniform vec4 uFrame;      // x, y, ancho, giro (rad, mismo sentido que CSS)
 uniform float uFrameAspect;
-uniform vec4 uImpact;     // x, edad del chapoteo, apertura de la cavidad, estrangulamiento
+uniform vec2 uImpact;     // x, edad del chapoteo
 uniform float uFade;
 uniform float uHasTex;
 uniform sampler2D uTex;
@@ -109,7 +109,7 @@ void main() {
   vec3 air = mix(vec3(0.05, 0.11, 0.33), vec3(0.012, 0.02, 0.043), smoothstep(0.0, 0.7, sd));
   vec2 kd = (wp - uFrame.xy) * vec2(0.85, 1.5);
   air += vec3(0.10, 0.20, 0.58) * exp(-dot(kd, kd) * 7.0) * 0.9;
-  air += vec3(0.16, 0.30, 0.80) * exp(-max(sd, 0.0) / 0.035) * 0.22;
+  air += vec3(0.16, 0.30, 0.80) * exp(-max(sd, 0.0) / 0.035) * 0.08;
 
   // Agua: cobalto luminoso bajo la superficie que se apaga con la profundidad (nunca negro)
   vec3 wcol = mix(vec3(0.14, 0.34, 0.92), vec3(0.06, 0.17, 0.56), smoothstep(0.0, 0.7, D));
@@ -122,7 +122,7 @@ void main() {
   // Reflexión total bajo la superficie: banda clara y ondulada
   float band = exp(-max(-sd, 0.0) / 0.024);
   float streak = 0.5 + 0.5 * sin(wp.x * 85.0 + 3.0 * sin(wp.x * 12.0 + t) + t * 0.8);
-  wcol += vec3(0.3, 0.55, 1.0) * band * (0.22 + 0.22 * streak);
+  wcol += vec3(0.3, 0.55, 1.0) * band * (0.08 + 0.12 * streak);
 
   // Espuma del impacto: agua blanca turbulenta junto a la superficie
   float age = uImpact.y;
@@ -132,34 +132,17 @@ void main() {
     float reach = fw * (0.55 + age * 0.18);
     foam = smoothstep(reach, reach * 0.4, dx) * exp(-max(-sd, 0.0) / (0.02 + 0.03 * age)) * exp(-age * 0.9) * smoothstep(0.0, 0.06, age);
     foam *= 0.45 + 0.9 * fbm(vec2(wp.x * 38.0, wp.y * 60.0 - age * 3.0));
-    wcol += vec3(0.7, 0.84, 1.0) * foam * 0.55;
-  }
-
-  // Cavidad de aire que arrastra el armazón al entrar (se estrangula y se rompe en burbujas)
-  float cav = 0.0;
-  if (uImpact.z > 0.001) {
-    vec2 a = vec2(uImpact.x, 0.0);
-    vec2 b = uFrame.xy;
-    vec2 pa = wp - a, ba = b - a;
-    float k = clamp(dot(pa, ba) / max(dot(ba, ba), 1e-5), 0.0, 1.0);
-    float r = fw * 0.5 * mix(1.0, 0.6, k) * uImpact.z * (1.0 - uImpact.w * 0.8 * sin(k * 3.14159));
-    float wob = 0.004 * sin(wp.y * 70.0 + t * 4.0) + 0.003 * sin(wp.x * 50.0 - t * 3.0);
-    float dc = length(pa - ba * k) - r + wob;
-    vec2 e = (wp - b) / (vec2(fw * 0.53, fw / uFrameAspect * 0.78) * (0.55 + 0.45 * uImpact.z));
-    float de = (length(e) - 1.0) * fw * 0.3 + wob;
-    de = max(de, b.y - fw / uFrameAspect * 0.25 - wp.y);   // la bolsa de aire va por encima del armazón
-    float d = min(dc, de);
-    cav = (1.0 - smoothstep(-px, px, d)) * water;
-    float rim = exp(-abs(d) / 0.0022) * water;
-    float churn = fbm(vec2(wp.x * 26.0, wp.y * 34.0 + t * 1.5));
-    vec3 pocket = mix(wcol, vec3(0.58, 0.74, 1.0), (0.05 + 0.22 * churn * churn) * smoothstep(0.0, -0.035, d));
-    wcol = mix(wcol, pocket, cav);
-    wcol += vec3(0.75, 0.88, 1.0) * rim * 0.14 * uImpact.z * churn;
-    wcol += vec3(0.4, 0.6, 1.0) * exp(-abs(d) / 0.018) * 0.08 * uImpact.z;
-    wcol -= vec3(0.02, 0.05, 0.1) * exp(-max(d, 0.0) / 0.012) * (1.0 - cav) * uImpact.z;
+    wcol += vec3(0.7, 0.84, 1.0) * foam * 0.8;
   }
 
   vec3 col = mix(air, wcol, water);
+
+  // Bruma del impacto: rocío luminoso sobre la superficie que se disipa
+  if (age > 0.0) {
+    float dx = (wp.x - uImpact.x) / (fw * 0.7);
+    float dy = max(sd, 0.0) / (0.06 + age * 0.08);
+    col += vec3(0.55, 0.72, 1.0) * 0.2 * exp(-(dx * dx + dy * dy)) * (1.0 - water) * smoothstep(0.0, 0.05, age) * exp(-age * 1.4);
+  }
   float frameAlpha = 0.0;
 
   // Armazón real: nítido en el aire; bajo el agua se refracta, absorbe rojos y recibe cáusticas
@@ -168,7 +151,8 @@ void main() {
     float c = cos(uFrame.w), s = sin(uFrame.w);
     vec2 q = vec2(c * fd.x - s * fd.y, s * fd.x + c * fd.y);
     float fh = fw / uFrameAspect;
-    float uw = water * (1.0 - cav);
+    // Mojado continuo: aumenta en los primeros milímetros bajo la superficie (sin costura en la línea de agua)
+    float uw = smoothstep(0.0, -0.03, sd);
     vec2 uv = q / vec2(fw, fh) + 0.5;
     uv += uw * vec2(sin(wp.y * 55.0 + t * 2.2), sin(wp.x * 48.0 - t * 1.9)) * 0.0028 / vec2(fw, fh);
     if (uv.x > 0.0 && uv.x < 1.0 && uv.y > 0.0 && uv.y < 1.0) {
@@ -177,7 +161,7 @@ void main() {
         float edge = clamp(tx.a - texture(uTex, uv + vec2(0.0, 0.014)).a, 0.0, 1.0);
         vec3 fc = tx.rgb;
         vec3 wet = fc * exp(-vec3(0.55, 0.28, 0.1) * (0.25 + D * 0.3)) + vec3(0.01, 0.035, 0.11) * tx.a;
-        wet += tx.a * vec3(0.55, 0.75, 1.0) * caustic(q * 11.0 + vec2(0.0, t * 0.1), t * 0.9) * 0.07 * exp(-D * 0.6);
+        wet += tx.a * vec3(0.55, 0.75, 1.0) * caustic(q * 11.0 + vec2(0.0, t * 0.1), t * 0.9) * 0.15 * exp(-D * 0.6);
         fc = mix(fc, wet, uw * 0.85);
         fc += vec3(0.6, 0.78, 1.0) * edge * (0.12 + 0.16 * uw) * tx.a;
         col = col * (1.0 - tx.a) + fc;
@@ -187,7 +171,9 @@ void main() {
   }
 
   // Menisco: la línea de la superficie pasa por delante de todo
-  col += vec3(0.78, 0.9, 1.0) * exp(-abs(sd) / (0.0014 + px)) * 0.8 * (1.0 - 0.7 * frameAlpha);
+  // Menisco fino y contenido (nunca cruza el armazón) con un filo oscuro de refracción justo debajo
+  col += vec3(0.78, 0.9, 1.0) * exp(-abs(sd) / (0.0009 + px)) * 0.42 * (1.0 - frameAlpha);
+  col *= 1.0 - 0.16 * exp(-abs(sd + 0.006) / 0.004) * water * (1.0 - frameAlpha);
 
   // Viñeta suave y grano de película
   float v = length(p * vec2(0.75, 1.0));
@@ -214,7 +200,7 @@ void main() {
     float speed = length(aB.xy);
     vec2 dir = speed > 1e-4 ? aB.xy / speed : vec2(0.0, 1.0);
     vec2 nrm = vec2(-dir.y, dir.x);
-    offset = dir * aCorner.y * aA.z * (1.0 + speed * 4.5) + nrm * aCorner.x * aA.z;
+    offset = dir * aCorner.y * aA.z * (1.0 + speed * 2.2) + nrm * aCorner.x * aA.z;
   } else {
     offset = aCorner * aA.z;
   }
@@ -252,7 +238,7 @@ void main() {
     a = (rim * 0.8 + (1.0 - d) * 0.24 + hi * 0.75) * tail;
   } else {
     // Bokeh: disco desenfocado con borde apenas marcado
-    a = exp(-d * d * 3.2) * 0.32 + smoothstep(0.62, 0.9, d) * smoothstep(1.0, 0.9, d) * 0.08;
+    a = exp(-d * d * 3.2) * 0.32;
   }
   a = clamp(a, 0.0, 1.0) * vAlpha * (1.0 - uFade);
   outColor = vec4(vec3(0.86, 0.92, 1.0) * a, a);
@@ -393,7 +379,7 @@ export class ImmersionRenderer {
     gl.uniform1f(su.uCamY, scene.camY);
     gl.uniform4f(su.uFrame, scene.frameX, scene.frameY, scene.frameW, scene.frameRot);
     gl.uniform1f(su.uFrameAspect, this.aspect);
-    gl.uniform4f(su.uImpact, scene.impactX, scene.splash, scene.cavity, scene.pinch);
+    gl.uniform2f(su.uImpact, scene.impactX, scene.splash);
     gl.uniform1f(su.uFade, fade);
     gl.uniform1f(su.uHasTex, this.hasTexture ? 1 : 0);
     gl.activeTexture(gl.TEXTURE0);

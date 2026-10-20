@@ -88,9 +88,11 @@ function Droplets({ photo }: { photo: ProductPhoto }) {
     seed = (seed * 16807) % 2147483647;
     return seed / 2147483647;
   };
-  const drops = Array.from({ length: 70 }, () => {
-    const big = rand() < 0.18;
-    return { x: rand() * w, y: rand() * h, r: (big ? 0.022 + rand() * 0.02 : 0.006 + rand() * 0.012) * w, sq: 0.8 + rand() * 0.35 };
+  // Pocas gotas, de tamaños y formas variadas (algunas escurriendo): agua, no confeti
+  const drops = Array.from({ length: 26 }, () => {
+    const big = rand() < 0.2;
+    const run = rand() < 0.2;
+    return { x: rand() * w, y: rand() * h, r: (big ? 0.018 + rand() * 0.016 : 0.005 + rand() * 0.01) * w, sq: run ? 1.5 + rand() * 0.6 : 0.55 + rand() * 0.45 };
   });
   return (
     <svg viewBox={`0 0 ${w} ${h}`} className="absolute inset-0 h-full w-full" style={maskOf(photo.mask ?? photo.front)} aria-hidden>
@@ -98,14 +100,14 @@ function Droplets({ photo }: { photo: ProductPhoto }) {
         <radialGradient id={id} cx="45%" cy="40%" r="60%">
           <stop offset="0%" stopColor="rgba(255,255,255,0.05)" />
           <stop offset="70%" stopColor="rgba(150,190,255,0.12)" />
-          <stop offset="88%" stopColor="rgba(0,8,30,0.55)" />
+          <stop offset="88%" stopColor="rgba(0,8,30,0.18)" />
           <stop offset="100%" stopColor="rgba(190,215,255,0.5)" />
         </radialGradient>
       </defs>
       {drops.map((d, i) => (
         <g key={i} transform={`translate(${d.x} ${d.y}) scale(1 ${d.sq})`}>
           <circle r={d.r} fill={`url(#${id})`} />
-          <ellipse cx={-d.r * 0.35} cy={-d.r * 0.4} rx={d.r * 0.28} ry={d.r * 0.18} fill="rgba(255,255,255,0.85)" />
+          <ellipse cx={-d.r * 0.35} cy={-d.r * 0.4} rx={d.r * 0.28} ry={d.r * 0.18} fill="rgba(255,255,255,0.5)" />
         </g>
       ))}
     </svg>
