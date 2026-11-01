@@ -47,11 +47,13 @@ VIGNETTE = "vignette=angle=PI/6"                        # suave (PI/5 es el defa
 # Textos (tiempos en el timeline nuevo). Cada línea = lista de (texto, color).
 WHITE, YELLOW, RED, GREEN = "#FFFFFF", "#FFD60A", "#FF3B30", "#30E36B"
 BLOCKS = [
-    (0.0, 2.2, [[("Deja de hacer la Hack Squat así", WHITE)],
+    # Bloques 2 y 3 sincronizados con la acción real del clip:
+    # brazo al poste desde ~3.3 s, ambas manos en los seguros desde ~9.0 s.
+    (0.0, 3.3, [[("Deja de hacer la Hack Squat así", WHITE)],
                 [("si quieres crecer tus cuádriceps", YELLOW)]]),
-    (2.2, 7.0, [[("ERROR:", RED), (" Agarrarte del marco", WHITE)],
+    (3.3, 9.0, [[("ERROR:", RED), (" Agarrarte del marco", WHITE)],
                 [("te quita estabilidad en la cadera", WHITE)]]),
-    (7.0, 13.8, [[("MEJOR:", GREEN), (" Sujétate de los seguros", WHITE)],
+    (9.0, 13.8, [[("MEJOR:", GREEN), (" Sujétate de los seguros", WHITE)],
                  [("pega la espalda y baja profundo", WHITE)]]),
     (13.8, 16.5, [[("Guárdalo para tu día de pierna", YELLOW)],
                   [("y sígueme para entrenar pesado", WHITE)]]),
