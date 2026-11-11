@@ -1,0 +1,1620 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tortura Biomecánica</title>
+<meta name="description" content="Generador inteligente de rutinas de tortura biomecánica para competencia Classic Physique. Motor combinatorio anti-duplicación con historial local.">
+<meta name="theme-color" content="#0a0a0c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script>
+if (window.tailwind) tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        fondo: '#0a0a0c', panel: '#121216', panel2: '#18181d', linea: '#26262d',
+        sangre: '#dc2626', neon: '#ef4444', oro: '#d4af37', oro2: '#f5d76e'
+      },
+      fontFamily: {
+        display: ['Anton', 'Impact', 'sans-serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace']
+      }
+    }
+  }
+};
+</script>
+<style>
+:root{
+  --fondo:#0a0a0c; --panel:#121216; --panel2:#18181d; --linea:#26262d;
+  --sangre:#dc2626; --neon:#ef4444; --oro:#d4af37; --oro2:#f5d76e; --texto:#e4e4e7; --apagado:#a1a1aa;
+  color-scheme:dark;
+}
+html,body{background:var(--fondo);color:var(--texto)}
+body{font-family:Inter,system-ui,sans-serif;-webkit-tap-highlight-color:transparent;overscroll-behavior-y:none}
+.font-display{letter-spacing:.02em}
+[hidden]{display:none!important}
+.tarjeta{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--linea);border-radius:18px;position:relative}
+.tarjeta-brillo{border-color:rgba(239,68,68,.45);box-shadow:0 0 0 1px rgba(239,68,68,.15),0 0 28px -8px rgba(239,68,68,.55)}
+.tarjeta-oro{border-color:rgba(212,175,55,.5);box-shadow:0 0 0 1px rgba(212,175,55,.12),0 0 26px -10px rgba(212,175,55,.6)}
+.tarjeta.completa{border-color:rgba(212,175,55,.75);box-shadow:0 0 30px -8px rgba(212,175,55,.75)}
+.tarjeta.completa .num-ej{background:var(--oro);color:#0a0a0c}
+.num-ej{background:var(--sangre);color:#fff;font-family:Anton,Impact,sans-serif;min-width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:22px}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:4px 9px;border-radius:999px;border:1px solid var(--linea);color:var(--apagado);background:#0e0e11}
+.chip-rojo{border-color:rgba(239,68,68,.5);color:#fca5a5;background:rgba(220,38,38,.12)}
+.chip-oro{border-color:rgba(212,175,55,.55);color:var(--oro2);background:rgba(212,175,55,.1)}
+.bloque{border-left:3px solid var(--sangre);padding:10px 12px;background:rgba(220,38,38,.06);border-radius:0 12px 12px 0}
+.bloque-oro{border-left-color:var(--oro);background:rgba(212,175,55,.06)}
+.bloque-gris{border-left-color:#52525b;background:rgba(82,82,91,.12)}
+.etq{font-size:10.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
+.serie{width:52px;height:52px;border-radius:14px;border:2px solid #3f3f46;background:#0e0e11;color:#71717a;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:15px;display:grid;place-items:center;transition:transform .12s,background .15s,border-color .15s;cursor:pointer;user-select:none;position:relative}
+.serie:active{transform:scale(.92)}
+.serie.hecha{background:var(--sangre);border-color:var(--neon);color:#fff;box-shadow:0 0 18px -4px rgba(239,68,68,.9)}
+.serie.hecha::after{content:'';position:absolute;left:8px;right:8px;top:50%;height:3px;background:#fff;transform:rotate(-28deg);border-radius:2px;opacity:.9}
+.btn{min-height:48px;border-radius:14px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;font-size:13px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 16px;transition:transform .1s,filter .15s;cursor:pointer}
+.btn:active{transform:scale(.97)}
+.btn-rojo{background:linear-gradient(180deg,#ef4444,#b91c1c);color:#fff;box-shadow:0 8px 28px -10px rgba(239,68,68,.9),inset 0 1px 0 rgba(255,255,255,.25)}
+.btn-oro{background:linear-gradient(180deg,#f5d76e,#b8901f);color:#0a0a0c}
+.btn-fantasma{background:#111115;border:1px solid var(--linea);color:var(--texto)}
+.btn-fantasma:hover{border-color:#3f3f46}
+.btn-mini{min-height:38px;border-radius:10px;font-size:11.5px;padding:0 11px}
+select.sel{appearance:none;-webkit-appearance:none;background:#0e0e11 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23ef4444' stroke-width='3'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center;border:1px solid rgba(239,68,68,.45);border-radius:14px;padding:14px 40px 14px 14px;width:100%;color:#fff;font-weight:600;font-size:14.5px;line-height:1.3}
+select.sel:focus{outline:2px solid var(--neon);outline-offset:2px}
+input.campo{background:#0e0e11;border:1px solid var(--linea);border-radius:12px;padding:10px 12px;color:#fff;font-family:'JetBrains Mono',monospace;width:100%}
+input.campo:focus{outline:2px solid var(--oro);outline-offset:1px}
+.barra{height:8px;border-radius:999px;background:#1f1f25;overflow:hidden}
+.barra>span{display:block;height:100%;background:linear-gradient(90deg,#b91c1c,#ef4444,#f5d76e);border-radius:999px;transition:width .35s ease}
+.dato{background:#0e0e11;border:1px solid var(--linea);border-radius:14px;padding:10px 12px}
+.dato b{font-family:'JetBrains Mono',monospace;color:#fff;font-size:18px}
+.vac{width:44px;height:44px;border-radius:50%;border:2px solid #3f3f46;display:grid;place-items:center;font-family:'JetBrains Mono',monospace;font-size:12px;color:#71717a;cursor:pointer;background:#0e0e11}
+.vac.hecha{background:var(--oro);border-color:var(--oro2);color:#0a0a0c;font-weight:800}
+#dock{position:fixed;left:0;right:0;bottom:0;z-index:50;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:rgba(10,10,12,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid rgba(239,68,68,.35)}
+.t-btn{min-height:46px;border-radius:12px;background:#141418;border:1px solid #2c2c33;color:#fff;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:14px;cursor:pointer}
+.t-btn:active{transform:scale(.95)}
+.t-btn.iso{border-color:rgba(212,175,55,.5);color:var(--oro2)}
+.t-btn.fascia{border-color:rgba(239,68,68,.5);color:#fca5a5}
+#reloj{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
+#dock.corriendo{border-top-color:var(--neon);box-shadow:0 -10px 40px -12px rgba(239,68,68,.7)}
+#dock.ultimos #reloj{color:var(--neon);animation:latido .5s infinite alternate}
+@keyframes latido{from{transform:scale(1)}to{transform:scale(1.08)}}
+#flash{position:fixed;inset:0;z-index:80;display:grid;place-items:center;background:rgba(127,29,29,.94);animation:alerta .45s infinite alternate;cursor:pointer;padding:24px;text-align:center}
+@keyframes alerta{from{background:rgba(127,29,29,.94)}to{background:rgba(220,38,38,.97)}}
+.modal-fondo{position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.78);backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center}
+@media (min-width:640px){.modal-fondo{align-items:center}}
+.modal{background:var(--panel);border:1px solid rgba(239,68,68,.35);border-radius:22px 22px 0 0;width:100%;max-width:720px;max-height:88vh;display:flex;flex-direction:column}
+@media (min-width:640px){.modal{border-radius:22px}}
+#toast{position:fixed;left:50%;top:18px;transform:translateX(-50%) translateY(-140%);z-index:90;background:#111;border:1px solid var(--oro);color:var(--oro2);padding:10px 16px;border-radius:12px;font-weight:700;font-size:13px;transition:transform .3s;max-width:calc(100% - 32px);text-align:center}
+#toast.ver{transform:translateX(-50%) translateY(0)}
+.ruido{background-image:radial-gradient(ellipse at top,rgba(220,38,38,.18),transparent 60%),radial-gradient(ellipse at bottom right,rgba(212,175,55,.06),transparent 55%)}
+.glitch{text-shadow:2px 0 rgba(239,68,68,.55),-2px 0 rgba(212,175,55,.25)}
+.aparecer{animation:aparecer .45s ease both}
+@keyframes aparecer{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+details>summary{list-style:none;cursor:pointer}
+details>summary::-webkit-details-marker{display:none}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body class="ruido min-h-screen">
+
+<header class="sticky top-0 z-40 bg-fondo/90 backdrop-blur border-b border-linea">
+  <div class="max-w-3xl mx-auto px-4 pt-3 pb-2">
+    <div class="flex items-center justify-between gap-3">
+      <div class="min-w-0">
+        <p class="etq text-neon">Classic Physique · Competencia</p>
+        <h1 class="font-display text-[clamp(20px,6.4vw,30px)] leading-none text-white glitch">TORTURA BIOMECÁNICA</h1>
+      </div>
+      <button id="btnHistorial" class="btn btn-fantasma btn-mini shrink-0" aria-label="Abrir historial">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/></svg>
+        Historial
+      </button>
+    </div>
+    <div class="mt-2 flex items-center gap-3">
+      <div class="barra flex-1"><span id="barraSesion" style="width:0%"></span></div>
+      <span id="txtSesion" class="font-mono text-[11px] text-zinc-400 whitespace-nowrap">Sin rutina activa</span>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-3xl mx-auto px-4 pb-56 pt-4 space-y-4">
+
+  <!-- DASHBOARD BIOMÉTRICO -->
+  <section class="tarjeta tarjeta-oro p-4 aparecer" aria-labelledby="tDash">
+    <div class="flex items-start justify-between gap-3">
+      <div>
+        <p class="etq text-oro">Perfil biométrico del atleta</p>
+        <h2 id="tDash" class="font-display text-2xl text-white mt-1">RUMBO A TARIMA</h2>
+      </div>
+      <span class="chip chip-oro">Recomposición agresiva</span>
+    </div>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-3">
+      <div class="dato"><p class="etq text-zinc-500">Estatura</p><b>1.83 m</b><p class="text-[11px] text-zinc-500 mt-0.5">Palancas y fémures largos</p></div>
+      <div class="dato"><p class="etq text-zinc-500">Peso actual</p><b id="dPeso">90 kg</b><p class="text-[11px] text-zinc-500 mt-0.5">Desde 93 kg</p></div>
+      <div class="dato"><p class="etq text-zinc-500">Grasa corporal</p><b id="dGrasa">22%</b><p class="text-[11px] text-zinc-500 mt-0.5" id="dMagra">≈70.2 kg magros</p></div>
+      <div class="dato"><p class="etq text-zinc-500">Meta tarima</p><b>80–82 kg</b><p class="text-[11px] text-zinc-500 mt-0.5">al 10–12% de grasa</p></div>
+    </div>
+    <div class="mt-3">
+      <div class="flex justify-between text-[11px] font-mono text-zinc-400"><span>93 kg</span><span id="txtMeta">Avance al corte</span><span>81 kg</span></div>
+      <div class="barra mt-1"><span id="barraPeso" style="width:25%"></span></div>
+    </div>
+    <div class="grid grid-cols-3 gap-2 mt-3">
+      <div class="dato text-center"><p class="etq text-zinc-500">Hack Squat</p><b>160</b><p class="text-[10.5px] text-zinc-500">4×20 kg/lado</p></div>
+      <div class="dato text-center"><p class="etq text-zinc-500">Péndulo</p><b>100</b><p class="text-[10.5px] text-zinc-500">50 kg/lado</p></div>
+      <div class="dato text-center"><p class="etq text-zinc-500">Peso Muerto</p><b>140+</b><p class="text-[10.5px] text-zinc-500">3×20 kg/lado</p></div>
+    </div>
+    <details class="mt-3 group">
+      <summary class="flex items-center justify-between text-[12px] font-bold text-zinc-300 py-1">
+        <span>Registrar peso de hoy · Diagnóstico del juez · Equipo</span>
+        <span class="text-neon group-open:rotate-180 transition">▾</span>
+      </summary>
+      <div class="mt-2 space-y-3">
+        <div class="flex gap-2 items-end">
+          <label class="flex-1 text-[12px] text-zinc-400">Peso en ayunas (kg)
+            <input id="inPeso" class="campo mt-1" type="number" inputmode="decimal" step="0.1" min="60" max="130" value="90">
+          </label>
+          <button id="btnPeso" class="btn btn-oro btn-mini">Guardar</button>
+        </div>
+        <p id="txtProyeccion" class="text-[12px] text-zinc-400 leading-relaxed"></p>
+        <ul class="text-[12.5px] leading-relaxed text-zinc-300 space-y-1.5">
+          <li><span class="text-neon font-bold">P1 · Cintura de avispa:</span> cero peso muerto convencional desde el piso. Cadena posterior con pecho apoyado, Smith, Hack invertida o rumano con straps sin bloquear. Vacuums diarios.</li>
+          <li><span class="text-neon font-bold">P2 · Pantorrillas rezagadas:</span> en todo día de pierna el ejercicio #1 son gemelos en frío, 3 s de pausa muerta abajo y 2 s de contracción arriba.</li>
+          <li><span class="text-neon font-bold">P3 · Cadena posterior antes que cuádriceps:</span> femoral y glúteo se destruyen primero; cuádriceps con rango 100% y rodillas sin valgo.</li>
+          <li><span class="text-neon font-bold">P4 · Forma en X:</span> dorsal bajo ilíaco, deltoide lateral y posterior en 3D.</li>
+          <li><span class="text-neon font-bold">P5 · Formato letal:</span> 7 ejercicios exactos, 16–19 series efectivas, 55–65 min, cada serie al fallo real.</li>
+          <li><span class="text-neon font-bold">P6 · Posing isométrico:</span> 5 poses obligatorias de Classic al final, 20 s apretando.</li>
+        </ul>
+        <p class="text-[12px] text-zinc-500"><span class="text-oro font-bold">Equipo:</span> Smith pesada · Hack Squat · Sentadilla Péndulo · Prensa · Poleas dobles ajustables · Mancuernas pesadas · Banco predicador · Cojín de Hip Thrust · <span class="text-white">Straps obligatorios en tirones</span>.</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- RECORDATORIO VACUUM -->
+  <section class="tarjeta p-4 aparecer" aria-labelledby="tVac">
+    <div class="flex items-center justify-between gap-3">
+      <div>
+        <p class="etq text-neon">Recordatorio diario · En ayunas</p>
+        <h2 id="tVac" class="font-display text-xl text-white mt-0.5">STOMACH VACUUMS 5 × 25 s</h2>
+      </div>
+      <button class="t-btn iso px-3" data-timer="25" data-etq="Vacuum 25 s">25s</button>
+    </div>
+    <p class="text-[12.5px] text-zinc-400 mt-1.5">Exhala TODO el aire, succiona el ombligo hacia la columna y sube las costillas. Sostén 25 s sin respirar por el pecho. Así se encoge el transverso y se dibuja la cintura de avispa que el juez compara contra tus hombros.</p>
+    <div id="vacuums" class="flex gap-2 mt-3"></div>
+  </section>
+
+  <!-- GENERADOR -->
+  <section class="tarjeta tarjeta-brillo p-4 aparecer" aria-labelledby="tGen">
+    <p class="etq text-neon">Motor combinatorio anti-duplicación</p>
+    <h2 id="tGen" class="font-display text-2xl text-white mt-1">¿QUÉ ME TOCA DESTRUIR HOY?</h2>
+    <label for="selGrupo" class="sr-only">Grupo muscular</label>
+    <select id="selGrupo" class="sel mt-3">
+      <option value="1">Pierna Completa (Enfoque Gemelos + Femoral/Glúteo -&gt; Remate Cuádriceps)</option>
+      <option value="2">Pecho + Hombros (Enfoque Clavicular + Anchura Lateral/Posterior 3D)</option>
+      <option value="3">Espalda Brutal (Enfoque Dorsal Bajo Ilíaco + Densidad sin Lumbar)</option>
+      <option value="4">Brazos al 100% + Hombro (Primero Bíceps/Tríceps -&gt; Al final Deltoides)</option>
+      <option value="5">Hombros + Brazos (Primero Deltoides 3D -&gt; Al final Bíceps/Tríceps)</option>
+      <option value="6">Pecho + Bíceps (Especialización de Torso y Picos de Brazo)</option>
+      <option value="7">Pierna Especialización "X-Frame" (Gemelos + Barrido Externo Cuádriceps + Aductores + Glúteo)</option>
+    </select>
+    <div class="flex items-center justify-between mt-3 text-[12px]">
+      <span class="text-zinc-400">Versiones generadas para este músculo:</span>
+      <span id="txtVersionesGrupo" class="font-mono text-oro2 font-bold">0</span>
+    </div>
+    <button id="btnGenerar" class="btn btn-rojo w-full mt-3 text-[15px]">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg>
+      Generar Nueva Rutina Brutal
+    </button>
+    <div class="grid grid-cols-2 gap-2 mt-2">
+      <button id="btnRotar" class="btn btn-fantasma btn-mini">⟳ Rotar variante ya</button>
+      <button id="btnReiniciarPool" class="btn btn-fantasma btn-mini">♻ Reiniciar pool</button>
+    </div>
+    <p class="text-[11.5px] text-zinc-500 mt-2 leading-relaxed">Cada rutina se guarda en este dispositivo. El motor excluye los ejercicios y combinaciones de la sesión inmediata anterior de ese músculo y nunca repite una firma exacta ya generada.</p>
+  </section>
+
+  <!-- RUTINA -->
+  <section id="zonaRutina" aria-live="polite"></section>
+
+</main>
+
+<!-- DOCK DEL CRONÓMETRO -->
+<div id="dock" role="region" aria-label="Cronómetro de torturas">
+  <div class="max-w-3xl mx-auto">
+    <div class="flex items-center gap-3">
+      <div class="flex-1 min-w-0">
+        <p id="relojEtq" class="etq text-zinc-500 truncate">Cronómetro de tortura</p>
+        <div id="reloj" class="text-[30px] leading-none font-bold text-white">00:00</div>
+      </div>
+      <button id="tMas" class="t-btn px-3" aria-label="Sumar 10 segundos">+10</button>
+      <button id="tPausa" class="t-btn px-3" aria-label="Pausar o reanudar">❚❚</button>
+      <button id="tStop" class="t-btn px-3 text-neon" aria-label="Detener">✕</button>
+    </div>
+    <div class="barra mt-2" style="height:5px"><span id="relojBarra" style="width:0%"></span></div>
+    <div class="grid grid-cols-6 gap-1.5 mt-2">
+      <button class="t-btn" data-timer="15" data-etq="Rest-Pause 15 s">15s</button>
+      <button class="t-btn" data-timer="20" data-etq="Rest-Pause 20 s">20s</button>
+      <button class="t-btn" data-timer="30" data-etq="Descanso 30 s">30s</button>
+      <button class="t-btn" data-timer="60" data-etq="Descanso 60 s">60s</button>
+      <button class="t-btn iso" data-timer="10" data-etq="Muro isométrico 10 s">ISO10</button>
+      <button class="t-btn fascia" data-timer="25" data-etq="Estiramiento fascial 25 s">FAS25</button>
+    </div>
+  </div>
+</div>
+
+<div id="flash" hidden role="alertdialog" aria-live="assertive">
+  <div>
+    <p class="etq text-white/80">Tiempo cumplido</p>
+    <p id="flashTxt" class="font-display text-[54px] leading-none text-white mt-2">¡AL HIERRO!</p>
+    <p id="flashSub" class="text-white/90 font-semibold mt-3">Toca la pantalla para cerrar</p>
+  </div>
+</div>
+
+<div id="modalHist" class="modal-fondo" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="tHist">
+    <div class="p-4 border-b border-linea flex items-center justify-between gap-3">
+      <div>
+        <p class="etq text-neon">Archivo de sesiones</p>
+        <h2 id="tHist" class="font-display text-2xl text-white">HISTORIAL DE TORTURAS</h2>
+      </div>
+      <button id="cerrarHist" class="t-btn px-4" aria-label="Cerrar historial">✕</button>
+    </div>
+    <div class="px-4 pt-3 flex flex-wrap gap-2">
+      <select id="filtroHist" class="sel !py-2.5 !text-[13px] flex-1 min-w-[180px]"></select>
+    </div>
+    <div class="px-4 pt-2 grid grid-cols-3 gap-2">
+      <button id="btnExportar" class="btn btn-oro btn-mini">⤓ JSON</button>
+      <button id="btnCopiar" class="btn btn-fantasma btn-mini">⧉ Copiar actual</button>
+      <button id="btnBorrarHist" class="btn btn-fantasma btn-mini text-neon">Borrar todo</button>
+    </div>
+    <div id="listaHist" class="p-4 overflow-y-auto space-y-2 flex-1"></div>
+  </div>
+</div>
+
+<div id="toast" role="status"></div>
+
+<script>
+'use strict';
+/* =====================================================================
+   BANCO DE EJERCICIOS
+   Campos: id · n (nombre) · eq (equipo) · t (etiquetas biomecánicas)
+   r (rango de reps) · tor (La Tortura: ejecución) · cue (clave del juez)
+   ref (opcional: carga sugerida a partir de tus marcas reales)
+   ===================================================================== */
+const BANCO = {};
+
+/* ---------------------------- GEMELOS ---------------------------- */
+BANCO.gemelos = [
+  { id:'gem01', n:'Gemelos de pie en Hack Squat (puntas en el borde)', eq:'Hack Squat', t:['maquina','aislado','gemelo'], r:'10-14',
+    tor:'Mete los hombros bajo las almohadillas, puntas de los pies en el último centímetro de la plataforma y rodillas bloqueadas sin hiperextender. Baja el talón hasta que sientas el tendón de Aquiles a punto de reventar y CONGELA 3 segundos: sin rebote, el tendón se desactiva y el gemelo carga todo solo. Explota hacia arriba sobre el dedo gordo y estrújalo 2 segundos como si quisieras romper la plataforma. Cuando ya no subas completo, haz parciales en la mitad baja hasta que tiemble la pierna entera.',
+    cue:'Peso sobre el 1er y 2º metatarsiano: evita que el tobillo se vaya hacia afuera y entrena la cabeza interna que llena la pantorrilla de frente.', ref:{b:'hack',p:[0.55,0.7]} },
+  { id:'gem02', n:'Gemelos en Prensa con pausa muerta', eq:'Prensa', t:['maquina','aislado','gemelo'], r:'12-15',
+    tor:'Rodillas extendidas pero vivas, solo la bola del pie sobre el borde inferior de la plataforma. Deja que el peso te empuje el tobillo a la máxima dorsiflexión y cuenta 3 segundos inmóvil abajo. Empuja con los dedos gordos, llega al tope y contrae 2 segundos. Cero rebote, cero trampa con la rodilla: si doblas la rodilla, la serie se cuenta en cero. Tu gemelo debe arder antes de la repetición 8.',
+    cue:'Fémures largos = tendón largo y gemelo alto: la pausa abajo es lo único que obliga al vientre muscular a trabajar en toda su longitud.', ref:{b:'pendulo',p:[1.2,1.6]} },
+  { id:'gem03', n:'Gemelos de pie en Smith sobre step', eq:'Máquina Smith + step', t:['smith','aislado','gemelo'], r:'10-12',
+    tor:'Barra de la Smith sobre los trapecios, metatarsos sobre un step o disco grueso. Baja hasta el fondo absoluto y aguanta 3 segundos sin respirar. Sube sin doblar las rodillas, quédate 2 segundos en la punta como bailarina y aprieta como si quisieras partir el step. La Smith elimina el equilibrio: toda tu energía va al músculo. Si no sientes calambre en la serie 2, estás haciendo turismo.',
+    cue:'Coloca el step para que el talón tenga mínimo 8–10 cm de recorrido libre: rango completo o nada.', ref:{b:'pm',p:[0.7,0.9]} },
+  { id:'gem04', n:'Gemelo Burro en Smith (cadera flexionada)', eq:'Máquina Smith', t:['smith','aislado','gemelo'], r:'12-15',
+    tor:'Inclínate 90° con las manos apoyadas en un banco y la barra de la Smith sobre la zona baja de la espalda y la cadera (con almohadilla). Con la cadera flexionada el gemelo queda pre-estirado desde arriba: es la posición de máximo daño. Baja el talón, pausa muerta de 3 segundos, sube y contrae 2. Sentirás que el gemelo se abre en dos. Ahí es donde crece.',
+    cue:'El burro es el único ejercicio que estira el gemelo desde ambos extremos: perfecto para un atleta de piernas largas con gemelo de inserción alta.', ref:{b:'pm',p:[0.5,0.7]} },
+  { id:'gem05', n:'Gemelos en Sentadilla Péndulo', eq:'Sentadilla Péndulo', t:['maquina','aislado','gemelo'], r:'10-14',
+    tor:'Ponte en la péndulo con las piernas rectas y solo las puntas en el borde de la plataforma. El arco de la máquina te da una resistencia que no afloja en la posición estirada. Baja a fondo, 3 segundos muertos, sube y retén 2 segundos arriba con los glúteos apretados para no hacer trampa con la cadera. Cada repetición debe ser idéntica a la primera: ni un milímetro de rebote.',
+    cue:'Mantén las rodillas bloqueadas en suave: si las doblas el sóleo roba el trabajo y el gemelo no se llena.', ref:{b:'pendulo',p:[0.6,0.8]} },
+  { id:'gem06', n:'Sóleo sentado en Smith (rodillas a 90°)', eq:'Máquina Smith + banco + step', t:['smith','aislado','gemelo'], r:'15-20',
+    tor:'Siéntate en un banco bajo la Smith, la barra sobre los muslos cerca de las rodillas con una toalla doblada, puntas sobre un step. Con la rodilla a 90° el gemelo se apaga y el sóleo carga todo: es el músculo que ensancha la pantorrilla vista de frente. Baja 3 segundos muertos, sube y retén 2. El sóleo es de fibra lenta: castígalo con volumen y ardor, no te detengas hasta que la quemazón sea insoportable.',
+    cue:'Un sóleo grande empuja el gemelo hacia afuera y hace que la pantorrilla se vea más gruesa en el cuarto de giro.', ref:{b:'pm',p:[0.45,0.65]} },
+  { id:'gem07', n:'Gemelo unilateral con mancuerna en step', eq:'Mancuerna pesada + step', t:['mancuerna','aislado','gemelo','unilateral'], r:'10-12 por pierna',
+    tor:'Una mano sujeta un rack, la otra la mancuerna más pesada que puedas controlar. Una sola pierna sobre el step, la otra cruzada detrás. Baja al fondo, 3 segundos muertos, sube y contrae 2 segundos con todo el peso del cuerpo sobre el dedo gordo. Al trabajar una pierna a la vez tu pantorrilla débil no se puede esconder detrás de la fuerte.',
+    cue:'Empieza siempre con la pantorrilla más pequeña y dale a la otra exactamente las mismas repeticiones: simetría de tarima.' },
+  { id:'gem08', n:'Gemelos en Prensa unilateral', eq:'Prensa', t:['maquina','aislado','gemelo','unilateral'], r:'10-12 por pierna',
+    tor:'Una sola pierna en el borde de la plataforma, la otra fuera. Con la mitad de carga obtienes el doble de tensión por fibra. Dorsiflexión total, 3 segundos de pausa sin moverte, empuje explosivo con el dedo gordo y 2 segundos de contracción. Termina cada pierna con 10 parciales en el tercio inferior. Cambia de pierna sin descanso.',
+    cue:'Mira la rodilla: si se desvía hacia afuera estás empujando con el meñique. Corrige o la pantorrilla crecerá torcida.', ref:{b:'pendulo',p:[0.6,0.8]} }
+];
+
+/* ----------------------- FEMORAL (FLEXIÓN DE RODILLA) ----------------------- */
+BANCO.femoral = [
+  { id:'fem01', n:'Curl femoral acostado con pausa en estiramiento', eq:'Máquina de curl acostado / polea', t:['maquina','aislado'], r:'8-10',
+    tor:'Cadera clavada contra el banco, empuja el pubis hacia el acolchado para que la cadera no se levante. Flexiona hasta que el talón casi toque el glúteo, aprieta 1 segundo y baja en 4 segundos hasta la extensión casi completa, donde te quedas 2 segundos en estiramiento antes de volver a subir. Cuando falles, que un compañero te ayude con 2 forzadas y aguanta tú solo la negativa.',
+    cue:'Puntas de los pies hacia el piso (flexión plantar) para apagar el gemelo y obligar al isquio a trabajar solo.' },
+  { id:'fem02', n:'Curl femoral sentado con torso inclinado hacia adelante', eq:'Máquina de curl sentado', t:['maquina','aislado'], r:'8-12',
+    tor:'Ajusta el respaldo lo más atrás posible y luego inclina el torso hacia adelante con la espalda recta: flexionar la cadera estira el isquio desde arriba. Este es el curl que más crece el femoral según la evidencia moderna. Tira hasta el fondo, aprieta 1 segundo, sube en 4 segundos y quédate 2 segundos en la posición más estirada. El femoral va a sentirse como un cable a punto de romperse.',
+    cue:'Este estiramiento lastrado es lo que crea el "cuelgue" del femoral visible de perfil en el side chest.' },
+  { id:'fem03', n:'Curl femoral unilateral de pie en polea', eq:'Polea baja + tobillera', t:['polea','aislado','unilateral'], r:'10-12 por pierna',
+    tor:'Tobillera en la polea baja, de cara a la máquina, sujétate y adelanta ligeramente la cadera. Flexiona la rodilla llevando el talón al glúteo sin mover el muslo, aprieta 2 segundos y baja en 4 segundos hasta que la pierna quede totalmente estirada. La polea no te da descanso en ningún punto. Sin pausa entre piernas: cuando termina una, empieza la otra.',
+    cue:'Inclina un poco el torso hacia adelante para alargar el isquio y que trabaje en mayor rango.' },
+  { id:'fem04', n:'Curl nórdico excéntrico asistido en polea', eq:'Polea alta + cojín de Hip Thrust', t:['peso_corporal','aislado'], r:'5-8',
+    tor:'Arrodíllate sobre el cojín con los talones anclados bajo algo pesado; agarra un estribo de la polea alta tras de ti como contrapeso. Desciende el torso hacia el piso en 6 a 8 segundos resistiendo SOLO con los isquios, cadera extendida, como una tabla. Cuando ya no puedas frenar, déjate caer sobre las manos y empuja para volver. Cada repetición es un desgarro controlado de fibras.',
+    cue:'Es el mejor protector de rodilla para fémures largos: el isquio fuerte excéntricamente estabiliza la Hack profunda.' },
+  { id:'fem05', n:'Curl femoral sentado unilateral', eq:'Máquina de curl sentado', t:['maquina','aislado','unilateral'], r:'10-12 por pierna',
+    tor:'Una sola pierna en la máquina, torso inclinado hacia adelante. Tira hasta el fondo con el talón buscando el asiento, retén 2 segundos, sube en 4 segundos. La pierna que no trabaja descansa en el suelo: nada de ayudas. Al terminar la serie, sin descanso, 10 parciales en el tercio estirado.',
+    cue:'Unilateral corrige el desequilibrio izquierda-derecha que los jueces ven al instante en el rear double biceps.' },
+  { id:'fem06', n:'Curl femoral acostado con mancuerna entre los pies', eq:'Banco plano + mancuerna', t:['mancuerna','aislado'], r:'10-12',
+    tor:'Acuéstate boca abajo en un banco plano con las rodillas en el borde y una mancuerna atrapada entre los pies. Flexiona hasta que la mancuerna quede vertical, sin pasar de ahí, y baja en 5 segundos hasta casi extender. Se pierde tensión arriba, así que el trabajo vive abajo: haz que cada centímetro del estiramiento cuente.',
+    cue:'Aprieta la cadera contra el banco: si se levanta, el glúteo y la lumbar roban la repetición.' }
+];
+
+/* --------------- BISAGRA DE CADERA (CADENA POSTERIOR SIN LUMBAR) --------------- */
+BANCO.bisagra = [
+  { id:'bis01', n:'Rumano B-Stance en Smith con straps', eq:'Máquina Smith + straps', t:['smith','compuesto','unilateral'], r:'8-10 por pierna',
+    tor:'Straps puestos. Pie de trabajo plano bajo la barra, el otro un paso atrás solo con la punta apoyada como "pata de cabra". Empuja la cadera hacia atrás con la columna neutra, barra pegada al muslo, hasta que el isquio de la pierna de apoyo grite. Sube SOLO hasta el 90%: no bloquees arriba, el músculo nunca descansa. La Smith te deja enfocarte en estirar sin pensar en el equilibrio.',
+    cue:'Lumbar neutra y tirando con el femoral, no con la espalda: así entrenas el cuelgue sin engrosar oblicuos ni erectores.', ref:{b:'pm',p:[0.45,0.6]} },
+  { id:'bis02', n:'Buenos Días en Hack Invertida', eq:'Hack Squat (de frente a la máquina)', t:['maquina','compuesto'], r:'8-10',
+    tor:'Colócate de frente al respaldo de la Hack con las almohadillas sobre los hombros y el pecho apoyado. Rodillas suavemente flexionadas y fijas. Empuja la cadera hacia atrás y deja que el torso baje hasta que los isquios estén al límite, luego sube con los glúteos. La máquina guía el recorrido y la espalda queda protegida: toda la carga cae en la cadera. No bloquees arriba.',
+    cue:'Uno de los mejores ejercicios de bisagra que existen para torsos largos: carga máxima en el femoral con cero compresión axial.', ref:{b:'hack',p:[0.35,0.5]} },
+  { id:'bis03', n:'Rumano con mancuernas y straps (sin bloquear)', eq:'Mancuernas pesadas + straps', t:['mancuerna','compuesto'], r:'8-12',
+    tor:'Straps apretados para que el agarre no limite la serie. Mancuernas pegadas a los muslos, empuja la cadera hacia atrás como si cerraras una puerta con los glúteos. Baja hasta media espinilla o hasta que la columna empiece a redondearse: ese es tu límite. Pausa 1 segundo en el estiramiento y sube hasta 3/4: nunca bloquees arriba ni eches los hombros hacia atrás.',
+    cue:'Las mancuernas a los lados permiten que el centro de masa quede cerca: menos palanca lumbar que con barra.', ref:{b:'pm',p:[0.4,0.5]} },
+  { id:'bis04', n:'Rumano en Smith con déficit y straps', eq:'Máquina Smith + disco o step', t:['smith','compuesto'], r:'6-10',
+    tor:'Párate sobre un disco de 20 kg bajo la Smith. El déficit te da 5–8 cm extra de estiramiento: el femoral pasará a un rango que no conocía. Straps, barra pegada a las piernas, cadera atrás, columna intacta. Baja en 4 segundos, pausa 2 abajo y sube con fuerza hasta el 90%. Los isquios van a amanecer destruidos dos días.',
+    cue:'Solo baja hasta donde la pelvis siga rotando: si la columna se redondea, terminaste la repetición.', ref:{b:'pm',p:[0.5,0.65]} },
+  { id:'bis05', n:'Hiperextensión 45° sesgada a femoral (espalda neutra, sin lumbar)', eq:'Banco de hiperextensión 45° + mancuerna', t:['peso_corporal','compuesto'], r:'12-15',
+    tor:'Almohadilla bajo los huesos de la cadera (no en el abdomen) para que la bisagra suceda en la cadera. Pies separados y puntas ligeramente afuera. Abraza una mancuerna al pecho, baja con la columna rígida y sube con glúteos e isquios SOLO hasta que el cuerpo quede alineado: nada de hiperextender la lumbar arriba. Pausa de 2 segundos abajo en cada repetición.',
+    cue:'Si sientes la lumbar, sube la almohadilla. La meta es glúteo-femoral, no erectores gruesos.' },
+  { id:'bis06', n:'Rumano unilateral Kickstand con mancuerna', eq:'Mancuerna pesada + straps', t:['mancuerna','compuesto','unilateral'], r:'10 por pierna',
+    tor:'Mancuerna en la mano contraria a la pierna de trabajo, la otra pierna atrás solo apoyada como soporte. La cadera de trabajo se va hacia atrás y la mancuerna desciende por la parte interna de la pierna. Siente cómo el femoral y la cara interna del glúteo se estiran como una banda. Sube contrayendo el glúteo sin girar la pelvis y nunca bloquees arriba.',
+    cue:'Llevar el peso al lado contrario activa el glúteo medio: estabiliza la rodilla y refuerza el contorno lateral de la cadera.' },
+  { id:'bis07', n:'Pull-Through en polea con cuerda', eq:'Polea baja + cuerda', t:['polea','compuesto'], r:'12-15',
+    tor:'De espaldas a la polea baja, cuerda entre las piernas, pies anchos. Deja que la polea te jale las manos hacia atrás mientras la cadera retrocede y el torso baja. Cuando los isquios estén al máximo, explota los glúteos hacia adelante y aprieta 2 segundos arriba como si partieras una nuez. La polea no te deja descansar en ningún punto del recorrido.',
+    cue:'Cero compresión espinal: es bisagra pura para atletas que quieren cintura pequeña.' }
+];
+
+/* --------------------------- GLÚTEO --------------------------- */
+BANCO.gluteo = [
+  { id:'glu01', n:'Hip Thrust en Smith con cojín y pausa de 2 s', eq:'Máquina Smith + cojín de Hip Thrust + banco', t:['smith','compuesto'], r:'8-12',
+    tor:'Escápulas sobre el borde del banco, barra de la Smith sobre la cadera con el cojín. Pies a la altura donde las espinillas queden verticales arriba. Sube con retroversión pélvica: costillas abajo, mentón al pecho, y aprieta los glúteos 2 segundos como si quisieras doblar la barra. Baja hasta que el glúteo apenas toque el piso y vuelve a subir. Si arquea la lumbar, la repetición no existe.',
+    cue:'La retroversión pélvica arriba es lo que dibuja las estrías del glúteo en el rear lat spread.', ref:{b:'pm',p:[0.8,1.1]} },
+  { id:'glu02', n:'Kneeling Squat en Smith', eq:'Máquina Smith + cojín', t:['smith','compuesto'], r:'8-12',
+    tor:'Arrodíllate sobre el cojín bajo la Smith, barra sobre los trapecios. Siéntate sobre los talones llevando la cadera atrás y explota hacia adelante con los glúteos hasta quedar erguido. El recorrido es corto pero brutal: toda la extensión de cadera, cero cuádriceps. Aprieta 2 segundos arriba con la pelvis en retroversión.',
+    cue:'Carga lo que quieras: aquí no hay estrés en la rodilla ni en la lumbar si mantienes las costillas abajo.', ref:{b:'pm',p:[0.6,0.85]} },
+  { id:'glu03', n:'Patada de glúteo en polea a 45°', eq:'Polea baja + tobillera', t:['polea','aislado','unilateral'], r:'12-15 por pierna',
+    tor:'Tobillera puesta, inclínate hacia adelante sujetándote. Lleva la pierna hacia atrás y hacia afuera a 45°, rodilla ligeramente flexionada, sin arquear la lumbar. Contrae 2 segundos arriba y regresa lento hasta que la pierna cruce por delante de la de apoyo. El glúteo superior y medio se encargan del "ancho" de la cadera de perfil.',
+    cue:'El vector a 45° trabaja glúteo mayor superior y medio: redondez lateral sin agrandar la cintura.' },
+  { id:'glu04', n:'Abducción en polea de pie inclinado', eq:'Polea baja + tobillera', t:['polea','aislado','unilateral'], r:'15-20 por pierna',
+    tor:'De lado a la polea, tobillera en la pierna lejana, inclínate ligeramente hacia adelante. Separa la pierna hacia afuera y un poco hacia atrás hasta sentir que el glúteo medio quema como ácido. Aguanta 1 segundo y regresa cruzando por delante para un estiramiento máximo. Al fallar, 10 parciales en la parte alta.',
+    cue:'Glúteo medio desarrollado = cadera que acompaña la línea de la X sin perder la cintura.' },
+  { id:'glu05', n:'Zancada inversa con déficit en Smith (sesgo glúteo)', eq:'Máquina Smith + step', t:['smith','compuesto','unilateral'], r:'8-10 por pierna',
+    tor:'Pie de trabajo sobre un step de 10 cm bajo la Smith. Da un paso largo hacia atrás e inclina el torso 20° hacia adelante: así el glúteo se lleva la carga. Baja hasta que la rodilla de atrás casi toque el piso y el glúteo esté estirado al límite. Empuja con el talón del pie de adelante. La rodilla de trabajo debe seguir la línea del pie: cero valgo.',
+    cue:'El déficit agrega rango de flexión de cadera: es la palanca ideal para fémures largos.', ref:{b:'pm',p:[0.35,0.5]} },
+  { id:'glu06', n:'Hip Thrust unilateral con mancuerna', eq:'Banco + mancuerna pesada', t:['mancuerna','compuesto','unilateral'], r:'10-12 por pierna',
+    tor:'Escápulas en el banco, mancuerna sobre la cadera del lado de trabajo, la otra pierna en el aire. Empuja con el talón y aprieta el glúteo 3 segundos arriba. Baja controlado y no toques el piso. El lado débil se expone al instante: trabájalo primero y dale a la otra pierna las mismas repeticiones.',
+    cue:'Sin rotar la pelvis: si la cadera libre cae, el glúteo medio se rinde y la serie terminó.' },
+  { id:'glu07', n:'Abducción sentado inclinado hacia adelante', eq:'Máquina abductora', t:['maquina','aislado'], r:'15-20',
+    tor:'Siéntate en la abductora e inclina el torso hacia adelante sujetándote de la máquina: así el glúteo superior hace el trabajo. Abre hasta el máximo, aguanta 2 segundos y cierra en 3 segundos. Al fallar, abre lo que puedas en parciales hasta que el glúteo arda como fuego.',
+    cue:'Inclinado hacia adelante sesga glúteo mayor superior; erguido sesga glúteo medio. Aquí buscamos el primero.' }
+];
+
+/* ----------------------- CUÁDRICEPS COMPUESTOS ----------------------- */
+BANCO.cuadComp = [
+  { id:'cua01', n:'Hack Squat profunda (isquio sobre pantorrilla)', eq:'Hack Squat', t:['maquina','compuesto'], r:'6-10',
+    tor:'Pies a la anchura de la cadera en la mitad de la plataforma, espalda pegada al respaldo. Baja en 4 segundos hasta que el isquiotibial APLASTE la pantorrilla: ese es el 100% del rango. Las rodillas viajan por encima del 2º-3er dedo del pie, jamás hacia adentro. Pausa 1 segundo abajo sin rebotar y empuja con todo el pie. Sube hasta el 90%, nunca bloquees.',
+    cue:'Fémures largos exigen que las rodillas pasen la punta del pie: la Hack lo permite sin cargar la lumbar.', ref:{b:'hack',p:[0.6,0.75]} },
+  { id:'cua02', n:'Sentadilla Péndulo profunda', eq:'Sentadilla Péndulo', t:['maquina','compuesto'], r:'8-12',
+    tor:'Pies juntos-medios en la parte media de la plataforma. Desciende en 4 segundos con el torso pegado al respaldo hasta que los glúteos casi toquen los talones. El arco de la péndulo mantiene la tensión en el cuádriceps en la parte más profunda. Sin rebote, con pausa abajo. Empuja con todo el pie hasta el 90%. Rodillas alineadas con los pies en TODA la repetición.',
+    cue:'La resistencia de la péndulo aumenta abajo: es el estímulo perfecto para el vasto medial y el lateral.', ref:{b:'pendulo',p:[0.7,0.9]} },
+  { id:'cua03', n:'Prensa 3 Posiciones 10-10-10', eq:'Prensa', t:['maquina','compuesto'], r:'10+10+10',
+    tor:'Sin soltar ni descansar: 10 repeticiones con los pies abajo y juntos (vasto lateral), 10 con los pies a la anchura de la cadera en el centro (todo el cuádriceps) y 10 con los pies altos y anchos (aductores y glúteo). 30 repeticiones seguidas en profundidad total. Si no llegas a 30, cada repetición que falte la terminas en parciales. Tus piernas van a temblar al bajarte de la máquina.',
+    cue:'Profundidad total pero lumbar pegada al respaldo: si la pelvis se despega, has bajado demasiado.', ref:{b:'hack',p:[1.0,1.3]} },
+  { id:'cua04', n:'Sentadilla en Smith con pies adelantados y talones elevados', eq:'Máquina Smith + cuña', t:['smith','compuesto'], r:'8-12',
+    tor:'Pies 20–30 cm adelante de la barra con los talones sobre una cuña o disco. Baja con el torso erguido hasta que los isquios toquen las pantorrillas. Los talones elevados permiten que la rodilla avance más y el cuádriceps se estire a tope. Pausa 1 segundo abajo y sube sin bloquear. Mantén las rodillas apuntando hacia afuera, siguiendo los pies.',
+    cue:'Para fémur largo esta posición mantiene el torso erguido sin cargar la lumbar: cuádriceps puro.', ref:{b:'pm',p:[0.55,0.75]} },
+  { id:'cua05', n:'Sentadilla Búlgara en Smith (sesgo cuádriceps)', eq:'Máquina Smith + banco', t:['smith','compuesto','unilateral'], r:'8-10 por pierna',
+    tor:'Pie trasero sobre el banco, pie delantero adelantado lo suficiente para que la rodilla pase la punta del pie. Torso erguido. Baja hasta que el glúteo casi toque el talón delantero y el cuádriceps esté al máximo de estiramiento. Sube empujando con el antepié. Cero valgo: la rodilla en la línea del 2º dedo.',
+    cue:'Torso vertical = cuádriceps. Si inclinas el torso, el glúteo se lleva el trabajo.', ref:{b:'pm',p:[0.3,0.45]} },
+  { id:'cua06', n:'Prensa unilateral profunda', eq:'Prensa', t:['maquina','compuesto','unilateral'], r:'10-12 por pierna',
+    tor:'Una sola pierna en el centro de la plataforma, la otra fuera. Baja hasta que la rodilla casi toque el pecho, sin que la cadera se despegue del asiento. Empuja con todo el pie y sube hasta el 90%. Sin descanso entre piernas. La pierna débil va primero.',
+    cue:'Unilateral sin bilateral deficit: más tensión por fibra y simetría absoluta para la tarima.', ref:{b:'hack',p:[0.45,0.6]} },
+  { id:'cua07', n:'Hack Squat con pausa de 3 s abajo', eq:'Hack Squat', t:['maquina','compuesto'], r:'6-8',
+    tor:'Baja en 3 segundos hasta el fondo absoluto, cuenta 3 segundos inmóvil con el cuádriceps cargado al máximo y sube con fuerza. La pausa elimina el reflejo de estiramiento: toda la fuerza viene del músculo, no del rebote. Vas a usar menos peso y vas a sufrir el doble.',
+    cue:'Pausa con tensión, no relajado: si las rodillas colapsan hacia adentro en la pausa, terminaste.', ref:{b:'hack',p:[0.5,0.62]} },
+  { id:'cua08', n:'Sentadilla frontal en Smith (agarre cruzado)', eq:'Máquina Smith', t:['smith','compuesto'], r:'6-10',
+    tor:'Barra sobre los deltoides frontales con los brazos cruzados, codos altos. Pies bajo la barra a la anchura de la cadera. Baja con el torso vertical hasta que el isquio toque la pantorrilla y sube empujando las rodillas hacia afuera. La posición frontal obliga al cuádriceps a cargar todo y la lumbar no trabaja de más.',
+    cue:'Codos altos = torso vertical = cuádriceps. Si los codos caen, el torso se inclina y la lumbar sufre.', ref:{b:'pm',p:[0.5,0.7]} }
+];
+
+/* ----------------------- CUÁDRICEPS AISLADOS ----------------------- */
+BANCO.cuadAisl = [
+  { id:'cai01', n:'Sissy Squat lastrada', eq:'Disco o mancuerna + soporte', t:['peso_corporal','aislado'], r:'8-12',
+    tor:'Sujétate de un poste con una mano y abraza un disco con la otra. Ponte en las puntas, inclina el cuerpo hacia atrás en línea recta de rodillas a hombros y deja que las rodillas avancen hasta que casi toquen el piso. El recto femoral queda estirado desde ambos extremos: dolor puro. Sube contrayendo el cuádriceps sin doblar la cadera.',
+    cue:'El estiramiento del recto femoral en la sissy es lo que dibuja la línea de separación del cuádriceps en el abdominal & thigh.' },
+  { id:'cai02', n:'Extensión de cuádriceps unilateral con torso reclinado', eq:'Máquina de extensión', t:['maquina','aislado','unilateral'], r:'10-12 por pierna',
+    tor:'Reclina el respaldo al máximo o inclínate hacia atrás para estirar el recto femoral. Una pierna a la vez. Extiende hasta arriba, contrae 2 segundos y baja en 4 segundos hasta el fondo. Al terminar una pierna, la otra empieza de inmediato. Repite 3 rondas sin descanso si el protocolo lo permite.',
+    cue:'Cadera extendida = recto femoral estirado = crecimiento máximo en el músculo más visible de frente.' },
+  { id:'cai03', n:'Extensión de cuádriceps con pausa de 2 s arriba', eq:'Máquina de extensión', t:['maquina','aislado'], r:'12-15',
+    tor:'Agárrate fuerte del asiento y extiende las piernas hasta bloquear arriba. Aprieta 2 segundos como si quisieras partir la máquina: el vasto medial debe salir como una lágrima. Baja en 3 segundos y sube sin rebote. Al fallar, parciales en el tercio superior hasta el colapso.',
+    cue:'La contracción máxima arriba desarrolla el vasto medial y la estriación que se ve con la luz de tarima.' },
+  { id:'cai04', n:'Sissy Squat en Smith', eq:'Máquina Smith', t:['smith','aislado'], r:'10-12',
+    tor:'Barra de la Smith sobre los trapecios, pies juntos y adelantados. Baja con las rodillas adelante y el torso hacia atrás hasta que las rodillas estén casi en el piso. La Smith te deja cargar más que en la sissy libre. Sube contrayendo el cuádriceps y sin flexionar la cadera.',
+    cue:'Solo la rodilla flexiona: si la cadera se dobla, el glúteo roba la repetición.', ref:{b:'pm',p:[0.25,0.4]} },
+  { id:'cai05', n:'Extensión de cuádriceps con parciales Meadows', eq:'Máquina de extensión', t:['maquina','aislado'], r:'10 + parciales',
+    tor:'10 repeticiones completas con control. Al fallar, sin soltar el peso, parciales en la mitad baja (la posición más estirada) hasta que no puedas mover la máquina ni un centímetro. Después aguanta el peso extendido 10 segundos. John Meadows lo llamaba "inundar el músculo de sangre".',
+    cue:'Las parciales en el estiramiento añaden tensión mecánica justo donde más crece el cuádriceps.' },
+  { id:'cai06', n:'Reverse Nordic lastrado', eq:'Cojín + disco', t:['peso_corporal','aislado'], r:'8-12',
+    tor:'De rodillas sobre el cojín con un disco al pecho. Inclínate hacia atrás manteniendo la cadera extendida y en línea con el torso, hasta que el cuádriceps esté al límite. Vuelve contrayendo el cuádriceps. El recto femoral trabaja en estiramiento máximo. Si duele la rodilla, reduce el rango.',
+    cue:'Sin flexionar la cadera: el cuerpo debe ser una tabla de rodillas a cabeza.' }
+];
+
+/* ------------------- BARRIDO EXTERNO (VASTO LATERAL) ------------------- */
+BANCO.vastoExterno = [
+  { id:'vex01', n:'Hack Squat con pies juntos y bajos', eq:'Hack Squat', t:['maquina','compuesto'], r:'8-12',
+    tor:'Pies juntos y en la parte baja de la plataforma. Baja hasta que los isquios toquen las pantorrillas. La posición estrecha y baja desplaza la carga al vasto lateral: el músculo que dibuja el barrido exterior. Rodillas en línea con los pies: sin valgo ni varo. Empuja con el antepié y no bloquees arriba.',
+    cue:'El barrido del vasto lateral es la mitad inferior de la X: el juez lo ve desde 20 metros.', ref:{b:'hack',p:[0.45,0.6]} },
+  { id:'vex02', n:'Prensa con pies juntos y bajos', eq:'Prensa', t:['maquina','compuesto'], r:'10-15',
+    tor:'Pies juntos en la parte más baja de la plataforma. Baja hasta que las rodillas casi toquen el pecho, con la cadera pegada al asiento. Empuja con el antepié para cargar el vasto lateral. Repeticiones controladas, nunca bloquees arriba.',
+    cue:'Los pies bajos aumentan la flexión de rodilla: el vasto lateral se estira y crece hacia afuera.', ref:{b:'hack',p:[0.8,1.1]} },
+  { id:'vex03', n:'Extensión con puntas hacia adentro', eq:'Máquina de extensión', t:['maquina','aislado'], r:'12-15',
+    tor:'Gira ligeramente las puntas de los pies hacia adentro (rotación interna de la tibia). Extiende hasta arriba, contrae 2 segundos y baja en 3 segundos. Sentirás el vasto lateral arder por fuera del muslo. No uses demasiado peso: el ángulo cuenta más que la carga.',
+    cue:'Ligera rotación interna sesga el vasto lateral. Siente el trabajo en la cara externa del muslo.' },
+  { id:'vex04', n:'Sentadilla Péndulo con pies juntos', eq:'Sentadilla Péndulo', t:['maquina','compuesto'], r:'8-12',
+    tor:'Pies juntos en la parte baja-media de la plataforma. Desciende a fondo con las rodillas siguiendo los pies y el torso pegado al respaldo. El arco de la péndulo más la postura estrecha destruyen el vasto lateral. Pausa 1 segundo abajo y sube sin bloquear.',
+    cue:'Postura estrecha + profundidad total = barrido lateral máximo para fémures largos.', ref:{b:'pendulo',p:[0.6,0.8]} },
+  { id:'vex05', n:'Sentadilla en Smith pies juntos y adelantados', eq:'Máquina Smith', t:['smith','compuesto'], r:'10-12',
+    tor:'Pies juntos 30 cm adelante de la barra. Baja con el torso erguido hasta que los isquios toquen las pantorrillas. La postura juntos concentra el trabajo en el vasto lateral. Sube sin bloquear arriba y mantén tensión constante.',
+    cue:'Torso erguido y profundidad total: el cuádriceps exterior se estira bajo carga.', ref:{b:'pm',p:[0.45,0.6]} },
+  { id:'vex06', n:'Zancada cruzada en Smith (curtsy)', eq:'Máquina Smith', t:['smith','compuesto','unilateral'], r:'10 por pierna',
+    tor:'Barra sobre los trapecios. Da un paso atrás y cruzado detrás de la pierna de apoyo, como una reverencia. Baja hasta que la rodilla trasera casi toque el piso y sube empujando con la pierna delantera. El vasto lateral y el glúteo medio se encienden. Rodilla delantera alineada con el pie.',
+    cue:'La reverencia carga la cara externa del muslo y el glúteo medio a la vez: barrido + cadera.', ref:{b:'pm',p:[0.25,0.4]} }
+];
+
+/* --------------------------- ADUCTORES --------------------------- */
+BANCO.aductor = [
+  { id:'adu01', n:'Aducción en máquina inclinado hacia adelante', eq:'Máquina aductora', t:['maquina','aislado'], r:'12-15',
+    tor:'Abre la máquina al máximo rango cómodo. Inclina el torso hacia adelante sujetándote de la máquina para estirar el aductor mayor. Cierra hasta juntar las rodillas, aprieta 2 segundos y abre en 4 segundos. El aductor rellena la cara interna del muslo, lo que da volumen de frente.',
+    cue:'Aductores grandes = muslo que no se ve vacío por dentro en el front double biceps.' },
+  { id:'adu02', n:'Aducción en polea de pie', eq:'Polea baja + tobillera', t:['polea','aislado','unilateral'], r:'12-15 por pierna',
+    tor:'De lado a la polea con la tobillera en la pierna cercana. Lleva la pierna a través del cuerpo hasta cruzar la otra, aprieta 1 segundo y vuelve lento hasta el máximo estiramiento. Mantén el torso erguido.',
+    cue:'El estiramiento lateral máximo carga el aductor largo y el grácil.' },
+  { id:'adu03', n:'Sentadilla sumo profunda en Smith', eq:'Máquina Smith', t:['smith','compuesto'], r:'8-12',
+    tor:'Pies muy abiertos con las puntas a 45° hacia afuera. Baja con el torso erguido hasta que los muslos estén por debajo de paralelo y sientas el aductor estirado al máximo. Empuja con los talones y aprieta los aductores para subir. Rodillas siempre siguiendo los pies.',
+    cue:'El aductor mayor es uno de los músculos más grandes de la pierna: llenarlo cambia el muslo entero.', ref:{b:'pm',p:[0.5,0.7]} },
+  { id:'adu04', n:'Prensa con pies altos y abiertos', eq:'Prensa', t:['maquina','compuesto'], r:'10-12',
+    tor:'Pies en la parte alta de la plataforma, muy abiertos y con las puntas hacia afuera. Baja hasta que las rodillas vayan hacia los hombros, sintiendo el estiramiento en la cara interna del muslo. Empuja con los talones. Sin bloquear arriba.',
+    cue:'Pies altos y abiertos = aductores + glúteo con mínimo estrés en la rodilla.', ref:{b:'hack',p:[0.9,1.2]} },
+  { id:'adu05', n:'Copenhagen Plank lastrado', eq:'Banco + disco', t:['peso_corporal','aislado'], r:'20-30 s por lado',
+    tor:'De lado, apoya el antebrazo en el piso y la cara interna de la rodilla (o el pie, para más dificultad) de la pierna de arriba sobre un banco. Eleva la cadera hasta quedar en línea recta y sostén. Coloca un disco sobre la cadera para lastrar. Aguanta hasta temblar.',
+    cue:'Isométrico de aductor que blinda la rodilla contra el valgo en la Hack profunda.' },
+  { id:'adu06', n:'Sentadilla Goblet sumo con déficit', eq:'Mancuerna pesada + dos steps', t:['mancuerna','compuesto'], r:'12-15',
+    tor:'Párate con cada pie sobre un step y sujeta la mancuerna por la cabeza. Baja hasta que la mancuerna pase por debajo del nivel de los pies, estirando el aductor a fondo. Pausa 2 segundos abajo y sube apretando los aductores.',
+    cue:'El déficit da el estiramiento extra que necesitan los aductores de un atleta con fémures largos.' }
+];
+
+/* ----------------------- PECHO CLAVICULAR ----------------------- */
+BANCO.pechoClav = [
+  { id:'pcl01', n:'Pin Press inclinado en Smith (30°) desde pines', eq:'Máquina Smith + banco inclinado', t:['smith','compuesto'], r:'6-8',
+    tor:'Banco a 30°, pines de seguridad a 2–3 cm del pecho. Cada repetición arranca muerta desde los pines: sin reflejo de estiramiento, el pectoral clavicular tiene que generar toda la fuerza desde cero. Escápulas hundidas y juntas, codos a 45°. Empuja explosivo y baja en 3 segundos hasta que la barra apenas toque los pines. Ni un rebote.',
+    cue:'El clavicular es lo que llena el hueco bajo la clavícula: la diferencia entre un torso plano y uno "lleno" en el side chest.' },
+  { id:'pcl02', n:'Guillotine Press inclinada en Smith con pausa', eq:'Máquina Smith + banco inclinado', t:['smith','compuesto'], r:'8-10',
+    tor:'Banco a 30°. Baja la barra hacia la base del cuello, codos abiertos a 70–80°, hasta que el pecho esté estirado al límite. Pausa 2 segundos con tensión sin tocar. Sube hasta 3/4, sin bloquear. Peso moderado: aquí manda el estiramiento, no el ego. La carga se aloja en el pectoral clavicular y desaparece el tríceps.',
+    cue:'Codos abiertos estiran las fibras superiores del pectoral. Si sientes el hombro anterior, cierra 10° los codos.' },
+  { id:'pcl03', n:'Cruce Low-to-High unilateral cruzando el esternón', eq:'Polea doble ajustable', t:['polea','aislado','unilateral'], r:'12-15 por lado',
+    tor:'Polea en el punto más bajo, de lado a la máquina. Lleva el estribo desde la cadera hacia arriba y a través del cuerpo hasta pasar la línea del esternón y quedar frente al hombro contrario. Aprieta 2 segundos el clavicular. Regresa lento hasta que el pectoral quede estirado al máximo.',
+    cue:'Cruzar el esternón logra la aducción completa: la única forma de contraer al 100% la porción clavicular.' },
+  { id:'pcl04', n:'Press inclinado con mancuernas en torsión (neutro a prono)', eq:'Mancuernas pesadas + banco inclinado', t:['mancuerna','compuesto'], r:'8-10',
+    tor:'Banco a 30°, mancuernas en agarre neutro abajo. Al subir, gira las muñecas hacia agarre prono y junta las mancuernas arriba apretando el pecho 1 segundo. Baja en 3 segundos regresando a neutro hasta un estiramiento profundo. Esa torsión fuerza al pectoral a contraerse más que en un press normal.',
+    cue:'El agarre neutro abajo protege el hombro; el prono arriba maximiza la contracción del clavicular.' },
+  { id:'pcl05', n:'Press inclinado en Smith con agarre inverso', eq:'Máquina Smith + banco inclinado', t:['smith','compuesto'], r:'8-10',
+    tor:'Banco a 25–30°, agarre supino a la anchura de los hombros. Baja la barra hacia la parte baja del pecho con los codos pegados. Sentirás el clavicular trabajando en un ángulo que tu cuerpo jamás ha sentido. Sube hasta 3/4 sin bloquear.',
+    cue:'Estudios de EMG muestran mayor activación del clavicular con agarre supino. Peso moderado: muñecas rectas.' },
+  { id:'pcl06', n:'Fly inclinado en polea a 30°', eq:'Polea doble + banco inclinado', t:['polea','aislado'], r:'12-15',
+    tor:'Banco inclinado entre dos poleas bajas. Brazos abiertos con codos ligeramente flexionados. Junta las manos arriba del pecho apretando el clavicular 2 segundos. Abre lentamente hasta que los codos queden por debajo del banco y el pecho se estire al límite. La polea mantiene tensión en todo el recorrido.',
+    cue:'A diferencia del fly con mancuernas, la polea no pierde tensión arriba: contracción + estiramiento en un solo movimiento.' },
+  { id:'pcl07', n:'Landmine Press unilateral de rodillas', eq:'Barra en landmine', t:['barra','compuesto','unilateral'], r:'10 por lado',
+    tor:'Arrodillado frente a la barra en el landmine. Empuja hacia arriba y hacia adelante en arco, cruzando el pecho. El arco natural de la barra sigue la trayectoria de las fibras claviculares. Aprieta 1 segundo arriba y baja lento hasta sentir el estiramiento.',
+    cue:'Trayectoria en arco + aducción = clavicular sin estrés articular en el hombro.' }
+];
+
+/* ----------------------- PECHO COMPUESTO ----------------------- */
+BANCO.pechoComp = [
+  { id:'pco01', n:'Larsen Press con mancuernas', eq:'Mancuernas pesadas + banco plano', t:['mancuerna','compuesto'], r:'8-10',
+    tor:'Acostado en banco plano con las piernas extendidas y los pies en el aire o apenas apoyados sin empuje. Sin ayuda de las piernas, el pectoral hace todo el trabajo. Baja las mancuernas hasta un estiramiento profundo y empuja. Escápulas hundidas, sin arco lumbar exagerado.',
+    cue:'El Larsen elimina el leg drive y el arco: honestidad total en el pectoral.' },
+  { id:'pco02', n:'Guillotine Press plana en Smith con pausa', eq:'Máquina Smith + banco plano', t:['smith','compuesto'], r:'8-10',
+    tor:'Baja la barra hacia la base del cuello con los codos abiertos. Pausa 2 segundos con el pectoral estirado. Sube hasta 3/4. Peso moderado, control absoluto. La parte esternal del pectoral se estira como nunca.',
+    cue:'Codos abiertos = pectoral, no tríceps. Si sientes el hombro, baja el peso.' },
+  { id:'pco03', n:'Fondos lastrados con torso inclinado', eq:'Paralelas + cinturón con disco', t:['peso_corporal','compuesto'], r:'8-12',
+    tor:'Cinturón con disco, inclínate 30° hacia adelante con los codos abiertos. Baja hasta que el pectoral esté estirado al máximo y los hombros queden un poco por debajo de los codos. Sube empujando con el pectoral, sin bloquear arriba.',
+    cue:'Torso inclinado = pectoral inferior que da el borde de abajo del pecho en el side chest.' },
+  { id:'pco04', n:'Press plano con mancuernas pausa en estiramiento', eq:'Mancuernas pesadas + banco plano', t:['mancuerna','compuesto'], r:'8-10',
+    tor:'Escápulas hundidas y clavadas en el banco, pies firmes. Baja las mancuernas abiertas hasta que el pectoral se estire tanto que sientas tirar la inserción en el húmero. Ahí CONGELA 2 segundos sin perder la tensión: nada de descansar las mancuernas en el pecho. Empuja en arco juntándolas arriba y aprieta 1 segundo como si quisieras unir los codos. Sin el rebote, el pectoral genera cada kilo desde cero.',
+    cue:'La pausa en estiramiento elimina el reflejo elástico: tensión mecánica pura en el pectoral, sin que el tríceps ni el hombro anterior roben la serie.' },
+  { id:'pco05', n:'Pin Press plano en Smith', eq:'Máquina Smith + banco plano', t:['smith','compuesto'], r:'6-8',
+    tor:'Pines a 2–3 cm del pecho. Cada repetición arranca muerta desde los pines. Empuja explosivo, baja controlado y deja que la barra repose en los pines medio segundo antes de volver a empujar. Sin rebote.',
+    cue:'Arranque muerto = máxima tensión mecánica en el pectoral.' },
+  { id:'pco06', n:'Press declinado ligero con mancuernas Meadows', eq:'Mancuernas pesadas + banco ligeramente declinado', t:['mancuerna','compuesto'], r:'10-12',
+    tor:'Banco con 10–15° de declinación, pies anclados. Las mancuernas bajan en arco amplio hasta que el pectoral esternal-abdominal se estire al límite. Sube en arco cerrándolas sobre la parte baja del pecho y aprieta 1 segundo. John Meadows lo usaba para dibujar el borde inferior del pecho sin destrozar el hombro. Cada repetición se baja en 3 segundos: control o nada.',
+    cue:'Un borde inferior marcado separa el pecho del abdomen y le da el corte cuadrado que se ve en el side chest bajo las luces.' }
+];
+
+/* ----------------------- PECHO AISLADO ----------------------- */
+BANCO.pechoAisl = [
+  { id:'pai01', n:'Cruce unilateral cruzando el esternón (polea alta a cadera opuesta)', eq:'Polea doble ajustable', t:['polea','aislado','unilateral'], r:'12-15 por lado',
+    tor:'Polea alta, de lado a la máquina. Lleva el estribo desde arriba hacia abajo y a través del cuerpo hasta la cadera contraria, cruzando el esternón. Aprieta 2 segundos. Regresa lento hasta un estiramiento máximo.',
+    cue:'Cruzar la línea media completa la aducción horizontal: contracción máxima de las fibras esternales.' },
+  { id:'pai02', n:'Fly con mancuernas pausa de 3 s en estiramiento', eq:'Mancuernas + banco plano', t:['mancuerna','aislado'], r:'10-12',
+    tor:'Banco plano, codos ligeramente flexionados y fijos: es un abrazo, no un press. Abre los brazos hasta que el pectoral esté estirado al límite y CONGELA 3 segundos sintiendo cómo se abren las fibras. Cierra solo hasta 3/4 del recorrido, sin juntar las mancuernas arriba, para que la tensión nunca desaparezca. Peso moderado: si el codo se dobla para empujar, conviertes el fly en press y lo arruinas.',
+    cue:'La pausa estirada bajo carga es el estímulo hipertrófico más potente: microdesgarros en todo el pectoral esternal.' },
+  { id:'pai03', n:'Cruce en polea de pie a la altura del pecho', eq:'Polea doble ajustable', t:['polea','aislado'], r:'12-15',
+    tor:'Poleas a la altura del pecho, un paso largo al frente con postura escalonada. Brazos abiertos con codos suaves. Junta las manos frente al esternón empujando con el pectoral, no con los brazos, y aprieta 2 segundos tratando de cruzar una mano sobre la otra. Regresa lento hasta que los brazos queden por detrás del cuerpo y el pecho se estire como una lona.',
+    cue:'Altura media = fibras esternales, las que dan volumen al centro del pecho de frente.' },
+  { id:'pai04', n:'Fly en polea acostado en banco plano', eq:'Polea doble + banco plano', t:['polea','aislado'], r:'12-15',
+    tor:'Banco plano entre las dos poleas bajas. Brazos abiertos con codos ligeramente flexionados. Junta las manos arriba apretando 2 segundos. Abre hasta que los codos estén por debajo del banco. La polea mantiene tensión arriba.',
+    cue:'Tensión constante arriba y abajo: mejor que el fly con mancuernas para el pump.' },
+  { id:'pai05', n:'Fly en polea unilateral de rodillas', eq:'Polea doble ajustable', t:['polea','aislado','unilateral'], r:'12 por lado',
+    tor:'De rodillas, polea a la altura del hombro. Lleva el brazo a través del cuerpo hasta cruzar la línea media, aprieta 2 segundos y regresa lento hasta el estiramiento máximo. Arrodillado eliminas el impulso del cuerpo.',
+    cue:'Arrodillado = estabilidad absoluta, cero trampa con las piernas.' },
+  { id:'pai06', n:'Squeeze Press con mancuernas', eq:'Mancuernas + banco plano', t:['mancuerna','aislado'], r:'12-15',
+    tor:'Junta las mancuernas y aprieta una contra la otra con todas tus fuerzas durante todo el recorrido. Baja hasta el pecho y sube sin separar las mancuernas. El pectoral se contrae de forma isométrica todo el tiempo.',
+    cue:'Contracción isométrica constante: pump y densidad en el pectoral interno.' }
+];
+
+/* ----------------------- DELTOIDE (PRESS) ----------------------- */
+BANCO.deltPress = [
+  { id:'dpr01', n:'Press militar en Smith sentado', eq:'Máquina Smith + banco con respaldo', t:['smith','compuesto'], r:'8-10',
+    tor:'Banco a 80° bajo la Smith, la barra baja por DELANTE de la cara hasta la altura de la barbilla. Costillas abajo, glúteos en el asiento, nada de arquear la lumbar. Empuja explosivo hasta 3/4 del recorrido y baja en 3 segundos. Sin bloquear arriba: el deltoide jamás descansa. La Smith te deja empujar con todo sin gastar energía en equilibrio.',
+    cue:'Banco a 80° en lugar de 90°: menos estrés en el hombro y más reclutamiento del deltoide lateral junto con el anterior.' },
+  { id:'dpr02', n:'Press con mancuernas sentado agarre neutro', eq:'Mancuernas pesadas + banco', t:['mancuerna','compuesto'], r:'8-10',
+    tor:'Sentado con respaldo, agarre neutro y codos ligeramente adelante del torso. Baja las mancuernas hasta que estén a la altura de las orejas y sientas el deltoide estirarse. Empuja hasta 3/4 sin chocar las mancuernas arriba y vuelve a bajar en 3 segundos. Costillas abajo y glúteos en el asiento: si arqueas, el pecho se lleva el trabajo y la lumbar paga la factura.',
+    cue:'El agarre neutro protege el manguito rotador y permite más rango que la barra: hombro sano para seguir entrenando pesado hasta la tarima.' },
+  { id:'dpr03', n:'Landmine Press de pie', eq:'Barra en landmine', t:['barra','compuesto','unilateral'], r:'10 por lado',
+    tor:'De pie, postura escalonada, la barra del landmine apoyada en el hombro. Empuja hacia arriba y hacia adelante siguiendo el arco natural de la barra hasta extender casi por completo. Aprieta 1 segundo y baja en 3 segundos hasta el hombro. Glúteos y abdomen apretados como bloque: cero inclinación del torso, cero trampa.',
+    cue:'El arco del landmine respeta la articulación del hombro: carga pesada en deltoide anterior y lateral sin pinzamiento.' },
+  { id:'dpr04', n:'Press Arnold Poliquin', eq:'Mancuernas + banco', t:['mancuerna','compuesto'], r:'8-10',
+    tor:'Sentado con respaldo, mancuernas frente al rostro con las palmas hacia ti. Al subir, rota las palmas hacia afuera y abre los codos hasta terminar en press normal. Baja invirtiendo el giro y vuelve a la posición inicial. Versión Poliquin: tempo 4-0-1-0, cuatro segundos bajando. La rotación hace que el deltoide trabaje en todo su abanico.',
+    cue:'El giro recluta deltoide anterior y lateral en un solo movimiento: hombros llenos de frente y de lado.' },
+  { id:'dpr05', n:'Pin Press en Smith desde la barbilla', eq:'Máquina Smith + banco', t:['smith','compuesto'], r:'6-8',
+    tor:'Banco a 80° bajo la Smith con los pines a la altura de la barbilla. Cada repetición arranca MUERTA desde los pines: sin reflejo elástico, el deltoide tiene que generar la fuerza desde cero. Empuja explosivo hasta 3/4, baja en 3 segundos y deja que la barra repose medio segundo en los pines antes de volver a empujar. Esto es fuerza bruta de hombro, sin trucos.',
+    cue:'El arranque muerto elimina el rebote y obliga al deltoide a producir tensión máxima en su punto más débil.' },
+  { id:'dpr06', n:'Press Meadows sentado con mancuernas', eq:'Mancuernas + banco', t:['mancuerna','compuesto'], r:'10-12',
+    tor:'Sentado con respaldo, agarre semi-neutro con las mancuernas un poco por delante de los hombros. Baja más profundo que en un press normal, hasta que el deltoide esté estirado, pausa 1 segundo y empuja hasta 3/4. Cuando falles, quédate en la mitad baja del recorrido y haz parciales hasta que no puedas despegar las mancuernas de los hombros. Sin piedad.',
+    cue:'Rango profundo y parciales en estiramiento: el método Meadows para hombros que se ven redondos desde cualquier ángulo.' }
+];
+
+/* ----------------------- DELTOIDE LATERAL ----------------------- */
+BANCO.deltLat = [
+  { id:'dla01', n:'Elevación lateral en polea a la altura de la muñeca (por detrás)', eq:'Polea ajustable', t:['polea','aislado','unilateral'], r:'12-15 por lado',
+    tor:'Polea a la altura de la muñeca, cable pasando por DETRÁS del cuerpo. Desde ahí, la tensión arranca en la posición estirada, donde las mancuernas no hacen nada. Sube el brazo en el plano escapular (30° adelante) hasta la altura del hombro, guiando con el codo, no con la mano. Aprieta 1 segundo y baja en 4 segundos. El deltoide lateral va a arder como si lo estuvieran quemando con soplete.',
+    cue:'La polea a la altura de la muñeca carga el deltoide en el rango estirado: la clave para hombros redondos en 3D.' },
+  { id:'dla02', n:'Y-Raise cruzado en polea doble', eq:'Polea doble ajustable', t:['polea','aislado'], r:'12-15',
+    tor:'Poleas bajas, agarra los cables cruzados (mano derecha toma el cable izquierdo). Sube los brazos en diagonal formando una Y hasta por encima de la altura de los hombros. Aprieta 1 segundo arriba y baja en 4 segundos. Los cables cruzados dan tensión desde el primer centímetro.',
+    cue:'El patrón en Y combina deltoide lateral y trapecio inferior: anchura de hombro sin trapecio superior.' },
+  { id:'dla03', n:'Elevación lateral inclinada (lean-away) con mancuerna', eq:'Mancuerna + soporte', t:['mancuerna','aislado','unilateral'], r:'12-15 por lado',
+    tor:'Agárrate de un poste con la mano libre e inclínate hacia afuera unos 20–30°. Esa inclinación pone el deltoide en tensión desde abajo, donde la elevación normal no hace nada. Sube hasta la altura del hombro guiando con el codo y baja en 4 segundos. Sin balanceo.',
+    cue:'Inclinarse cambia la curva de resistencia: tensión máxima en la parte baja del recorrido.' },
+  { id:'dla04', n:'Destroyer Set de laterales (pesado-medio-ligero)', eq:'Mancuernas (3 pesos)', t:['mancuerna','aislado'], r:'8 + 8 + 8 + parciales',
+    tor:'Tres pares de mancuernas listos. Pesadas: 8 repeticiones estrictas. Sin descanso, medianas: 8 repeticiones. Sin descanso, ligeras: 8 repeticiones completas + 15 parciales en la mitad superior. Al terminar, mantén los brazos a 90° hasta que no puedas más. El hombro va a sentirse como un globo a punto de explotar.',
+    cue:'Volumen extremo con tensión continua: inunda de sangre el deltoide lateral y maximiza la estrés metabólico.' },
+  { id:'dla05', n:'Elevación lateral en banco inclinado (de lado)', eq:'Mancuerna + banco inclinado', t:['mancuerna','aislado','unilateral'], r:'12-15 por lado',
+    tor:'Acostado de lado sobre un banco inclinado a 45°. Desde abajo, sube la mancuerna hasta la vertical. Esta posición pone la máxima tensión en el estiramiento, donde está el crecimiento. Baja en 4 segundos.',
+    cue:'Tensión máxima en el estiramiento: el complemento perfecto de la lateral normal.' },
+  { id:'dla06', n:'Elevación lateral sentado con pausa arriba (Rambod)', eq:'Mancuernas + banco', t:['mancuerna','aislado'], r:'12-15',
+    tor:'Sentado, sin impulso. Sube las mancuernas hasta la altura del hombro con los codos ligeramente flexionados, pausa 2 segundos arriba con el meñique ligeramente elevado y baja en 3 segundos. Sentado eliminas cualquier trampa con las piernas.',
+    cue:'Sentado = estricto. La pausa arriba maximiza la contracción del deltoide lateral.' },
+  { id:'dla07', n:'Remo al mentón ancho en polea con cuerda', eq:'Polea baja + cuerda', t:['polea','compuesto'], r:'12-15',
+    tor:'Polea baja con cuerda. Sube tirando con los codos hacia afuera y arriba hasta que las manos lleguen a la altura del esternón. Los codos siempre por encima de las manos. Aprieta 1 segundo y baja lento.',
+    cue:'Agarre ancho y solo hasta el esternón: deltoide lateral sin pinzar el hombro.' },
+  { id:'dla08', n:'Elevación lateral unilateral en polea tras glúteo + parciales', eq:'Polea baja', t:['polea','aislado','unilateral'], r:'10 + 10 parciales por lado',
+    tor:'Polea en el punto más bajo, cable por detrás del glúteo. Haz 10 repeticiones completas y, al fallar, 10 parciales en la mitad inferior del recorrido, donde el deltoide está estirado. No sueltes el cable entre lados: cambia y sigue.',
+    cue:'Cable por detrás = tensión en el estiramiento. Parciales abajo = estímulo extra justo donde más crece.' }
+];
+
+/* ----------------------- DELTOIDE POSTERIOR ----------------------- */
+BANCO.deltPost = [
+  { id:'dpo01', n:'Cruce invertido en polea a la altura de los ojos', eq:'Polea doble ajustable', t:['polea','aislado'], r:'12-15',
+    tor:'Poleas a la altura de los ojos, cables cruzados (mano derecha toma el cable izquierdo). Abre los brazos hacia atrás con los codos ligeramente flexionados hasta que las manos queden en línea con los hombros. Aprieta 2 segundos y regresa lento hasta cruzar por delante.',
+    cue:'Deltoide posterior desarrollado = hombro redondo de perfil y en el rear lat spread.' },
+  { id:'dpo02', n:'Face Pull sentado con rotación externa', eq:'Polea alta + cuerda', t:['polea','compuesto'], r:'15-20',
+    tor:'Sentado frente a la polea alta, cuerda con agarre por encima. Tira hacia la frente separando los extremos de la cuerda mientras rotas los brazos hacia atrás hasta terminar en posición de doble bíceps, con los codos más altos que las manos. Aprieta 2 segundos los deltoides posteriores y los rotadores externos. Regresa lento hasta que los brazos queden extendidos.',
+    cue:'Rotación externa + deltoide posterior: hombros sanos que soportan el press pesado y redondez trasera para el rear lat spread.' },
+  { id:'dpo03', n:'Elevación posterior con pecho apoyado en banco inclinado', eq:'Mancuernas + banco inclinado', t:['mancuerna','aislado'], r:'12-15',
+    tor:'Pecho apoyado en un banco inclinado a 30°, mancuernas ligeras colgando. Abre los brazos hacia los lados con los codos ligeramente flexionados, guiando con el codo y con los meñiques un poco más altos que los pulgares. Aprieta 2 segundos arriba sin juntar las escápulas, que roban el trabajo. Baja en 3 segundos. El pecho no se despega del banco.',
+    cue:'Pecho apoyado = cero impulso y cero lumbar. Escápulas quietas = deltoide posterior aislado.' },
+  { id:'dpo04', n:'Remo posterior unilateral en polea (rear delt row)', eq:'Polea ajustable', t:['polea','compuesto','unilateral'], r:'12-15 por lado',
+    tor:'Polea a la altura del pecho, estribo con agarre prono. Tira hacia atrás con el codo abierto a 90° y a la altura del hombro, como si quisieras dar un codazo a alguien detrás de ti. Aprieta 2 segundos el deltoide posterior. Regresa lento estirando el brazo cruzado por delante del cuerpo. Torso quieto: si rotas, el dorsal se mete.',
+    cue:'Codo alto y abierto = deltoide posterior; codo bajo y pegado = dorsal. Aquí no queremos dorsal.' },
+  { id:'dpo05', n:'Pájaro unilateral cruzado en polea a la altura del hombro', eq:'Polea ajustable', t:['polea','aislado','unilateral'], r:'12-15 por lado',
+    tor:'Polea a la altura del hombro, toma el cable con la mano contraria y cruza el brazo por delante del cuerpo. Ábrelo hacia atrás en arco hasta que el brazo quede en línea con el hombro. Aprieta 2 segundos. Regresa lento cruzando de nuevo por delante para estirar el deltoide posterior. Una mano termina y la otra empieza sin descanso.',
+    cue:'Unilateral = conexión mente-músculo total y simetría izquierda-derecha en el hombro trasero.' },
+  { id:'dpo06', n:'Elevación posterior en Y en banco inclinado', eq:'Mancuernas ligeras + banco inclinado', t:['mancuerna','aislado'], r:'12-15',
+    tor:'Pecho apoyado en el banco a 30°, mancuernas ligeras con los pulgares hacia arriba. Sube los brazos en diagonal formando una Y por encima de la cabeza, con los brazos casi rectos. Aprieta 2 segundos arriba deprimiendo las escápulas. Baja en 3 segundos. Si necesitas impulso, el peso es demasiado: aquí manda la contracción, no el ego.',
+    cue:'Patrón en Y = deltoide posterior y trapecio inferior: espalda alta definida sin trapecio superior gigante.' },
+  { id:'dpo07', n:'Pájaro acostado de lado en banco', eq:'Mancuerna + banco plano', t:['mancuerna','aislado','unilateral'], r:'12-15 por lado',
+    tor:'Acostado de lado sobre un banco plano, mancuerna en la mano de arriba frente al pecho. Sube la mancuerna en arco hasta la vertical con el codo ligeramente flexionado. Aprieta 1 segundo arriba y baja en 3 segundos hasta que el brazo cruce por delante del cuerpo y el deltoide posterior quede estirado.',
+    cue:'Tensión máxima en la parte baja del recorrido: el complemento perfecto del pájaro tradicional.' }
+];
+
+/* ----------------------- DORSAL VERTICAL (JALONES) ----------------------- */
+BANCO.dorsalVertical = [
+  { id:'dve01', n:'Jalón unilateral de rodillas tirando hacia la cadera', eq:'Polea alta + estribo + straps', t:['polea','compuesto','unilateral'], r:'10-12 por lado',
+    tor:'Straps puestos. Arrodíllate frente a la polea alta, un poco de lado. Deja que el cable te jale el brazo hasta arriba y la escápula se eleve: dorsal estirado desde la axila hasta la cresta ilíaca. Tira llevando el codo hacia el BOLSILLO trasero, no hacia el hombro. Aprieta 2 segundos con el dorsal bajo y regresa en 4 segundos hasta el estiramiento total.',
+    cue:'Dirección hacia la cadera = fibras ilíacas del dorsal. Es lo que alarga la V hacia abajo y estrecha la cintura visualmente.' },
+  { id:'dve02', n:'Jalón en Y cruzado (polea doble)', eq:'Polea doble alta + straps', t:['polea','compuesto'], r:'10-12',
+    tor:'Arrodíllate entre las dos poleas altas y toma los cables cruzados (mano derecha el cable izquierdo). Con los brazos en Y, tira bajando los codos hacia las costillas bajas en arco. Aprieta 2 segundos y vuelve lento hasta que los brazos se crucen arriba y el dorsal se estire al límite.',
+    cue:'La trayectoria en arco sigue las fibras del dorsal: anchura sin tirar con los bíceps.' },
+  { id:'dve03', n:'Jalón agarre neutro estrecho con inclinación atrás', eq:'Polea alta + agarre V + straps', t:['polea','compuesto'], r:'8-12',
+    tor:'Straps, agarre neutro estrecho. Inclina el torso 15–20° hacia atrás y fija esa posición: nada de balanceo. Tira el agarre hacia la parte baja del pecho llevando los codos hacia la cadera. Aprieta 2 segundos y sube en 4 segundos hasta que los hombros se eleven y el dorsal se estire completo.',
+    cue:'Agarre neutro y estrecho = rango mayor y dorsal bajo; escápulas hundidas al final del tirón.' },
+  { id:'dve04', n:'Dominadas lastradas agarre neutro con pausa en colgado', eq:'Barra de dominadas + cinturón + straps', t:['peso_corporal','compuesto'], r:'6-8',
+    tor:'Cinturón con disco, straps a la barra. Cuelga totalmente estirado 2 segundos en cada repetición: el dorsal se alarga bajo carga. Sube llevando el pecho a la barra y los codos hacia las costillas. Baja en 4 segundos. Sin kipping, sin balanceo, sin piedad.',
+    cue:'El colgado activo con straps estira el dorsal sin que el antebrazo limite la serie.' },
+  { id:'dve05', n:'Jalón unilateral sentado con rotación (prono a neutro)', eq:'Polea alta + estribo + straps', t:['polea','compuesto','unilateral'], r:'10-12 por lado',
+    tor:'Sentado en el jalón con un estribo. Arriba la palma mira al frente; al tirar, gira la mano hacia neutro mientras el codo baja hacia la cadera. Aprieta 2 segundos. Regresa rotando y deja que el dorsal se estire completo.',
+    cue:'La rotación sigue la línea de las fibras del dorsal: contracción más completa que un jalón fijo.' },
+  { id:'dve06', n:'Jalón supino estrecho', eq:'Polea alta + barra recta + straps', t:['polea','compuesto'], r:'8-10',
+    tor:'Agarre supino a la anchura de los hombros con straps. Tira hacia la parte baja del pecho con los codos pegados al torso, dirección cadera. Aprieta 2 segundos. Sube lento hasta el estiramiento total.',
+    cue:'El agarre supino lleva el codo pegado al torso: máximo rango para el dorsal bajo.' }
+];
+
+/* ----------------------- DORSAL BAJO ILÍACO ----------------------- */
+BANCO.dorsalBajo = [
+  { id:'dba01', n:'Pullover en polea con cuerda (brazos rectos)', eq:'Polea alta + cuerda', t:['polea','aislado'], r:'12-15',
+    tor:'De pie frente a la polea alta, cadera atrás y torso inclinado 30°. Brazos casi rectos. Lleva la cuerda en arco desde arriba hasta los muslos separando los extremos al final. Aprieta 2 segundos el dorsal y sube lento hasta que el dorsal quede estirado arriba.',
+    cue:'Sin bíceps: aislamiento puro del dorsal. Ideal como pre-agotamiento o remate.' },
+  { id:'dba02', n:'Pullover en polea unilateral de rodillas cruzado', eq:'Polea alta + estribo', t:['polea','aislado','unilateral'], r:'12-15 por lado',
+    tor:'De rodillas y de lado a la polea alta. Brazo casi recto, tira del estribo en arco desde arriba cruzando el cuerpo hasta la cadera contraria. Aprieta 2 segundos sintiendo el dorsal bajo contraerse junto a la cresta ilíaca. Regresa lento hasta que el brazo quede arriba y el dorsal se estire desde la axila. Sin doblar el codo.',
+    cue:'Cruzar la línea media lleva el dorsal bajo a su contracción máxima: alarga la V hasta la cintura.' },
+  { id:'dba03', n:'Remo en polea baja unilateral hacia la cadera (Meadows Lat Row)', eq:'Polea baja + estribo + straps', t:['polea','compuesto','unilateral'], r:'10-12 por lado',
+    tor:'Straps. De pie o sentado frente a la polea baja. Deja que el brazo se estire hacia adelante con el hombro protraído. Tira llevando el codo hacia la cadera en arco, no hacia atrás. Aprieta 2 segundos y suelta en 4 segundos hasta el estiramiento total.',
+    cue:'El arco hacia la cadera sigue las fibras ilíacas del dorsal: el detalle que alarga la V hacia la cintura.' },
+  { id:'dba04', n:'Remo con mancuerna en arco a la cadera (Lat Row en banco inclinado)', eq:'Mancuerna + banco inclinado + straps', t:['mancuerna','compuesto','unilateral'], r:'10-12 por lado',
+    tor:'Pecho apoyado en un banco inclinado a 30°, straps puestos. Deja que la mancuerna cuelgue estirando el dorsal. Tira en arco hacia la cadera, codo pegado al torso. Aprieta 2 segundos y baja en 4.',
+    cue:'Pecho apoyado = cero lumbar. Arco a la cadera = dorsal bajo.' },
+  { id:'dba05', n:'Jalón con brazo recto unilateral inclinado', eq:'Polea alta + estribo', t:['polea','aislado','unilateral'], r:'12-15 por lado',
+    tor:'De pie frente a la polea alta, cadera atrás y torso inclinado. Brazo recto, tira el estribo desde arriba hasta el muslo en un arco amplio. Aprieta 2 segundos con el codo bloqueado y siente el dorsal contraerse en la cadera. Sube lento hasta que el dorsal se estire al máximo. Una mano a la vez para mayor rango y concentración.',
+    cue:'Unilateral e inclinado = mayor rango y contracción del dorsal bajo sin intervención del bíceps.' },
+  { id:'dba06', n:'Pullover con mancuerna en banco (cruzado)', eq:'Mancuerna pesada + banco plano', t:['mancuerna','aislado'], r:'10-12',
+    tor:'Acostado de través en el banco con solo los hombros apoyados y la cadera abajo. Mancuerna sobre el pecho con brazos casi rectos. Baja en arco por detrás de la cabeza hasta que el dorsal y la caja torácica se estiren al límite. Sube tirando con el dorsal hasta la vertical del pecho.',
+    cue:'Caja torácica amplia + pullover = expansión visual del torso en el front lat spread.' }
+];
+
+/* ----------------- REMO CON PECHO APOYADO (DENSIDAD SIN LUMBAR) ----------------- */
+BANCO.remoApoyado = [
+  { id:'rap01', n:'Remo con pecho apoyado en banco inclinado (mancuernas + straps)', eq:'Mancuernas pesadas + banco inclinado + straps', t:['mancuerna','compuesto'], r:'8-12',
+    tor:'Banco a 30–45°, pecho apoyado, straps apretados. Deja que las mancuernas cuelguen y las escápulas se separen: estiramiento completo. Tira con los codos hacia la cadera, junta las escápulas y aprieta 2 segundos. Baja en 4 segundos. Ni un milímetro de despegue del pecho: si te levantas, la serie se acabó.',
+    cue:'Cero estrés lumbar: la densidad de la espalda media sin engrosar erectores.' },
+  { id:'rap02', n:'Remo Seal en banco plano elevado', eq:'Mancuernas + banco plano elevado + straps', t:['mancuerna','compuesto'], r:'8-10',
+    tor:'Banco plano elevado sobre dos cajas o discos. Acostado boca abajo, straps, mancuernas colgando. Tira hasta que los codos pasen la línea del torso y aprieta 2 segundos. Baja lento hasta el estiramiento completo.',
+    cue:'Imposible hacer trampa: si el pecho se despega del banco, la repetición no cuenta.' },
+  { id:'rap03', n:'Remo T con pecho apoyado (landmine + banco)', eq:'Barra en landmine + banco inclinado + straps', t:['barra','compuesto'], r:'8-10',
+    tor:'Pecho apoyado en un banco inclinado con la barra del landmine entre las piernas y el agarre V. Straps puestos. Deja que la carga cuelgue y las escápulas se separen. Tira con los codos hacia la cadera hasta que la carga toque el banco, junta las escápulas y aprieta 2 segundos. Baja lento hasta el estiramiento completo. El pecho nunca se despega.',
+    cue:'Pecho apoyado + carga pesada = densidad de espalda media sin compresión lumbar.' },
+  { id:'rap04', n:'Remo en Smith con pecho apoyado en banco inclinado', eq:'Máquina Smith + banco inclinado + straps', t:['smith','compuesto'], r:'8-10',
+    tor:'Banco inclinado bajo la Smith, pecho apoyado y brazos colgando. Straps. Tira la barra hasta que toque el banco, junta las escápulas y aprieta 2 segundos. Baja en 3 segundos hasta el estiramiento completo con los hombros protraídos. La Smith te permite cargar pesado y concentrarte solo en apretar la espalda.',
+    cue:'Máxima carga en remo sin estabilizar nada: densidad de espalda media para el rear lat spread.' },
+  { id:'rap05', n:'Remo en polea baja sentado agarre amplio', eq:'Polea baja + barra ancha + straps', t:['polea','compuesto'], r:'10-12',
+    tor:'Sentado erguido con el torso FIJO y los straps puestos. Agarre amplio. Tira hacia la parte baja del pecho con los codos abiertos a 60°, junta las escápulas y aprieta 2 segundos. Vuelve lento dejando que los hombros se adelanten para estirar la espalda, pero sin mover el torso. Si te balanceas, la lumbar entra y la espalda media sale.',
+    cue:'Agarre amplio = espalda alta y media; codos a 60° = trapecio medio y romboides sin estrés lumbar.' },
+  { id:'rap06', n:'Remo Helms con mancuernas (pecho apoyado de pie)', eq:'Mancuernas + banco inclinado + straps', t:['mancuerna','compuesto'], r:'10-12',
+    tor:'De pie con el pecho apoyado contra el respaldo de un banco inclinado. Straps. Mancuernas colgando. Tira con los codos hacia atrás y aprieta 2 segundos juntando las escápulas. Baja lento. El pecho no se despega del banco en ninguna repetición: si lo haces, la lumbar y el impulso se llevan el trabajo.',
+    cue:'De pie con pecho apoyado = máxima carga sin compresión lumbar.' }
+];
+
+/* ----------------------- REMO UNILATERAL ----------------------- */
+BANCO.remoUni = [
+  { id:'run01', n:'Remo Meadows en Landmine', eq:'Barra en landmine + straps', t:['barra','compuesto','unilateral'], r:'8-12 por lado',
+    tor:'De lado a la barra en el landmine, en postura escalonada con la cadera atrás. Straps, agarra la barra por el extremo (sin agarre). Tira hacia la cadera con el codo pegado. Aprieta 2 segundos y baja lento hasta el estiramiento completo. John Meadows lo llamaba su ejercicio insignia.',
+    cue:'El arco del landmine sigue las fibras del dorsal. Agarre grueso: más tensión en el dorsal.' },
+  { id:'run02', n:'Remo Kroc con mancuerna de 20 repeticiones', eq:'Mancuerna pesada + banco + straps', t:['mancuerna','compuesto','unilateral'], r:'20',
+    tor:'Mancuerna pesada con straps. Rodilla y mano en el banco o mano libre en un soporte. Tira hasta la cadera con fuerza, permitiendo algo de impulso controlado. 20 repeticiones de verdad, sin pausas largas. Cuando falles en la 15, respira y sigue hasta la 20.',
+    cue:'El Remo Kroc construye la densidad de la espalda baja y media con volumen extremo.' },
+  { id:'run03', n:'Remo unilateral con mancuerna con pausa en estiramiento', eq:'Mancuerna + banco + straps', t:['mancuerna','compuesto','unilateral'], r:'10-12 por lado',
+    tor:'Rodilla y mano en el banco, straps. Deja que la mancuerna cuelgue y el hombro se adelante: 2 segundos de estiramiento del dorsal en cada repetición. Tira hacia la cadera con el codo pegado, aprieta 2 segundos y baja en 4 segundos. Sin rotar el torso ni usar impulso. El dorsal debe arder antes de la repetición 8.',
+    cue:'La pausa en estiramiento elimina el rebote y aumenta la tensión mecánica justo donde crece el dorsal.' },
+  { id:'run04', n:'Remo unilateral en polea baja de pie rotacional', eq:'Polea baja + estribo + straps', t:['polea','compuesto','unilateral'], r:'10-12 por lado',
+    tor:'De pie frente a la polea baja en postura escalonada. Deja que el cable te rote el torso hacia adelante. Tira girando el torso y llevando el codo a la cadera. Aprieta 2 segundos y vuelve lento.',
+    cue:'La rotación agrega rango y contracción al dorsal.' },
+  { id:'run05', n:'Remo unilateral en Smith de pie', eq:'Máquina Smith + straps', t:['smith','compuesto','unilateral'], r:'8-10 por lado',
+    tor:'De lado a la Smith con postura escalonada y la mano libre apoyada en un banco. Straps. Tira la barra hacia la cadera con el codo pegado al torso y aprieta 2 segundos. Baja en 3 segundos dejando que el hombro se adelante para estirar el dorsal. La Smith elimina el equilibrio y te deja cargar pesado sin pensar en nada más.',
+    cue:'Carga pesada unilateral sin estabilizar: dorsal y espalda media a un nivel que la mancuerna no permite.' },
+  { id:'run06', n:'Remo unilateral en polea alta inclinado (high-to-low)', eq:'Polea alta + estribo + straps', t:['polea','compuesto','unilateral'], r:'10-12 por lado',
+    tor:'Polea alta, de pie y ligeramente inclinado hacia atrás con postura escalonada. Straps puestos. Deja que el cable te jale el brazo hacia arriba y adelante hasta estirar el dorsal. Tira en diagonal desde arriba hasta la cadera con el codo pegado al torso, aprieta 2 segundos y regresa en 4 segundos hasta el estiramiento completo.',
+    cue:'La diagonal de arriba hacia abajo sigue las fibras ilíacas del dorsal: anchura en la parte baja de la V.' }
+];
+
+/* ----------------------- TRAPECIO MEDIO / DENSIDAD ----------------------- */
+BANCO.trapecio = [
+  { id:'tra01', n:'Kelso Shrugs en banco inclinado con mancuernas', eq:'Mancuernas + banco inclinado + straps', t:['mancuerna','aislado'], r:'12-15',
+    tor:'Pecho apoyado en un banco inclinado a 30°, straps. Brazos colgando rectos. Sin doblar los codos, junta las escápulas hacia atrás y aprieta 3 segundos. Suelta lento hasta separarlas por completo. Es un encogimiento hacia atrás, no hacia arriba.',
+    cue:'Trapecio medio e inferior: densidad en la espalda alta sin agrandar el trapecio superior que acorta el cuello y estrecha los hombros.' },
+  { id:'tra02', n:'Kelso Shrugs en Smith con pecho apoyado', eq:'Máquina Smith + banco inclinado + straps', t:['smith','aislado'], r:'12-15',
+    tor:'Banco inclinado bajo la Smith, pecho apoyado, straps. Brazos rectos colgando. Sin doblar los codos, junta las escápulas hacia atrás y aprieta 3 segundos. Suelta lento hasta separarlas por completo. Es un encogimiento hacia atrás, no hacia arriba. La Smith te permite cargar pesado sin preocuparte por el equilibrio.',
+    cue:'Trapecio medio e inferior para densidad de espalda alta sin agrandar el trapecio superior.' },
+  { id:'tra03', n:'Encogimiento en Y en polea baja', eq:'Polea doble baja', t:['polea','aislado'], r:'15',
+    tor:'Poleas bajas con los cables cruzados frente a ti. Sube los brazos casi rectos en diagonal formando una Y por encima de la cabeza y, en el tope, hunde las escápulas hacia los bolsillos traseros como si quisieras alejar los hombros de las orejas. Aprieta 2 segundos. Baja en 3 segundos sin dejar que los trapecios superiores se encojan. Peso ligero, ejecución quirúrgica.',
+    cue:'Trapecio inferior fuerte = hombros atrás y abajo: cuello largo, clavículas anchas y una X más marcada en la tarima.' },
+  { id:'tra04', n:'Face Pull alto con retracción', eq:'Polea alta + cuerda', t:['polea','compuesto'], r:'15-20',
+    tor:'Polea alta con cuerda, de pie con postura escalonada. Tira la cuerda hacia la frente separando los extremos y llevando las escápulas hacia atrás hasta que se toquen. Aprieta 3 segundos como si quisieras partir un lápiz entre los omóplatos. Regresa en 3 segundos dejando que las escápulas se separen por completo. Sin encoger los hombros hacia arriba.',
+    cue:'Retracción escapular pura: espalda alta densa sin inflar el trapecio superior que acorta el cuello.' },
+  { id:'tra05', n:'Encogimiento prono en banco inclinado 30°', eq:'Mancuernas + banco inclinado + straps', t:['mancuerna','aislado'], r:'12-15',
+    tor:'Pecho apoyado en el banco a 30°, straps y mancuernas pesadas colgando con los brazos rectos. Encoge los hombros hacia atrás y hacia arriba en diagonal, siguiendo la dirección de las fibras del trapecio medio, sin doblar los codos. Aprieta 3 segundos arriba y baja en 3 segundos hasta que las escápulas se separen por completo.',
+    cue:'La diagonal hacia atrás carga el trapecio medio: la densidad que el juez busca en el rear lat spread.' }
+];
+
+/* ----------------------- BÍCEPS EN ESTIRAMIENTO ----------------------- */
+BANCO.bicepsEstir = [
+  { id:'bes01', n:'Curl Bayesiano en polea (de espaldas)', eq:'Polea baja + estribo', t:['polea','aislado','unilateral'], r:'10-12 por lado',
+    tor:'De espaldas a la polea baja, un paso adelante, brazo extendido por detrás del torso. El bíceps arranca estirado desde el hombro: la cabeza larga grita desde la primera repetición. Flexiona sin adelantar el codo, aprieta 2 segundos arriba girando el meñique hacia arriba y baja en 4 segundos hasta que el brazo vuelva a quedar atrás.',
+    cue:'Hombro en extensión = cabeza larga estirada = el pico que se ve en el front double biceps.' },
+  { id:'bes02', n:'Curl Bayesiano unilateral arrodillado', eq:'Polea baja + estribo', t:['polea','aislado','unilateral'], r:'10-12 por lado',
+    tor:'Arrodillado de espaldas a la polea, el brazo de trabajo queda detrás del cuerpo. Arrodillado no puedes mecerte: todo es bíceps. Flexiona, aprieta 2 segundos y baja en 4 segundos. Al fallar, 5 parciales en la mitad estirada.',
+    cue:'Eliminar el impulso de las piernas = control absoluto en el rango estirado.' },
+  { id:'bes03', n:'Curl inclinado con mancuernas a 45°', eq:'Mancuernas + banco inclinado', t:['mancuerna','aislado'], r:'8-12',
+    tor:'Banco a 45°, cabeza y espalda pegadas al respaldo, brazos colgando por detrás del torso. Flexiona supinando, aprieta 2 segundos arriba. Baja en 4 segundos hasta que el bíceps quede estirado al máximo. Los codos no se mueven hacia adelante.',
+    cue:'Clásico de la Era Dorada para la cabeza larga: el pico se construye en este estiramiento.' },
+  { id:'bes04', n:'Curl inclinado frente a la polea baja', eq:'Polea baja + banco inclinado', t:['polea','aislado'], r:'10-12',
+    tor:'Banco inclinado de espaldas a la polea baja, brazos por detrás del torso sujetando los estribos. Flexiona sin mover los codos y aprieta 2 segundos. Baja lento. La polea mantiene tensión incluso arriba, donde las mancuernas descansan.',
+    cue:'Polea + inclinación = estiramiento y tensión constante en un solo movimiento.' },
+  { id:'bes05', n:'Curl acostado en polea alta (detrás de la cabeza)', eq:'Polea alta + barra recta + banco plano', t:['polea','aislado'], r:'12-15',
+    tor:'Acostado en un banco con la cabeza hacia la polea alta. Brazos extendidos hacia la polea. Flexiona llevando la barra hacia la frente sin mover los codos. Aprieta 2 segundos. Vuelve lento hasta el estiramiento.',
+    cue:'Hombro flexionado = cabeza corta en tensión. Perfecto para la "bola" del bíceps.' }
+];
+
+/* ----------------------- BÍCEPS EN CONTRACCIÓN ----------------------- */
+BANCO.bicepsCorto = [
+  { id:'bco01', n:'Curl Predicador con barra Z pausa abajo', eq:'Banco Predicador + barra Z', t:['barra','aislado'], r:'8-10',
+    tor:'Axilas pegadas al borde del predicador. Baja en 4 segundos hasta casi extender por completo y pausa 2 segundos en el fondo: aquí se desgarra el bíceps inferior. Sube sin despegar los tríceps del cojín y aprieta 1 segundo arriba. Si los hombros se adelantan, la repetición no cuenta.',
+    cue:'El predicador desarrolla la parte baja del bíceps: el brazo se ve completo, sin hueco en el codo.' },
+  { id:'bco02', n:'Curl Predicador unilateral con mancuerna', eq:'Banco Predicador + mancuerna', t:['mancuerna','aislado','unilateral'], r:'10-12 por lado',
+    tor:'Un brazo en el predicador, la otra mano te estabiliza. Baja en 4 segundos hasta casi extender. Sube supinando la muñeca y aprieta 2 segundos arriba. Al fallar, usa la mano libre para 2 forzadas y aguanta la negativa tú solo.',
+    cue:'Unilateral = cada brazo trabaja sin que el fuerte ayude al débil.' },
+  { id:'bco03', n:'Curl Araña en banco inclinado', eq:'Mancuernas + banco inclinado', t:['mancuerna','aislado'], r:'10-12',
+    tor:'Pecho apoyado en un banco inclinado a 45°, brazos colgando perfectamente verticales. Flexiona supinando las muñecas sin que los codos se muevan ni un centímetro. Arriba aprieta 2 segundos: aquí la gravedad pone la máxima tensión en la contracción. Baja en 3 segundos hasta casi extender. Sin balanceo posible: el banco te tiene secuestrado.',
+    cue:'Hombro flexionado = cabeza corta en contracción máxima: el pico y la bola del bíceps en el front double biceps.' },
+  { id:'bco04', n:'Curl Concentrado estilo Arnold (de pie inclinado)', eq:'Mancuerna', t:['mancuerna','aislado','unilateral'], r:'10-12 por lado',
+    tor:'De pie, inclinado hacia adelante con la mano libre apoyada en la rodilla. Brazo de trabajo colgando vertical, sin apoyarlo en el muslo. Flexiona supinando la muñeca y lleva la mancuerna hacia el hombro opuesto. Aprieta 2 segundos como si estuvieras posando. Baja en 3 segundos hasta extender por completo. Arnold lo hacía así para construir su pico legendario.',
+    cue:'Supinar hacia el hombro opuesto maximiza la contracción de la cabeza corta: altura del pico.' },
+  { id:'bco05', n:'Curl Crucifijo en polea alta doble', eq:'Polea doble alta', t:['polea','aislado'], r:'12-15',
+    tor:'De pie entre dos poleas altas, brazos abiertos en cruz a la altura de los hombros. Flexiona llevando las manos hacia las orejas sin bajar los codos: es la pose de doble bíceps bajo carga. Aprieta 2 segundos con todo. Regresa lento hasta extender los brazos sin perder la altura de los codos.',
+    cue:'Entrenas el bíceps exactamente en la pose que el juez evalúa: pico y control para la tarima.' },
+  { id:'bco06', n:'Drag Curl en Smith', eq:'Máquina Smith', t:['smith','aislado'], r:'10-12',
+    tor:'Barra de la Smith con agarre supino a la anchura de los hombros. Sube la barra arrastrándola pegada al torso mientras los codos viajan hacia atrás, no hacia adelante. Aprieta 2 segundos arriba con la barra a la altura del pecho bajo. Baja en 3 segundos por el mismo camino. El deltoide anterior queda fuera del juego.',
+    cue:'Codos hacia atrás = cabeza larga del bíceps sin ayuda del hombro.' },
+  { id:'bco07', n:'Curl predicador en polea baja', eq:'Banco Predicador + polea baja + barra Z', t:['polea','aislado'], r:'12-15',
+    tor:'Coloca el banco predicador frente a la polea baja con la barra Z. Axilas pegadas al borde. Flexiona y aprieta 2 segundos arriba: la polea mantiene tensión justo donde la barra libre descansa. Baja en 4 segundos hasta casi extender, sin despegar los tríceps del cojín.',
+    cue:'Tensión constante en todo el recorrido: el bíceps se llena de sangre antes y el pump dura toda la sesión.' }
+];
+
+/* ----------------------- BRAQUIAL / BRAQUIORRADIAL ----------------------- */
+BANCO.braquial = [
+  { id:'bra01', n:'Curl Zottman + Drag Curl (combo)', eq:'Mancuernas', t:['mancuerna','aislado'], r:'8 + 8',
+    tor:'8 repeticiones de Zottman: sube en supino, gira arriba a prono y baja en 4 segundos en prono. Sin soltar, 8 Drag Curl arrastrando las mancuernas por el torso con los codos hacia atrás. El antebrazo y el braquial se inflan como mangueras.',
+    cue:'Braquial grande empuja el bíceps hacia arriba: más pico en el front double biceps.' },
+  { id:'bra02', n:'Curl martillo cruzado (cross-body)', eq:'Mancuernas', t:['mancuerna','aislado','unilateral'], r:'10-12 por lado',
+    tor:'Agarre neutro, mancuerna pegada al muslo. Sube en diagonal cruzando el cuerpo hacia el hombro contrario sin girar la muñeca. Aprieta 1 segundo arriba y baja en 3 segundos por el mismo camino. Alterna brazos sin descanso: cuando uno baja, el otro sube. El braquial y el braquiorradial arden como si los quemaran.',
+    cue:'Braquial y braquiorradial grandes = brazo grueso de lado en el side chest.' },
+  { id:'bra03', n:'Curl inverso en Predicador', eq:'Banco Predicador + barra Z', t:['barra','aislado'], r:'10-12',
+    tor:'Banco predicador, barra Z con agarre prono a la anchura de los hombros. Flexiona sin despegar los tríceps del cojín y aprieta 1 segundo arriba. Baja en 4 segundos hasta casi extender. Las muñecas rectas, nada de doblarlas. El braquiorradial se enciende desde la primera repetición.',
+    cue:'Agarre prono = braquial y braquiorradial sin bíceps: grosor del antebrazo y del brazo.' },
+  { id:'bra04', n:'Curl martillo en polea con cuerda', eq:'Polea baja + cuerda', t:['polea','aislado'], r:'12-15',
+    tor:'Polea baja con cuerda, agarre neutro. Codos pegados al torso. Flexiona y separa los extremos de la cuerda arriba, aprieta 2 segundos. Baja en 3 segundos hasta extender. La polea no da descanso en ningún punto del recorrido: el braquial no tiene dónde esconderse.',
+    cue:'Tensión constante para el braquial y el braquiorradial: grosor del brazo en todas las poses.' },
+  { id:'bra05', n:'Curl martillo en banco inclinado', eq:'Mancuernas + banco inclinado', t:['mancuerna','aislado'], r:'10-12',
+    tor:'Banco a 45°, brazos colgando por detrás del torso con agarre neutro. Flexiona sin mover los codos hacia adelante, aprieta 1 segundo arriba y baja en 4 segundos hasta el estiramiento completo. El braquial queda estirado bajo carga: dolor profundo en la cara externa del brazo.',
+    cue:'Estiramiento del braquial bajo carga: grosor del brazo en todas las poses.' }
+];
+
+/* ----------------------- TRÍCEPS CABEZA LARGA ----------------------- */
+BANCO.tricepsLargo = [
+  { id:'tla01', n:'Extensión Katana en polea (cross-body sobre la cabeza)', eq:'Polea baja + estribo', t:['polea','aislado','unilateral'], r:'10-12 por lado',
+    tor:'De espaldas a la polea baja, toma el estribo con la mano contraria y llévalo por detrás de la cabeza como desenvainando una katana. El codo apunta al techo y el tríceps se estira al máximo. Extiende hacia arriba y en diagonal, aprieta 2 segundos y baja en 4 segundos hasta que el estribo toque el omóplato contrario.',
+    cue:'Hombro flexionado = cabeza larga del tríceps estirada: dos tercios de la masa del brazo.' },
+  { id:'tla02', n:'Extensión sobre cabeza en polea con cuerda (de espaldas)', eq:'Polea baja + cuerda', t:['polea','aislado'], r:'10-12',
+    tor:'De espaldas a la polea, cuerda detrás de la cabeza, paso adelante. Codos apuntando al frente y fijos. Extiende separando la cuerda y aprieta 2 segundos. Vuelve lento hasta el estiramiento total.',
+    cue:'Estiramiento máximo de la cabeza larga: el tríceps crece en esta posición.' },
+  { id:'tla03', n:'Extensión francesa con mancuerna en banco inclinado', eq:'Mancuerna + banco inclinado', t:['mancuerna','aislado'], r:'10-12',
+    tor:'Sentado en un banco inclinado, una mancuerna con ambas manos detrás de la cabeza. Codos fijos apuntando al techo. Baja hasta que el tríceps esté estirado al límite y extiende hasta arriba. Aprieta 1 segundo.',
+    cue:'El banco inclinado aumenta el estiramiento de la cabeza larga.' },
+  { id:'tla04', n:'Rompecráneos en polea baja acostado', eq:'Polea baja + barra Z + banco plano', t:['polea','aislado'], r:'12-15',
+    tor:'Acostado en un banco con la cabeza hacia la polea baja. Codos apuntando al techo con un poco de inclinación hacia atrás. Baja la barra hacia la frente y extiende. La polea mantiene tensión incluso arriba.',
+    cue:'Tensión constante en el tríceps: sin descanso arriba.' },
+  { id:'tla05', n:'Extensión sobre cabeza unilateral con mancuerna sentado', eq:'Mancuerna + banco con respaldo', t:['mancuerna','aislado','unilateral'], r:'10-12 por lado',
+    tor:'Sentado con respaldo, mancuerna en una mano detrás de la cabeza con el codo apuntando al techo y pegado a la oreja. Baja hasta que la mancuerna toque el omóplato y el tríceps esté estirado al límite, pausa 1 segundo y extiende hasta arriba. Aprieta 1 segundo. La mano libre sujeta el codo para que no se abra.',
+    cue:'Unilateral = mayor rango de estiramiento de la cabeza larga y simetría entre brazos.' },
+  { id:'tla06', n:'Extensión sobre cabeza en Smith (pecho al frente)', eq:'Máquina Smith + banco', t:['smith','aislado'], r:'8-12',
+    tor:'De rodillas o sentado de espaldas a la barra de la Smith a la altura de la frente. Agarre estrecho. Inclínate hacia adelante dejando que la barra baje por detrás de la cabeza hasta estirar el tríceps. Extiende empujando la barra hacia arriba y adelante.',
+    cue:'Carga pesada en la cabeza larga sin equilibrio que gestionar.' }
+];
+
+/* ----------------------- TRÍCEPS PESADO ----------------------- */
+BANCO.tricepsPesado = [
+  { id:'tpe01', n:'JM Press en Smith', eq:'Máquina Smith + banco plano', t:['smith','compuesto'], r:'6-10',
+    tor:'Agarre a la anchura de los hombros. Baja la barra hacia la barbilla doblando los codos hacia adelante: es un híbrido entre press cerrado y rompecráneos. Cuando la barra llegue a 5 cm de la cara, empuja de regreso con el tríceps. Sin bloquear arriba.',
+    cue:'El mejor constructor de masa del tríceps según JM Blakley: carga pesada, cero estrés en el codo.' },
+  { id:'tpe02', n:'Pin Press cerrado en Smith', eq:'Máquina Smith + banco plano', t:['smith','compuesto'], r:'6-8',
+    tor:'Pines a 5 cm del pecho, agarre cerrado a la anchura de los hombros. Cada repetición arranca MUERTA desde los pines: sin rebote, el tríceps hace toda la fuerza desde cero. Codos pegados al torso. Empuja explosivo hasta 3/4 y baja en 3 segundos hasta tocar los pines. Sin bloquear arriba.',
+    cue:'Arranque muerto + agarre cerrado = sobrecarga pesada del tríceps sin estrés en el codo.' },
+  { id:'tpe03', n:'Fondos lastrados verticales', eq:'Paralelas + cinturón con disco', t:['peso_corporal','compuesto'], r:'8-12',
+    tor:'Cinturón con disco, torso vertical, codos pegados al cuerpo y apuntando hacia atrás. Baja en 3 segundos hasta que los codos lleguen a 90° y empuja con el tríceps. Sin bloquear arriba: tensión continua. Cuando falles, haz parciales en la mitad superior hasta que no puedas moverte.',
+    cue:'Torso vertical = tríceps, no pecho. La masa que llena la parte trasera del brazo.' },
+  { id:'tpe04', n:'Press cerrado con mancuernas agarre neutro (crush press)', eq:'Mancuernas + banco plano', t:['mancuerna','compuesto'], r:'10-12',
+    tor:'Mancuernas juntas en agarre neutro, aprieta una contra la otra con toda la fuerza durante todo el recorrido: nunca dejes de comprimir. Baja hasta el pecho y empuja con los codos pegados al torso. Aprieta 1 segundo arriba sin bloquear. Tempo 3-0-1-0.',
+    cue:'La compresión constante activa el tríceps y el pectoral interno al mismo tiempo.' },
+  { id:'tpe05', n:'Rompecráneos con barra Z detrás de la cabeza', eq:'Barra Z + banco plano', t:['barra','aislado'], r:'8-10',
+    tor:'Acostado, barra Z con agarre estrecho. Baja la barra por DETRÁS de la cabeza, no hacia la frente: el tríceps se estira más y el codo sufre menos. Los codos apuntan al techo y se mueven lo mínimo. Extiende hasta 3/4 sin bloquear arriba. Baja en 3 segundos.',
+    cue:'Detrás de la cabeza = cabeza larga estirada y menos estrés en el codo.' },
+  { id:'tpe06', n:'Tate Press con mancuernas', eq:'Mancuernas + banco plano', t:['mancuerna','aislado'], r:'10-12',
+    tor:'Mancuernas sobre el pecho en agarre prono, codos abiertos hacia afuera. Baja las mancuernas hacia el pecho doblando los codos hacia los lados hasta que toquen el pectoral. Extiende sin mover los hombros. Aprieta 1 segundo arriba. El tríceps lateral arde desde la primera repetición.',
+    cue:'Cabezas lateral y medial del tríceps: la herradura que se ve en el side triceps.' }
+];
+
+/* ----------------------- TRÍCEPS CABEZA CORTA ----------------------- */
+BANCO.tricepsCorto = [
+  { id:'tco01', n:'Extensión unilateral en polea agarre inverso', eq:'Polea alta + estribo', t:['polea','aislado','unilateral'], r:'12-15 por lado',
+    tor:'Polea alta con estribo, agarre supino (palma hacia arriba). Codo clavado al costado como si lo tuvieras atornillado. Extiende hasta abajo y aprieta 2 segundos con el tríceps contraído al máximo. Vuelve en 3 segundos sin que el codo se mueva. Una mano termina y la otra empieza sin descanso.',
+    cue:'El agarre supino sesga la cabeza medial: el tríceps se ve lleno cerca del codo.' },
+  { id:'tco02', n:'Pushdown con cuerda abriendo abajo', eq:'Polea alta + cuerda', t:['polea','aislado'], r:'12-15',
+    tor:'Polea alta con cuerda, codos pegados al torso. Extiende hacia abajo y, en el último tramo, separa los extremos de la cuerda hacia afuera de los muslos. Aprieta 2 segundos con el tríceps contraído al máximo. Sube en 3 segundos sin que los codos se despeguen. Al fallar, parciales en la mitad baja.',
+    cue:'Abrir abajo = contracción máxima de la cabeza lateral: la herradura del tríceps.' },
+  { id:'tco03', n:'Patada en polea inclinado (cable kickback)', eq:'Polea baja + estribo', t:['polea','aislado','unilateral'], r:'12-15 por lado',
+    tor:'Inclinado a 45° frente a la polea baja, con el codo fijo a la altura del torso. Extiende el brazo hacia atrás hasta bloquear y aprieta 2 segundos. Vuelve lento sin que el codo baje. La polea mantiene tensión en la contracción máxima, justo donde la mancuerna no hace nada.',
+    cue:'Contracción máxima del tríceps con el brazo detrás del cuerpo: separación del tríceps en el rear double biceps.' },
+  { id:'tco04', n:'Pushdown cruzado unilateral (cross-body)', eq:'Polea alta + estribo', t:['polea','aislado','unilateral'], r:'12-15 por lado',
+    tor:'De lado a la polea alta, toma el estribo con la mano contraria. Extiende el brazo en diagonal hacia afuera y hacia abajo hasta bloquear. Aprieta 2 segundos. Vuelve lento hasta que el codo quede flexionado al máximo. El codo no se mueve: solo el antebrazo.',
+    cue:'La diagonal sigue las fibras de la cabeza lateral: herradura marcada en el side triceps.' },
+  { id:'tco05', n:'Pushdown con barra V con pausa', eq:'Polea alta + barra V', t:['polea','aislado'], r:'10-12',
+    tor:'Polea alta con barra V, codos pegados al torso. Extiende hasta abajo y aprieta 3 segundos contrayendo todo el tríceps. Sube en 3 segundos. Al fallar, parciales en la mitad baja hasta que no puedas mover la barra. Bloquea, aprieta, repite.',
+    cue:'La pausa abajo maximiza la contracción de las cabezas lateral y medial.' }
+];
+
+/* =====================================================================
+   PROTOCOLOS DE TORTURA / INTENSIFICADORES
+   apto: etiquetas compatibles (vacío = cualquiera) · rep: sustituye el rango
+   timers: botones rápidos que aparecen en la tarjeta · {m} = músculo objetivo
+   ===================================================================== */
+const PROTOCOLOS = [
+  { id:'omni', n:'Método "Omnicontracción"', origen:'Híbrido Yates / Poliquin', apto:[],
+    d:'Cada serie efectiva tiene 3 fases sin soltar la carga. FASE 1: repeticiones completas hasta el fallo positivo real (no puedes subir ni un centímetro más). FASE 2: MURO ISOMÉTRICO — lleva el peso a 90° (mitad del recorrido) y sostenlo 10 segundos mientras el {m} tiembla. FASE 3: 3 a 5 NEGATIVAS de 6 segundos (con ayuda en la subida o subiendo con ambos lados si es unilateral). Contracción concéntrica, isométrica y excéntrica: las tres llaves del daño muscular en una sola serie.',
+    timers:[{s:10,e:'Muro iso 10 s'}] },
+  { id:'reloj', n:'Protocolo "Reloj Iso-Dinámico 6-5-4-3-2-1"', origen:'Poliquin', apto:[],
+    d:'Pausas decrecientes en el punto más duro del recorrido del {m}: la 1ª repetición se congela 6 segundos, la 2ª 5 segundos, la 3ª 4, la 4ª 3, la 5ª 2 y la 6ª 1 segundo. Después, sin descanso, repeticiones normales con tempo explosivo hasta el fallo. Las pausas acumulan 21 segundos de tensión isométrica antes de que empiece la parte "fácil". Usa ~70% del peso habitual: tu ego no sobrevive a este reloj.',
+    timers:[{s:6,e:'Pausa 6 s'}] },
+  { id:'uncuarto', n:'Método "1 y 1/4" en el máximo estiramiento + Estiramiento Fascial Lastrado', origen:'Poliquin / Rambod', apto:[],
+    d:'Cada repetición: bajas a la posición de máximo estiramiento del {m}, subes solo 1/4 del recorrido, vuelves a bajar al fondo y luego haces la repetición completa. Eso es UNA repetición. La porción estirada recibe el doble de tensión. Al terminar la ÚLTIMA serie, quédate en la posición estirada con la carga durante 25 segundos: estiramiento fascial lastrado para expandir la fascia y darle espacio al músculo para crecer.',
+    timers:[{s:25,e:'Fascia lastrada 25 s'}] },
+  { id:'unmedio', n:'Método "1 y 1/2" en el máximo estiramiento + Estiramiento Fascial Lastrado', origen:'Mountain Dog / Rambod', apto:[],
+    d:'Cada repetición: baja al estiramiento completo del {m}, sube a la MITAD del recorrido, vuelve a bajar al fondo y completa la repetición entera. La mitad estirada se trabaja dos veces por repetición. Las series se sienten el doble de largas. Al terminar la última serie: 25 segundos en la posición de máximo estiramiento con el peso, respirando por la nariz mientras la fascia se abre.',
+    timers:[{s:25,e:'Fascia lastrada 25 s'}] },
+  { id:'cluster', n:'Megaserie Cluster / Rest-Pause Pesado', origen:'Heavy Duty / DC', apto:['compuesto','maquina','smith'], rep:'24–30 reps totales con peso de 8 RM',
+    d:'Elige un peso con el que falles en 8 repeticiones. Haz 6–8 repeticiones al fallo, descansa 15 segundos con el peso en el soporte, vuelve a fallar, descansa 15 segundos... repite hasta acumular 24 a 30 repeticiones totales con ese mismo peso de 8 RM. Cada mini-serie será más corta: 8, 6, 5, 4, 3, 3... No reduces el peso. No negocias. Esa es UNA serie efectiva.',
+    timers:[{s:15,e:'Cluster 15 s'}] },
+  { id:'poliquin', n:'Triserie Científica "6-12-25" de Poliquin', origen:'Poliquin', apto:[], rep:'6 + 12 + 25',
+    d:'Tres estímulos sobre el {m} sin descanso real. A) 6 repeticiones PESADAS de este ejercicio con tempo 4-0-X-0 (4 segundos bajando, explosivo subiendo). 10 segundos de transición. B) 12 repeticiones de una variante del mismo músculo con otro ángulo (polea o mancuerna) con tempo 3-0-1-0. 10 segundos. C) 25 repeticiones de bombeo en aislamiento con peso ligero y sin pausa. Fibras rápidas, intermedias y lentas destruidas en 90 segundos.',
+    timers:[{s:10,e:'Transición 10 s'}] },
+  { id:'dropmec', n:'Drop Set Mecánico de 3 Ángulos sin soltar el peso', origen:'Mountain Dog', apto:['mancuerna','polea','smith','maquina'],
+    d:'Con el MISMO peso cambias la mecánica de la palanca más débil a la más fuerte. Ángulo 1 (desventaja mecánica: mayor estiramiento o brazo de palanca más largo) al fallo. Sin soltar, cambia agarre, postura o inclinación a una posición intermedia y vuelve a fallar. Por último, la posición de mayor ventaja (rango más corto o palanca más corta) hasta el fallo absoluto. El {m} no tiene tiempo de recuperar: la fatiga es acumulativa y total.',
+    timers:[] },
+  { id:'secuestro', n:'Protocolo "Secuestro 21s Invertido"', origen:'Variante Meadows', apto:['aislado','polea','maquina'], rep:'7 + 7 + 7 + negativa 30 s',
+    d:'Al revés del 21 clásico. 7 repeticiones en la mitad de ACORTAMIENTO (contracción) del {m}, luego 7 en la mitad de ESTIRAMIENTO (donde más duele), luego 7 repeticiones completas. Para cerrar el secuestro: una negativa de 30 segundos bajando milímetro a milímetro. Si la negativa dura menos de 30 segundos, repite la serie la próxima vez con menos peso.',
+    timers:[{s:30,e:'Negativa 30 s'}] },
+  { id:'yates', n:'Heavy Duty Yates: Fallo + Forzadas + Negativa', origen:'Dorian Yates', apto:['maquina','smith','polea','mancuerna','barra'],
+    d:'Haz series de aproximación progresivas (no cuentan). La serie efectiva va al fallo positivo con técnica perfecta. Al fallar, tu compañero te ayuda con 2 repeticiones forzadas (lo mínimo para que la barra se mueva) y después TÚ solo controlas 1 o 2 negativas de 5 segundos. Descansa 2–3 minutos completos entre series efectivas: la intensidad de Yates exige recuperación del sistema nervioso para la siguiente serie.',
+    timers:[{s:60,e:'Descanso 60 s'}] },
+  { id:'parciales', n:'Parciales Lastradas en Estiramiento (Mountain Dog)', origen:'John Meadows', apto:[],
+    d:'Repeticiones completas hasta el fallo con técnica perfecta. Cuando no puedas completar otra repetición, sin soltar el peso, haz repeticiones parciales en la MITAD ESTIRADA del {m} hasta que no puedas mover la carga ni un centímetro. Las parciales en estiramiento son el estímulo hipertrófico más potente según la evidencia más reciente: el {m} trabaja justo donde más crece.',
+    timers:[] },
+  { id:'fst7', n:'Bombeo Fascial FST-7 (remate)', origen:'Hany Rambod', apto:['aislado','polea','maquina'],
+    d:'Tus series marcadas son la base. Tras la ÚLTIMA serie efectiva, encadena 7 mini-series de 8–12 repeticiones con solo 30 segundos de descanso. En cada descanso estira el {m} o hazle posing isométrico. El objetivo es inundar el músculo de sangre hasta que la fascia esté al límite. Bebe agua entre series: la hidratación y el bombeo hacen que la fascia se expanda.',
+    timers:[{s:30,e:'FST-7 30 s'}] },
+  { id:'excentrico', n:'Excéntrico Asesino 5-1-X-1', origen:'Poliquin', apto:[],
+    d:'Tempo 5-1-X-1: 5 segundos bajando, 1 segundo de pausa en el estiramiento máximo, subida explosiva y 1 segundo de contracción arriba. Cada repetición tarda 7–8 segundos. 8 repeticiones = 1 minuto de tensión continua en el {m}. La fase excéntrica genera el mayor daño muscular: aquí la controlas al 100%.',
+    timers:[] },
+  { id:'dcrest', n:'Rest-Pause DC "15 Respiraciones"', origen:'Dante Trudel (DC)', apto:['compuesto','maquina','smith'], rep:'(7-9) + 15 resp + fallo + 15 resp + fallo',
+    d:'Serie al fallo entre 7 y 9 repeticiones. Suelta el peso y toma 15 respiraciones profundas (≈20 segundos). Vuelve a fallar. Otras 15 respiraciones. Último fallo. Objetivo: 11–15 repeticiones totales. Cuando lo logres, sube el peso la próxima sesión. Termina con 30–60 segundos de estiramiento extremo del {m} con carga.',
+    timers:[{s:20,e:'15 respiraciones'}] }
+];
+
+/* =====================================================================
+   PLANTILLAS: 7 ejercicios exactos por sesión, en orden biomecánico
+   b: bancos de origen · et: rol del ejercicio · m: músculo objetivo · s: series base
+   ===================================================================== */
+const PLANTILLAS = {
+  '1': { nombre:'Pierna Completa', sub:'Gemelos + Femoral/Glúteo → Remate Cuádriceps', pierna:true, slots:[
+    { b:['gemelos'], et:'Gemelos en frío — Ejercicio #1 obligatorio', m:'gemelo', s:3 },
+    { b:['femoral'], et:'Femoral — flexión de rodilla (cuelgue de perfil)', m:'femoral', s:3 },
+    { b:['bisagra'], et:'Cadena posterior — bisagra sin lumbar', m:'femoral y glúteo', s:3 },
+    { b:['gluteo'], et:'Glúteo — rayas y estriación', m:'glúteo', s:2 },
+    { b:['cuadComp'], et:'Cuádriceps — compuesto principal (rango 100%)', m:'cuádriceps', s:3 },
+    { b:['cuadComp','vastoExterno'], et:'Cuádriceps — compuesto secundario', m:'cuádriceps', s:2 },
+    { b:['cuadAisl'], et:'Cuádriceps — remate aislado', m:'cuádriceps', s:2 } ]},
+  '2': { nombre:'Pecho + Hombros', sub:'Enfoque Clavicular + Anchura Lateral/Posterior 3D', slots:[
+    { b:['pechoClav'], et:'Pectoral clavicular — compuesto principal', m:'pectoral superior', s:3 },
+    { b:['pechoClav','pechoComp'], et:'Pectoral — segundo press', m:'pectoral', s:2 },
+    { b:['pechoAisl','pechoClav'], et:'Pectoral — aislamiento en aducción', m:'pectoral', s:2 },
+    { b:['deltLat'], et:'Deltoide lateral — anchura (forma en X)', m:'deltoide lateral', s:3 },
+    { b:['deltPress'], et:'Deltoide — press', m:'deltoide', s:2 },
+    { b:['deltPost'], et:'Deltoide posterior — hombro 3D', m:'deltoide posterior', s:3 },
+    { b:['deltLat'], et:'Deltoide lateral — remate destructor', m:'deltoide lateral', s:2 } ]},
+  '3': { nombre:'Espalda Brutal', sub:'Dorsal Bajo Ilíaco + Densidad sin Lumbar', slots:[
+    { b:['dorsalVertical'], et:'Dorsal — tirón vertical hacia la cadera', m:'dorsal', s:3 },
+    { b:['remoApoyado'], et:'Densidad — remo con pecho apoyado', m:'espalda media', s:3 },
+    { b:['dorsalBajo'], et:'Dorsal bajo ilíaco — arco a la cadera', m:'dorsal bajo', s:3 },
+    { b:['remoUni'], et:'Remo unilateral pesado', m:'dorsal', s:2 },
+    { b:['dorsalBajo','dorsalVertical'], et:'Dorsal — remate de estiramiento', m:'dorsal', s:2 },
+    { b:['trapecio'], et:'Trapecio medio — densidad sin cuello', m:'trapecio medio', s:2 },
+    { b:['deltPost'], et:'Deltoide posterior — cierre de la X', m:'deltoide posterior', s:2 } ]},
+  '4': { nombre:'Brazos al 100% + Hombro', sub:'Primero Bíceps/Tríceps → Al final Deltoides', slots:[
+    { b:['bicepsEstir'], et:'Bíceps — cabeza larga en estiramiento', m:'bíceps', s:3 },
+    { b:['tricepsLargo'], et:'Tríceps — cabeza larga sobre la cabeza', m:'tríceps', s:3 },
+    { b:['bicepsCorto'], et:'Bíceps — pico en contracción', m:'bíceps', s:2 },
+    { b:['tricepsPesado'], et:'Tríceps — masa pesada', m:'tríceps', s:3 },
+    { b:['braquial'], et:'Braquial / braquiorradial — grosor', m:'braquial', s:2 },
+    { b:['deltLat'], et:'Deltoide lateral — anchura', m:'deltoide lateral', s:3 },
+    { b:['deltPost'], et:'Deltoide posterior — hombro 3D', m:'deltoide posterior', s:2 } ]},
+  '5': { nombre:'Hombros + Brazos', sub:'Primero Deltoides 3D → Al final Bíceps/Tríceps', slots:[
+    { b:['deltLat'], et:'Deltoide lateral — pre-agotamiento', m:'deltoide lateral', s:3 },
+    { b:['deltPress'], et:'Deltoide — press pesado', m:'deltoide', s:3 },
+    { b:['deltPost'], et:'Deltoide posterior — hombro 3D', m:'deltoide posterior', s:3 },
+    { b:['deltLat'], et:'Deltoide lateral — remate destructor', m:'deltoide lateral', s:2 },
+    { b:['bicepsEstir','bicepsCorto'], et:'Bíceps', m:'bíceps', s:2 },
+    { b:['tricepsLargo','tricepsPesado'], et:'Tríceps', m:'tríceps', s:2 },
+    { b:['braquial','tricepsCorto'], et:'Brazo — remate', m:'brazo', s:2 } ]},
+  '6': { nombre:'Pecho + Bíceps', sub:'Especialización de Torso y Picos de Brazo', slots:[
+    { b:['pechoClav'], et:'Pectoral clavicular — compuesto principal', m:'pectoral superior', s:3 },
+    { b:['pechoComp'], et:'Pectoral — press de masa', m:'pectoral', s:3 },
+    { b:['pechoClav','pechoAisl'], et:'Pectoral superior — segundo ángulo', m:'pectoral superior', s:2 },
+    { b:['pechoAisl'], et:'Pectoral — aislamiento cruzando el esternón', m:'pectoral', s:2 },
+    { b:['bicepsEstir'], et:'Bíceps — cabeza larga en estiramiento', m:'bíceps', s:3 },
+    { b:['bicepsCorto'], et:'Bíceps — pico en contracción', m:'bíceps', s:2 },
+    { b:['braquial'], et:'Braquial — grosor del brazo', m:'braquial', s:2 } ]},
+  '7': { nombre:'Pierna "X-Frame"', sub:'Gemelos + Barrido Externo + Aductores + Glúteo', pierna:true, slots:[
+    { b:['gemelos'], et:'Gemelos en frío — Ejercicio #1 obligatorio', m:'gemelo', s:3 },
+    { b:['gluteo'], et:'Glúteo — volumen lateral de cadera', m:'glúteo', s:3 },
+    { b:['femoral','bisagra'], et:'Femoral — cadena posterior antes del cuádriceps', m:'femoral', s:2 },
+    { b:['aductor'], et:'Aductores — relleno interno del muslo', m:'aductor', s:2 },
+    { b:['vastoExterno'], et:'Barrido externo — vasto lateral compuesto', m:'vasto lateral', s:3 },
+    { b:['cuadComp'], et:'Cuádriceps — compuesto profundo', m:'cuádriceps', s:2 },
+    { b:['vastoExterno','cuadAisl'], et:'Barrido externo — remate', m:'vasto lateral', s:2 } ]}
+};
+
+/* Reglas biomecánicas obligatorias que se imprimen sobre cada tarjeta según el banco */
+const REGLAS = {
+  gemelos:'REGLA P2: 3 s de pausa MUERTA abajo (anula el rebote del Aquiles) + 2 s de contracción arriba en CADA repetición. El protocolo se monta encima de esta regla, nunca la sustituye.',
+  femoral:'REGLA P3: la cadena posterior se destruye ANTES del cuádriceps. Pies en flexión plantar, cadera pegada al acolchado.',
+  bisagra:'REGLA P1: straps obligatorios, columna neutra y SIN bloquear arriba. Cero peso muerto convencional desde el piso.',
+  gluteo:'REGLA P3: glúteo antes que cuádriceps. Retroversión pélvica arriba, costillas abajo, cero hiperextensión lumbar.',
+  cuadComp:'REGLA P3: rango 100% — el isquiotibial aplasta la pantorrilla. Rodillas en la línea del 2º-3er dedo: CERO valgo.',
+  cuadAisl:'REGLA P3: rango completo y rodillas alineadas. Si la rodilla se mete hacia adentro, la repetición no cuenta.',
+  vastoExterno:'REGLA P3: profundidad total con las rodillas siguiendo los pies. Barrido externo sin valgo.',
+  aductor:'REGLA: estiramiento máximo controlado. El aductor fuerte blinda la rodilla contra el valgo.',
+  dorsalVertical:'REGLA P1/P4: straps obligatorios. Codo hacia el bolsillo trasero: dorsal bajo ilíaco, no bíceps.',
+  dorsalBajo:'REGLA P4: arco hacia la cadera. Las fibras ilíacas del dorsal alargan la V y estrechan la cintura.',
+  remoApoyado:'REGLA P1: straps obligatorios y pecho clavado al apoyo. Si te despegas, la lumbar entra y la serie termina.',
+  remoUni:'REGLA P1: straps obligatorios, torso estable, codo hacia la cadera.',
+  trapecio:'REGLA: encogimiento hacia ATRÁS, no hacia arriba. Trapecio superior grande = cuello corto y hombros estrechos.',
+  deltLat:'REGLA P4: guía con el codo, no con la mano. Sin balanceo. El deltoide lateral es el ancho de tu X.',
+  deltPost:'REGLA P4: deltoide posterior desarrollado = hombro 3D de perfil y en el rear lat spread.',
+  deltPress:'REGLA: sin bloquear arriba. Tensión continua en el deltoide.',
+  pechoClav:'REGLA: escápulas hundidas y juntas. El clavicular se llena con estiramiento, no con ego.',
+  pechoComp:'REGLA: escápulas atrás y abajo durante todo el recorrido. Estiramiento profundo controlado.',
+  pechoAisl:'REGLA: aducción completa cruzando la línea media. Contracción de 2 s.',
+  bicepsEstir:'REGLA: codo fijo detrás del torso. Cero balanceo.',
+  bicepsCorto:'REGLA: tríceps pegado al apoyo. Si el hombro se adelanta, la repetición no cuenta.',
+  braquial:'REGLA: control total en la bajada. El braquial empuja el bíceps hacia arriba.',
+  tricepsLargo:'REGLA: codo apuntando al techo y fijo. Estiramiento máximo de la cabeza larga.',
+  tricepsPesado:'REGLA: codos controlados, sin bloquear con violencia. Protege el codo, destruye el tríceps.',
+  tricepsCorto:'REGLA: codo clavado al costado. Contracción de 2–3 s abajo.'
+};
+
+/* Bloque obligatorio de posing de Classic Physique */
+const POSES = [
+  { id:'fdb', n:'Front Double Biceps', cue:'Abre primero los dorsales, después sube los brazos con los codos a la altura de los hombros y los puños hacia las orejas. Vacuum suave, cuádriceps contraídos con un pie adelantado. Muestra la X: hombros anchos, cintura mínima.' },
+  { id:'fls', n:'Front Lat Spread', cue:'Pulgares en la cintura baja, empuja los codos hacia adelante y abre los dorsales como alas. Cintura hundida con vacuum, pecho alto, cuádriceps tensos y rodillas sin valgo.' },
+  { id:'sch', n:'Side Chest', cue:'Tu mejor lado al juez. Pierna cercana flexionada en la punta del pie para mostrar el femoral colgando y el gemelo. Brazo a 90°, pecho hacia arriba, aprieta el bíceps contra el pectoral.' },
+  { id:'rls', n:'Rear Lat Spread', cue:'De espaldas, un pie atrás en punta mostrando gemelo y femoral. Abre los dorsales hacia afuera desde abajo, glúteos apretados para mostrar las estrías y codos adelante.' },
+  { id:'abt', n:'Abdominal & Thigh', cue:'Manos detrás de la cabeza, exhala y contrae los abdominales con un crunch. Una pierna adelante con el cuádriceps contraído: muestra la separación del recto femoral y el vasto lateral.' }
+];
+const POSING_RONDAS = 3;
+const MARCAS = { hack:160, pendulo:100, pm:140 };
+
+/* =====================================================================
+   UTILIDADES Y ALMACENAMIENTO LOCAL
+   ===================================================================== */
+const LS = { hist:'tb_hist_v1', ult:'tb_ultima_v1', ver:'tb_versiones_v1', firmas:'tb_firmas_v1', uso:'tb_uso_v1',
+             act:'tb_actual_v1', peso:'tb_peso_v1', vac:'tb_vacuum_v1', grupo:'tb_grupo_v1' };
+function leer(k, def) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : def; } catch (e) { return def; } }
+function guardar(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+const rnd = n => Math.floor(Math.random() * n);
+
+/* Índice plano de ejercicios y protocolos por id */
+const INDICE = {};
+Object.keys(BANCO).forEach(b => BANCO[b].forEach(e => { INDICE[e.id] = Object.assign({ banco: b }, e); }));
+const PROT = {};
+PROTOCOLOS.forEach(p => { PROT[p.id] = p; });
+
+function hashCorto(txt) {
+  let h = 5381;
+  for (let i = 0; i < txt.length; i++) h = ((h << 5) + h + txt.charCodeAt(i)) >>> 0;
+  return h.toString(16).toUpperCase().padStart(8, '0').slice(-6);
+}
+
+function elegirPonderado(lista, peso) {
+  const ws = lista.map(x => Math.max(0.0001, peso(x)));
+  let r = Math.random() * ws.reduce((a, b) => a + b, 0);
+  for (let i = 0; i < lista.length; i++) { r -= ws[i]; if (r <= 0) return lista[i]; }
+  return lista[lista.length - 1];
+}
+
+/* =====================================================================
+   MOTOR COMBINATORIO ANTI-DUPLICACIÓN
+   1) Excluye todos los ejercicios de la sesión inmediata anterior del grupo.
+   2) Excluye los pares ejercicio+protocolo de esa sesión.
+   3) Rechaza cualquier firma completa (7 ejercicios + 7 protocolos) ya generada.
+   4) Pondera por uso histórico: lo que menos has hecho sale con más probabilidad.
+   ===================================================================== */
+function protocoloApto(p, ej, idx) {
+  if (p.id === 'fst7' && idx < 3) return false;               // FST-7 solo como remate
+  return !p.apto.length || p.apto.some(t => ej.t.includes(t));
+}
+
+function poolSlot(slot) {
+  const vistos = new Set(), pool = [];
+  slot.b.forEach(b => BANCO[b].forEach(e => { if (!vistos.has(e.id)) { vistos.add(e.id); pool.push(INDICE[e.id]); } }));
+  return pool;
+}
+
+function candidatosEj(slot, usados, evitar) {
+  const pool = poolSlot(slot);
+  let c = pool.filter(e => !usados.has(e.id) && !evitar.has(e.id));
+  if (!c.length) c = pool.filter(e => !usados.has(e.id));
+  return c.length ? c : pool;
+}
+
+function candidatosProt(ej, idx, conteo, vecinos, paresPrev) {
+  const base = PROTOCOLOS.filter(p => protocoloApto(p, ej, idx));
+  let c = base.filter(p => (conteo[p.id] || 0) < 2 && !vecinos.includes(p.id) && !paresPrev.has(ej.id + '|' + p.id));
+  if (!c.length) c = base.filter(p => !vecinos.includes(p.id));
+  return c.length ? c : base;
+}
+
+function distribuirSeries(base) {
+  const s = base.slice();
+  const meta = 16 + rnd(4);                                    // 16 a 19 series efectivas
+  let suma = s.reduce((a, b) => a + b, 0), guardia = 0;
+  while (suma < meta && guardia++ < 200) { const i = rnd(s.length); if (s[i] < 4) { s[i]++; suma++; } }
+  while (suma > meta && guardia++ < 400) { const i = rnd(s.length); if (s[i] > 2) { s[i]--; suma--; } }
+  return s;
+}
+
+function firmaDe(items) { return items.map(i => i.ex + ':' + i.pr).join('>'); }
+
+function generarRutina(gid, rotar) {
+  const tpl = PLANTILLAS[gid];
+  const ultimas = leer(LS.ult, {});
+  const ult = ultimas[gid] || null;
+  const firmasG = new Set((leer(LS.firmas, {}))[gid] || []);
+  const uso = leer(LS.uso, {});
+  const evitar = new Set(ult ? ult.items.map(i => i.ex) : []);
+  if (rotar && ult && ult.antes) ult.antes.forEach(id => evitar.add(id));
+  const paresPrev = new Set(ult ? ult.items.map(i => i.ex + '|' + i.pr) : []);
+
+  let elegido = null;
+  for (let intento = 0; intento < 150; intento++) {
+    const usados = new Set(), conteo = {}, items = [];
+    tpl.slots.forEach((slot, idx) => {
+      const ej = elegirPonderado(candidatosEj(slot, usados, evitar), e => 1 / (1 + (uso[e.id] || 0)));
+      usados.add(ej.id);
+      const vecinos = items.length ? [items[items.length - 1].pr] : [];
+      const pr = elegirPonderado(candidatosProt(ej, idx, conteo, vecinos, paresPrev), p => 1 / (1 + 0.35 * (uso['p:' + p.id] || 0)));
+      conteo[pr.id] = (conteo[pr.id] || 0) + 1;
+      items.push({ ex: ej.id, pr: pr.id });
+    });
+    const firma = firmaDe(items);
+    if (!firmasG.has(firma)) { elegido = { items, firma }; break; }
+    if (!elegido) elegido = { items, firma };
+  }
+
+  const series = distribuirSeries(tpl.slots.map(s => s.s));
+  const versiones = leer(LS.ver, {});
+  versiones[gid] = (versiones[gid] || 0) + 1;
+  guardar(LS.ver, versiones);
+
+  const rutina = {
+    id: Date.now().toString(36) + rnd(1e6).toString(36),
+    gid, version: versiones[gid], fecha: new Date().toISOString(), firma: elegido.firma,
+    items: elegido.items.map((it, i) => ({ ex: it.ex, pr: it.pr, sets: series[i], done: new Array(series[i]).fill(false) })),
+    posing: new Array(POSES.length * POSING_RONDAS).fill(false)
+  };
+
+  /* Memoria: la sesión anterior "real" se conserva en `antes` para que rotar no la resucite */
+  const antes = rotar && ult ? (ult.antes || []) : (ult ? ult.items.map(i => i.ex) : []);
+  ultimas[gid] = { items: rutina.items.map(i => ({ ex: i.ex, pr: i.pr })), firma: rutina.firma, antes };
+  guardar(LS.ult, ultimas);
+
+  const f = leer(LS.firmas, {});
+  f[gid] = (f[gid] || []).concat(rutina.firma).slice(-500);
+  guardar(LS.firmas, f);
+
+  rutina.items.forEach(i => { uso[i.ex] = (uso[i.ex] || 0) + 1; uso['p:' + i.pr] = (uso['p:' + i.pr] || 0) + 1; });
+  guardar(LS.uso, uso);
+
+  let hist = leer(LS.hist, []);
+  if (rotar) {                                                 // la variante descartada sin progreso no ensucia el historial
+    const act = leer(LS.act, null);
+    if (act && act.gid === gid && progresoDe(act).hechos === 0) hist = hist.filter(h => h.id !== act.id);
+  }
+  hist.unshift(rutina);
+  guardar(LS.hist, hist.slice(0, 150));
+  guardar(LS.act, rutina);
+  return rutina;
+}
+
+/* Cambia un solo ejercicio de la rutina activa sin tocar el resto */
+function cambiarEjercicio(rutina, idx) {
+  const slot = PLANTILLAS[rutina.gid].slots[idx];
+  const ult = (leer(LS.ult, {}))[rutina.gid] || {};
+  const usados = new Set(rutina.items.map(i => i.ex));
+  const evitar = new Set(ult.antes || []);
+  const uso = leer(LS.uso, {});
+  const pool = candidatosEj(slot, usados, evitar).filter(e => !usados.has(e.id));
+  if (!pool.length) return false;
+  const ej = elegirPonderado(pool, e => 1 / (1 + (uso[e.id] || 0)));
+  const conteo = {};
+  rutina.items.forEach((it, i) => { if (i !== idx) conteo[it.pr] = (conteo[it.pr] || 0) + 1; });
+  const vecinos = [rutina.items[idx - 1], rutina.items[idx + 1]].filter(Boolean).map(i => i.pr);
+  const pr = elegirPonderado(candidatosProt(ej, idx, conteo, vecinos, new Set()), p => 1 / (1 + 0.35 * (uso['p:' + p.id] || 0)));
+  const item = rutina.items[idx];
+  item.ex = ej.id; item.pr = pr.id; item.done = new Array(item.sets).fill(false);
+  rutina.firma = firmaDe(rutina.items);
+  uso[ej.id] = (uso[ej.id] || 0) + 1; uso['p:' + pr.id] = (uso['p:' + pr.id] || 0) + 1;
+  guardar(LS.uso, uso);
+  const ultimas = leer(LS.ult, {});
+  if (ultimas[rutina.gid]) { ultimas[rutina.gid].items = rutina.items.map(i => ({ ex: i.ex, pr: i.pr })); ultimas[rutina.gid].firma = rutina.firma; guardar(LS.ult, ultimas); }
+  const f = leer(LS.firmas, {}); f[rutina.gid] = (f[rutina.gid] || []).concat(rutina.firma).slice(-500); guardar(LS.firmas, f);
+  return true;
+}
+
+/* Borra la memoria anti-repetición del grupo (no toca historial ni contador de versiones) */
+function reiniciarPool(gid) {
+  const ultimas = leer(LS.ult, {}); delete ultimas[gid]; guardar(LS.ult, ultimas);
+  const f = leer(LS.firmas, {}); delete f[gid]; guardar(LS.firmas, f);
+  const uso = leer(LS.uso, {});
+  PLANTILLAS[gid].slots.forEach(s => poolSlot(s).forEach(e => { delete uso[e.id]; }));
+  guardar(LS.uso, uso);
+}
+
+function progresoDe(r) {
+  let total = 0, hechos = 0;
+  r.items.forEach(i => { total += i.done.length; hechos += i.done.filter(Boolean).length; });
+  const pt = r.posing.length, ph = r.posing.filter(Boolean).length;
+  return { total, hechos, pt, ph, pct: Math.round(100 * (hechos + ph) / Math.max(1, total + pt)) };
+}
+
+const FACTOR_CARGA = { reloj:0.8, excentrico:0.85, uncuarto:0.85, unmedio:0.85, secuestro:0.8, omni:0.9, fst7:0.75 };
+function cargaTxt(ej, prId) {
+  if (!ej.ref) return '';
+  const f = FACTOR_CARGA[prId] || 1, base = MARCAS[ej.ref.b];
+  const lo = Math.round(base * ej.ref.p[0] * f / 5) * 5, hi = Math.round(base * ej.ref.p[1] * f / 5) * 5;
+  const nombre = { hack:'Hack Squat de 160 kg', pendulo:'Péndulo de 100 kg', pm:'Peso Muerto de 140 kg' }[ej.ref.b];
+  return lo + '–' + hi + ' kg en discos (≈' + (lo / 2) + '–' + (hi / 2) + ' kg por lado) · calculado sobre tu ' + nombre + (f < 1 ? ', ajustado al protocolo' : '');
+}
+
+function guardarActual(r) {
+  guardar(LS.act, r);
+  const hist = leer(LS.hist, []);
+  const i = hist.findIndex(h => h.id === r.id);
+  if (i >= 0) { hist[i] = r; guardar(LS.hist, hist); }
+}
+
+/* =====================================================================
+   RENDER DE LA RUTINA
+   ===================================================================== */
+let actual = leer(LS.act, null);
+if (actual && (!PLANTILLAS[actual.gid] || !actual.items || actual.items.some(i => !INDICE[i.ex] || !PROT[i.pr]))) actual = null;
+
+function botonesTimer(p) {
+  return (p.timers || []).map(t =>
+    '<button class="t-btn px-3 !min-h-[40px] text-[12.5px] ' + (t.s === 25 || t.s === 30 ? 'fascia' : 'iso') + '" data-timer="' + t.s + '" data-etq="' + esc(t.e) + '">⏱ ' + esc(t.e) + '</button>'
+  ).join('');
+}
+
+function tarjetaEjercicio(r, it, i) {
+  const ej = INDICE[it.ex], p = PROT[it.pr], slot = PLANTILLAS[r.gid].slots[i];
+  const m = slot.m;
+  const regla = REGLAS[ej.banco] || '';
+  const carga = cargaTxt(ej, p.id);
+  const series = it.done.map((d, j) =>
+    '<button class="serie' + (d ? ' hecha' : '') + '" data-serie="' + i + '-' + j + '" aria-pressed="' + d + '" aria-label="Serie ' + (j + 1) + ' de ' + esc(ej.n) + '">S' + (j + 1) + '</button>'
+  ).join('');
+  const completa = it.done.every(Boolean);
+  return '' +
+  '<article class="tarjeta p-4 aparecer' + (completa ? ' completa' : '') + '" id="ej-' + i + '" style="animation-delay:' + (i * 50) + 'ms">' +
+    '<div class="flex gap-3 items-start">' +
+      '<div class="num-ej shrink-0">' + (i + 1) + '</div>' +
+      '<div class="min-w-0 flex-1">' +
+        '<p class="etq text-neon">' + esc(slot.et) + '</p>' +
+        '<h3 class="text-white font-extrabold text-[17px] leading-snug mt-0.5">' + esc(ej.n) + '</h3>' +
+        '<div class="flex flex-wrap gap-1.5 mt-2">' +
+          '<span class="chip chip-rojo">' + it.sets + ' series × ' + esc(p.rep || ej.r) + '</span>' +
+          '<span class="chip">' + esc(ej.eq) + '</span>' +
+        '</div>' +
+      '</div>' +
+      '<button class="btn btn-fantasma btn-mini shrink-0 !px-2.5" data-cambiar="' + i + '" aria-label="Cambiar este ejercicio por otro del mismo bloque" title="Cambiar ejercicio">⇄</button>' +
+    '</div>' +
+    (regla ? '<div class="bloque bloque-gris mt-3"><p class="text-[12px] leading-relaxed text-zinc-300 font-semibold">' + esc(regla) + '</p></div>' : '') +
+    '<div class="bloque mt-2"><p class="etq text-neon mb-1">La Tortura (Ejecución)</p><p class="text-[13.5px] leading-relaxed text-zinc-200">' + esc(ej.tor) + '</p></div>' +
+    '<div class="bloque bloque-oro mt-2">' +
+      '<p class="etq text-oro mb-1">Intensificador · ' + esc(p.origen) + '</p>' +
+      '<p class="text-[14px] font-extrabold text-oro2 leading-snug">' + esc(p.n) + '</p>' +
+      '<p class="text-[13px] leading-relaxed text-zinc-300 mt-1">' + esc(p.d.split('{m}').join(m)) + '</p>' +
+    '</div>' +
+    '<p class="text-[12.5px] text-zinc-400 mt-2 leading-relaxed"><span class="text-oro2 font-bold">Clave del juez:</span> ' + esc(ej.cue) + '</p>' +
+    (carga ? '<p class="text-[12px] text-zinc-400 mt-1.5 font-mono leading-relaxed"><span class="text-white font-bold">Carga:</span> ' + esc(carga) + '</p>' : '') +
+    (p.timers && p.timers.length ? '<div class="flex flex-wrap gap-2 mt-3">' + botonesTimer(p) + '</div>' : '') +
+    '<div class="mt-3"><p class="etq text-zinc-500 mb-2">Series de supervivencia — toca al terminar cada una</p><div class="flex flex-wrap gap-2">' + series + '</div></div>' +
+  '</article>';
+}
+
+function bloquePosing(r) {
+  const filas = POSES.map((po, k) => {
+    const cajas = [];
+    for (let j = 0; j < POSING_RONDAS; j++) {
+      const n = k * POSING_RONDAS + j, d = r.posing[n];
+      cajas.push('<button class="serie !w-[46px] !h-[46px]' + (d ? ' hecha' : '') + '" data-pose="' + n + '" aria-pressed="' + d + '" aria-label="' + esc(po.n) + ' ronda ' + (j + 1) + '">' + (j + 1) + '</button>');
+    }
+    return '<div class="py-3 border-t border-linea first:border-t-0">' +
+      '<div class="flex items-center justify-between gap-2"><p class="font-extrabold text-white text-[15px]">' + (k + 1) + '. ' + esc(po.n) + '</p>' +
+      '<button class="t-btn iso px-3 !min-h-[38px] text-[12px]" data-timer="20" data-etq="' + esc(po.n) + ' · 20 s">⏱ 20s</button></div>' +
+      '<p class="text-[12.5px] text-zinc-400 leading-relaxed mt-1">' + esc(po.cue) + '</p>' +
+      '<div class="flex gap-2 mt-2">' + cajas.join('') + '</div></div>';
+  }).join('');
+  return '<section class="tarjeta tarjeta-oro p-4 aparecer" aria-labelledby="tPose">' +
+    '<p class="etq text-oro">Bloque obligatorio · Posing isométrico intra-entreno</p>' +
+    '<h2 id="tPose" class="font-display text-2xl text-white mt-1">POSING CLASSIC PHYSIQUE</h2>' +
+    '<p class="text-[12.5px] text-zinc-400 mt-1 leading-relaxed">' + POSING_RONDAS + ' rondas de las 5 poses. Cada pose: 20 segundos apretando TODO al máximo, respirando corto con el vacuum puesto. Rota entre poses sin descanso. Con el músculo inflado de sangre es cuando mejor aprendes a mostrarlo.</p>' +
+    '<div class="mt-2">' + filas + '</div></section>';
+}
+
+function renderRutina() {
+  const zona = $('#zonaRutina');
+  if (!actual) {
+    zona.innerHTML = '<div class="tarjeta p-6 text-center"><p class="font-display text-2xl text-zinc-500">SIN RUTINA CARGADA</p><p class="text-[13px] text-zinc-500 mt-2">Elige qué vas a destruir hoy y pulsa <span class="text-neon font-bold">Generar Nueva Rutina Brutal</span>.</p></div>';
+    actualizarProgreso();
+    return;
+  }
+  const r = actual, tpl = PLANTILLAS[r.gid], pr = progresoDe(r);
+  const fecha = new Date(r.fecha);
+  const minutos = pr.total * 3 + 8;
+  zona.innerHTML =
+    '<div class="tarjeta tarjeta-brillo p-4 aparecer">' +
+      '<div class="flex items-start justify-between gap-3">' +
+        '<div class="min-w-0"><p class="etq text-neon">Sesión de hoy</p>' +
+        '<h2 class="font-display text-[28px] leading-none text-white mt-1">' + esc(tpl.nombre.toUpperCase()) + '</h2>' +
+        '<p class="text-[12.5px] text-zinc-400 mt-1">' + esc(tpl.sub) + '</p></div>' +
+        '<div class="text-right shrink-0"><p class="etq text-zinc-500">Firma</p><p class="font-mono text-oro2 font-bold">#' + hashCorto(r.firma) + '</p></div>' +
+      '</div>' +
+      '<div class="mt-3 rounded-xl border border-oro/40 bg-oro/10 px-3 py-2.5 flex items-center justify-between gap-2">' +
+        '<span class="text-[12.5px] text-oro2 font-semibold">Versión de Rutina #' + r.version + ' generada para este músculo</span>' +
+        '<span class="font-display text-2xl text-oro2">#' + r.version + '</span>' +
+      '</div>' +
+      '<div class="grid grid-cols-3 gap-2 mt-3 text-center">' +
+        '<div class="dato"><p class="etq text-zinc-500">Ejercicios</p><b>7</b></div>' +
+        '<div class="dato"><p class="etq text-zinc-500">Series</p><b>' + pr.total + '</b></div>' +
+        '<div class="dato"><p class="etq text-zinc-500">Duración</p><b>~' + minutos + '\'</b></div>' +
+      '</div>' +
+      '<p class="text-[11.5px] text-zinc-500 mt-2 font-mono">' + fecha.toLocaleDateString('es-MX', { weekday:'long', day:'numeric', month:'long' }) + ' · ' + fecha.toLocaleTimeString('es-MX', { hour:'2-digit', minute:'2-digit' }) + '</p>' +
+      '<p class="text-[12.5px] text-zinc-300 mt-2 leading-relaxed">Calentamiento: 2–3 series de aproximación en el ejercicio 1 (no cuentan). Después, <span class="text-neon font-bold">cada serie marcada es una serie efectiva al fallo muscular real</span>. Descansos de 60–120 s salvo que el protocolo diga otra cosa.</p>' +
+    '</div>' +
+    '<div class="space-y-4 mt-4">' + r.items.map((it, i) => tarjetaEjercicio(r, it, i)).join('') + '</div>' +
+    '<div class="mt-4">' + bloquePosing(r) + '</div>' +
+    '<div id="finSesion" class="mt-4"></div>';
+  actualizarProgreso();
+}
+
+function actualizarProgreso() {
+  const barra = $('#barraSesion'), txt = $('#txtSesion');
+  if (!actual) { barra.style.width = '0%'; txt.textContent = 'Sin rutina activa'; return; }
+  const p = progresoDe(actual);
+  barra.style.width = p.pct + '%';
+  txt.textContent = p.hechos + '/' + p.total + ' series · ' + p.ph + '/' + p.pt + ' poses · ' + p.pct + '%';
+  actual.items.forEach((it, i) => { const c = $('#ej-' + i); if (c) c.classList.toggle('completa', it.done.every(Boolean)); });
+  const fin = $('#finSesion');
+  if (fin) {
+    fin.innerHTML = p.pct === 100
+      ? '<div class="tarjeta tarjeta-oro p-5 text-center aparecer"><p class="etq text-oro">Sesión completada</p><p class="font-display text-[34px] leading-none text-oro2 mt-1">MÚSCULO DESTRUIDO</p><p class="text-[13px] text-zinc-300 mt-2">Batido, carbohidrato y a dormir 8 horas. Mañana el motor te entrega otra combinación que no has visto.</p></div>'
+      : '';
+  }
+}
+
+$('#zonaRutina').addEventListener('click', ev => {
+  const s = ev.target.closest('[data-serie]');
+  if (s && actual) {
+    const [i, j] = s.dataset.serie.split('-').map(Number);
+    actual.items[i].done[j] = !actual.items[i].done[j];
+    s.classList.toggle('hecha', actual.items[i].done[j]);
+    s.setAttribute('aria-pressed', actual.items[i].done[j]);
+    guardarActual(actual);
+    actualizarProgreso();
+    if (actual.items[i].done[j]) {
+      vibrar(40);
+      if (actual.items[i].done.every(Boolean)) aviso('Ejercicio ' + (i + 1) + ' aniquilado');
+    }
+    return;
+  }
+  const po = ev.target.closest('[data-pose]');
+  if (po && actual) {
+    const n = Number(po.dataset.pose);
+    actual.posing[n] = !actual.posing[n];
+    po.classList.toggle('hecha', actual.posing[n]);
+    po.setAttribute('aria-pressed', actual.posing[n]);
+    guardarActual(actual);
+    actualizarProgreso();
+    return;
+  }
+  const c = ev.target.closest('[data-cambiar]');
+  if (c && actual) {
+    const i = Number(c.dataset.cambiar);
+    if (actual.items[i].done.some(Boolean) && !confirm('Este ejercicio ya tiene series marcadas. ¿Cambiarlo de todos modos?')) return;
+    if (cambiarEjercicio(actual, i)) {
+      guardarActual(actual);
+      const tmp = document.createElement('div');
+      tmp.innerHTML = tarjetaEjercicio(actual, actual.items[i], i);
+      $('#ej-' + i).replaceWith(tmp.firstElementChild);
+      actualizarProgreso();
+      aviso('Ejercicio ' + (i + 1) + ' mutado');
+    } else {
+      aviso('No quedan alternativas libres en este bloque');
+    }
+  }
+});
+
+/* =====================================================================
+   AVISOS, VIBRACIÓN Y SONIDO
+   ===================================================================== */
+let toastT = null;
+function aviso(txt) {
+  const t = $('#toast');
+  t.textContent = txt; t.classList.add('ver');
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('ver'), 2200);
+}
+function vibrar(p) { try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) {} }
+let audioCtx = null;
+function desbloquearAudio() {
+  try { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if (audioCtx.state === 'suspended') audioCtx.resume(); } catch (e) {}
+}
+function pitido(freq, dur, vol) {
+  if (!audioCtx) return;
+  try {
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain(), t0 = audioCtx.currentTime;
+    o.type = 'square'; o.frequency.value = freq;
+    g.gain.setValueAtTime(vol || 0.15, t0); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g); g.connect(audioCtx.destination); o.start(t0); o.stop(t0 + dur);
+  } catch (e) {}
+}
+
+/* =====================================================================
+   CRONÓMETRO FLOTANTE DE TORTURAS
+   ===================================================================== */
+const T = { fin: 0, total: 0, restante: 0, corriendo: false, pausado: false, etq: '', iv: null, ultimoSeg: -1 };
+let wakeLock = null;
+async function pedirWakeLock() { try { if ('wakeLock' in navigator && !wakeLock) { wakeLock = await navigator.wakeLock.request('screen'); wakeLock.addEventListener('release', () => { wakeLock = null; }); } } catch (e) {} }
+function fmt(ms) { const s = Math.ceil(ms / 1000), m = Math.floor(s / 60); return String(m).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); }
+
+function iniciarTimer(seg, etq) {
+  desbloquearAudio(); pedirWakeLock();
+  T.total = seg * 1000; T.fin = Date.now() + T.total; T.corriendo = true; T.pausado = false; T.etq = etq || (seg + ' s'); T.ultimoSeg = -1;
+  $('#relojEtq').textContent = T.etq; $('#tPausa').textContent = '❚❚';
+  $('#dock').classList.add('corriendo');
+  clearInterval(T.iv); T.iv = setInterval(tick, 100); tick();
+}
+function tick() {
+  if (!T.corriendo || T.pausado) return;
+  const rest = Math.max(0, T.fin - Date.now());
+  $('#reloj').textContent = fmt(rest);
+  $('#relojBarra').style.width = (100 * (1 - rest / T.total)) + '%';
+  const s = Math.ceil(rest / 1000);
+  $('#dock').classList.toggle('ultimos', s <= 3 && rest > 0);
+  if (s !== T.ultimoSeg && s <= 3 && s > 0) { pitido(880, 0.12); vibrar(60); }
+  T.ultimoSeg = s;
+  if (rest <= 0) terminarTimer();
+}
+function terminarTimer() {
+  clearInterval(T.iv); T.corriendo = false;
+  $('#dock').classList.remove('corriendo', 'ultimos');
+  $('#reloj').textContent = '00:00'; $('#relojBarra').style.width = '100%';
+  $('#flashTxt').textContent = /iso|muro|pausa|fascia|negativa|vacuum|20 s/i.test(T.etq) ? '¡SUELTA!' : '¡AL HIERRO!';
+  $('#flashSub').textContent = T.etq + ' cumplido · toca para cerrar';
+  $('#flash').hidden = false;
+  vibrar([300, 120, 300, 120, 600]);
+  pitido(660, 0.25, 0.2); setTimeout(() => pitido(990, 0.25, 0.2), 280); setTimeout(() => pitido(1320, 0.45, 0.22), 560);
+}
+function detenerTimer() {
+  clearInterval(T.iv); T.corriendo = false; T.pausado = false;
+  $('#dock').classList.remove('corriendo', 'ultimos');
+  $('#reloj').textContent = '00:00'; $('#relojBarra').style.width = '0%';
+  $('#relojEtq').textContent = 'Cronómetro de tortura'; $('#tPausa').textContent = '❚❚';
+}
+$('#tPausa').addEventListener('click', () => {
+  if (!T.corriendo) return;
+  if (!T.pausado) { T.restante = T.fin - Date.now(); T.pausado = true; $('#tPausa').textContent = '▶'; $('#dock').classList.remove('ultimos'); }
+  else { T.fin = Date.now() + T.restante; T.pausado = false; $('#tPausa').textContent = '❚❚'; }
+});
+$('#tMas').addEventListener('click', () => {
+  if (!T.corriendo) { iniciarTimer(10, '+10 s'); return; }
+  if (T.pausado) T.restante += 10000; else T.fin += 10000;
+  T.total += 10000; tick();
+});
+$('#tStop').addEventListener('click', detenerTimer);
+$('#flash').addEventListener('click', () => { $('#flash').hidden = true; $('#relojBarra').style.width = '0%'; $('#relojEtq').textContent = 'Cronómetro de tortura'; });
+document.addEventListener('click', ev => {
+  const b = ev.target.closest('[data-timer]');
+  if (b) iniciarTimer(Number(b.dataset.timer), b.dataset.etq);
+});
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && T.corriendo) { pedirWakeLock(); tick(); } });
+
+/* =====================================================================
+   GENERADOR: BOTONES
+   ===================================================================== */
+const sel = $('#selGrupo');
+function refrescarContadorGrupo() { $('#txtVersionesGrupo').textContent = (leer(LS.ver, {}))[sel.value] || 0; }
+sel.addEventListener('change', () => { guardar(LS.grupo, sel.value); refrescarContadorGrupo(); });
+
+function lanzar(rotar) {
+  desbloquearAudio();
+  const gid = sel.value;
+  if (!rotar && actual) {
+    const p = progresoDe(actual);
+    if (p.hechos > 0 && p.pct < 100 && !confirm('Tu rutina actual va al ' + p.pct + '%. Queda guardada en el historial. ¿Generar una nueva?')) return;
+  }
+  const esRotacion = rotar && actual && actual.gid === gid;
+  actual = generarRutina(gid, esRotacion);
+  guardar(LS.grupo, gid);
+  refrescarContadorGrupo();
+  renderRutina();
+  vibrar([30, 40, 80]);
+  aviso((esRotacion ? 'Variante rotada' : 'Rutina generada') + ' · Versión #' + actual.version + ' · Firma #' + hashCorto(actual.firma));
+  $('#zonaRutina').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+$('#btnGenerar').addEventListener('click', () => lanzar(false));
+$('#btnRotar').addEventListener('click', () => {
+  if (actual && actual.gid === sel.value && progresoDe(actual).hechos > 0 && !confirm('Ya marcaste series en esta variante. ¿Rotarla igualmente?')) return;
+  lanzar(true);
+});
+$('#btnReiniciarPool').addEventListener('click', () => {
+  const tpl = PLANTILLAS[sel.value];
+  if (!confirm('¿Reiniciar la memoria anti-repetición de "' + tpl.nombre + '"? El historial y el contador de versiones se conservan.')) return;
+  reiniciarPool(sel.value);
+  aviso('Pool de ' + tpl.nombre + ' reiniciado');
+});
+
+/* =====================================================================
+   HISTORIAL Y EXPORTACIÓN
+   ===================================================================== */
+const filtro = $('#filtroHist');
+filtro.innerHTML = '<option value="">Todos los grupos</option>' + Object.keys(PLANTILLAS).map(k => '<option value="' + k + '">' + esc(PLANTILLAS[k].nombre) + '</option>').join('');
+
+function renderHistorial() {
+  const hist = leer(LS.hist, []).filter(h => PLANTILLAS[h.gid] && (!filtro.value || h.gid === filtro.value));
+  const lista = $('#listaHist');
+  if (!hist.length) { lista.innerHTML = '<p class="text-center text-zinc-500 py-8">Aún no hay sesiones guardadas.</p>'; return; }
+  lista.innerHTML = hist.map(h => {
+    const p = progresoDe(h), f = new Date(h.fecha), esActual = actual && actual.id === h.id;
+    const ejercicios = h.items.map((it, i) => {
+      const ej = INDICE[it.ex], pr = PROT[it.pr];
+      return '<li class="py-1"><span class="text-white font-semibold">' + (i + 1) + '. ' + esc(ej ? ej.n : it.ex) + '</span> <span class="text-zinc-500">· ' + it.sets + ' series</span><br><span class="text-oro2 text-[11.5px]">' + esc(pr ? pr.n : it.pr) + '</span></li>';
+    }).join('');
+    return '<details class="tarjeta p-3' + (esActual ? ' tarjeta-brillo' : '') + '">' +
+      '<summary class="flex items-center justify-between gap-3">' +
+        '<div class="min-w-0"><p class="font-bold text-white text-[14px] truncate">' + esc(PLANTILLAS[h.gid].nombre) + ' · v#' + h.version + (esActual ? ' <span class="text-neon">(activa)</span>' : '') + '</p>' +
+        '<p class="text-[11.5px] text-zinc-500 font-mono">' + f.toLocaleDateString('es-MX', { day:'2-digit', month:'short', year:'numeric' }) + ' · #' + hashCorto(h.firma) + '</p></div>' +
+        '<div class="text-right shrink-0"><p class="font-mono font-bold ' + (p.pct === 100 ? 'text-oro2' : 'text-zinc-300') + '">' + p.pct + '%</p><p class="text-[10.5px] text-zinc-500">' + p.hechos + '/' + p.total + ' series</p></div>' +
+      '</summary>' +
+      '<ol class="mt-2 text-[12.5px] leading-snug border-t border-linea pt-2">' + ejercicios + '</ol>' +
+      (esActual ? '' : '<button class="btn btn-fantasma btn-mini w-full mt-2" data-cargar="' + esc(h.id) + '">Cargar como sesión activa</button>') +
+    '</details>';
+  }).join('');
+}
+filtro.addEventListener('change', renderHistorial);
+$('#listaHist').addEventListener('click', ev => {
+  const b = ev.target.closest('[data-cargar]');
+  if (!b) return;
+  const h = leer(LS.hist, []).find(x => x.id === b.dataset.cargar);
+  if (!h) return;
+  actual = h; guardar(LS.act, h);
+  sel.value = h.gid; guardar(LS.grupo, h.gid); refrescarContadorGrupo();
+  cerrarHistorial(); renderRutina();
+  aviso('Sesión v#' + h.version + ' cargada');
+});
+function abrirHistorial() { renderHistorial(); $('#modalHist').hidden = false; document.body.style.overflow = 'hidden'; }
+function cerrarHistorial() { $('#modalHist').hidden = true; document.body.style.overflow = ''; }
+$('#btnHistorial').addEventListener('click', abrirHistorial);
+$('#cerrarHist').addEventListener('click', cerrarHistorial);
+$('#modalHist').addEventListener('click', ev => { if (ev.target.id === 'modalHist') cerrarHistorial(); });
+document.addEventListener('keydown', ev => { if (ev.key === 'Escape') { if (!$('#modalHist').hidden) cerrarHistorial(); if (!$('#flash').hidden) $('#flash').click(); } });
+
+function rutinaComoTexto(r) {
+  const tpl = PLANTILLAS[r.gid];
+  const l = ['TORTURA BIOMECÁNICA · ' + tpl.nombre.toUpperCase(), tpl.sub, 'Versión #' + r.version + ' · Firma #' + hashCorto(r.firma) + ' · ' + new Date(r.fecha).toLocaleDateString('es-MX'), ''];
+  r.items.forEach((it, i) => {
+    const ej = INDICE[it.ex], p = PROT[it.pr];
+    l.push((i + 1) + '. ' + ej.n + ' — ' + it.sets + ' × ' + (p.rep || ej.r));
+    l.push('   ⚡ ' + p.n);
+  });
+  l.push('', 'POSING: ' + POSES.map(p => p.n).join(' · ') + ' (' + POSING_RONDAS + ' rondas × 20 s)');
+  l.push('VACUUMS: 5 × 25 s en ayunas');
+  return l.join('\n');
+}
+$('#btnCopiar').addEventListener('click', async () => {
+  if (!actual) { aviso('No hay rutina activa'); return; }
+  const txt = rutinaComoTexto(actual);
+  try { await navigator.clipboard.writeText(txt); aviso('Rutina copiada al portapapeles'); }
+  catch (e) { prompt('Copia la rutina:', txt); }
+});
+$('#btnExportar').addEventListener('click', () => {
+  const datos = {
+    app: 'Tortura Biomecánica', exportado: new Date().toISOString(),
+    atleta: { estatura_m: 1.83, peso_kg: leer(LS.peso, 90), grasa_inicial: 0.22, meta: '80-82 kg al 10-12%', marcas_kg: MARCAS },
+    historial: leer(LS.hist, []).map(h => Object.assign({}, h, {
+      grupo: PLANTILLAS[h.gid] ? PLANTILLAS[h.gid].nombre : h.gid,
+      detalle: h.items.map(it => ({ ejercicio: INDICE[it.ex] ? INDICE[it.ex].n : it.ex, protocolo: PROT[it.pr] ? PROT[it.pr].n : it.pr, series: it.sets, completadas: it.done.filter(Boolean).length }))
+    }))
+  };
+  const blob = new Blob([JSON.stringify(datos, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'tortura-biomecanica-historial-' + new Date().toISOString().slice(0, 10) + '.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  aviso('Historial exportado');
+});
+$('#btnBorrarHist').addEventListener('click', () => {
+  if (!confirm('¿Borrar TODO: historial, versiones y memoria anti-repetición de todos los grupos? No se puede deshacer.')) return;
+  [LS.hist, LS.ult, LS.ver, LS.firmas, LS.uso, LS.act].forEach(k => { try { localStorage.removeItem(k); } catch (e) {} });
+  actual = null; renderHistorial(); renderRutina(); refrescarContadorGrupo();
+  aviso('Todo borrado. Lienzo en blanco.');
+});
+
+/* =====================================================================
+   VACUUMS DIARIOS
+   ===================================================================== */
+function hoyClave() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+function renderVacuums() {
+  const v = leer(LS.vac, {}), hoy = v[hoyClave()] || [false, false, false, false, false];
+  const caja = $('#vacuums');
+  caja.innerHTML = hoy.map((d, i) => '<button class="vac' + (d ? ' hecha' : '') + '" data-vac="' + i + '" aria-pressed="' + d + '" aria-label="Vacuum ' + (i + 1) + '">' + (d ? '✓' : (i + 1)) + '</button>').join('') +
+    (hoy.every(Boolean) ? '<span class="self-center text-[12px] font-bold text-oro2 ml-1">Cintura blindada hoy</span>' : '');
+}
+$('#vacuums').addEventListener('click', ev => {
+  const b = ev.target.closest('[data-vac]');
+  if (!b) return;
+  const v = leer(LS.vac, {}), k = hoyClave(), hoy = v[k] || [false, false, false, false, false];
+  hoy[Number(b.dataset.vac)] = !hoy[Number(b.dataset.vac)];
+  const limpio = {}; limpio[k] = hoy;                         // solo se conserva el día en curso
+  guardar(LS.vac, limpio); renderVacuums();
+});
+
+/* =====================================================================
+   PESO Y PROYECCIÓN DE CORTE
+   ===================================================================== */
+const MAGRA = 70.2;                                            // 90 kg × (1 − 0.22)
+function renderPeso() {
+  const peso = Number(leer(LS.peso, 90)) || 90;
+  $('#inPeso').value = peso;
+  $('#dPeso').textContent = peso.toFixed(1).replace('.0', '') + ' kg';
+  const grasa = Math.max(0, (1 - MAGRA / peso) * 100);
+  $('#dGrasa').textContent = (Math.abs(peso - 90) < 0.05 ? 22 : grasa.toFixed(1)) + '%';
+  $('#dMagra').textContent = Math.abs(peso - 90) < 0.05 ? '≈70.2 kg magros' : 'estimada con 70.2 kg magros';
+  const avance = Math.min(100, Math.max(0, (93 - peso) / (93 - 81) * 100));
+  $('#barraPeso').style.width = avance + '%';
+  $('#txtMeta').textContent = Math.round(avance) + '% del corte · faltan ' + Math.max(0, peso - 81).toFixed(1) + ' kg';
+  const a11 = (MAGRA / 0.89).toFixed(1), musculo = (81 * 0.89 - MAGRA).toFixed(1);
+  $('#txtProyeccion').innerHTML = 'Conservando <b class="text-white">70.2 kg magros</b>, el 11% de grasa llega en <b class="text-oro2">' + a11 + ' kg</b>. Para pisar tarima en <b class="text-oro2">81 kg al 11%</b> necesitas sumar ≈<b class="text-white">' + musculo + ' kg de músculo</b> durante el corte: por eso cada serie va al fallo real y la proteína no se negocia.';
+}
+$('#btnPeso').addEventListener('click', () => {
+  const v = parseFloat($('#inPeso').value);
+  if (!(v >= 60 && v <= 130)) { aviso('Peso fuera de rango (60–130 kg)'); return; }
+  guardar(LS.peso, Math.round(v * 10) / 10); renderPeso(); aviso('Peso registrado: ' + v + ' kg');
+});
+
+/* =====================================================================
+   ARRANQUE
+   ===================================================================== */
+(function init() {
+  const g = leer(LS.grupo, null);
+  if (actual) sel.value = actual.gid; else if (g && PLANTILLAS[g]) sel.value = g;
+  refrescarContadorGrupo();
+  renderPeso();
+  renderVacuums();
+  renderRutina();
+})();
+</script>
+</body>
+</html>
