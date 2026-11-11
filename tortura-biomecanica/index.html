@@ -2,284 +2,279 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <title>Tortura Biomecánica</title>
-<meta name="description" content="Generador inteligente de rutinas de tortura biomecánica para competencia Classic Physique. Motor combinatorio anti-duplicación con historial local.">
-<meta name="theme-color" content="#0a0a0c">
+<meta name="description" content="Tu rutina de Classic Physique en dos toques: eliges el músculo, pulsas un botón y la app te guía serie por serie.">
+<meta name="theme-color" content="#1e1b3a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tortura">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800;900&family=Unbounded:wght@600;800&display=swap">
 <script src="https://cdn.tailwindcss.com/3.4.16"></script>
 <script>
 if (window.tailwind) tailwind.config = {
-  theme: {
-    extend: {
-      colors: {
-        fondo: '#0a0a0c', panel: '#121216', panel2: '#18181d', linea: '#26262d',
-        sangre: '#dc2626', neon: '#ef4444', oro: '#d4af37', oro2: '#f5d76e'
-      },
-      fontFamily: {
-        display: ['Anton', 'Impact', 'sans-serif'],
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace']
-      }
-    }
-  }
+  corePlugins: { preflight: false },
+  theme: { extend: {
+    colors: { tinta:'#1e1b3a', tinta2:'#2c2950', durazno:'#ffb27f', crema:'#ffe6cf', niebla:'#f3f2f8', gris:'#77748d' },
+    fontFamily: { display:['Unbounded','system-ui','sans-serif'], sans:['Nunito','system-ui','sans-serif'] }
+  } }
 };
 </script>
 <style>
+/* Diseño: tinta azul noche con goteos líquidos, papel blanco, durazno de acción y crema de resalte.
+   Todo es una sola columna de teléfono (máx. 480 px), objetivos táctiles de 48 px o más y textos cortos. */
 :root{
-  --fondo:#0a0a0c; --panel:#121216; --panel2:#18181d; --linea:#26262d;
-  --sangre:#dc2626; --neon:#ef4444; --oro:#d4af37; --oro2:#f5d76e; --texto:#e4e4e7; --apagado:#a1a1aa;
-  color-scheme:dark;
+  --tinta:#1e1b3a; --tinta2:#2c2950; --papel:#ffffff; --niebla:#f3f2f8;
+  --durazno:#ffb27f; --durazno2:#f7975a; --crema:#ffe6cf; --gris:#6f6c86; --rojo:#e5484d;
+  --borde:2px solid var(--tinta); --r-lg:24px; --r-md:18px;
+  --nav-h:74px; --seguro-ab:env(safe-area-inset-bottom,0px); --seguro-ar:env(safe-area-inset-top,0px);
+  color-scheme:light;
 }
-html,body{background:var(--fondo);color:var(--texto)}
-body{font-family:Inter,system-ui,sans-serif;-webkit-tap-highlight-color:transparent;overscroll-behavior-y:none}
-.font-display{letter-spacing:.02em}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;background:var(--tinta)}
+body{margin:0;font-family:Nunito,system-ui,-apple-system,"Segoe UI",sans-serif;font-size:16px;line-height:1.45;color:var(--tinta);background:var(--tinta);-webkit-font-smoothing:antialiased;overscroll-behavior-y:none}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:0;padding:0;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+:focus-visible{outline:3px solid var(--durazno2);outline-offset:2px}
+h1,h2,h3,p{margin:0}
+svg{display:block}
 [hidden]{display:none!important}
-.tarjeta{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--linea);border-radius:18px;position:relative}
-.tarjeta-brillo{border-color:rgba(239,68,68,.45);box-shadow:0 0 0 1px rgba(239,68,68,.15),0 0 28px -8px rgba(239,68,68,.55)}
-.tarjeta-oro{border-color:rgba(212,175,55,.5);box-shadow:0 0 0 1px rgba(212,175,55,.12),0 0 26px -10px rgba(212,175,55,.6)}
-.tarjeta.completa{border-color:rgba(212,175,55,.75);box-shadow:0 0 30px -8px rgba(212,175,55,.75)}
-.tarjeta.completa .num-ej{background:var(--oro);color:#0a0a0c}
-.num-ej{background:var(--sangre);color:#fff;font-family:Anton,Impact,sans-serif;min-width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:22px}
-.chip{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:4px 9px;border-radius:999px;border:1px solid var(--linea);color:var(--apagado);background:#0e0e11}
-.chip-rojo{border-color:rgba(239,68,68,.5);color:#fca5a5;background:rgba(220,38,38,.12)}
-.chip-oro{border-color:rgba(212,175,55,.55);color:var(--oro2);background:rgba(212,175,55,.1)}
-.bloque{border-left:3px solid var(--sangre);padding:10px 12px;background:rgba(220,38,38,.06);border-radius:0 12px 12px 0}
-.bloque-oro{border-left-color:var(--oro);background:rgba(212,175,55,.06)}
-.bloque-gris{border-left-color:#52525b;background:rgba(82,82,91,.12)}
-.etq{font-size:10.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
-.serie{width:52px;height:52px;border-radius:14px;border:2px solid #3f3f46;background:#0e0e11;color:#71717a;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:15px;display:grid;place-items:center;transition:transform .12s,background .15s,border-color .15s;cursor:pointer;user-select:none;position:relative}
-.serie:active{transform:scale(.92)}
-.serie.hecha{background:var(--sangre);border-color:var(--neon);color:#fff;box-shadow:0 0 18px -4px rgba(239,68,68,.9)}
-.serie.hecha::after{content:'';position:absolute;left:8px;right:8px;top:50%;height:3px;background:#fff;transform:rotate(-28deg);border-radius:2px;opacity:.9}
-.btn{min-height:48px;border-radius:14px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;font-size:13px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 16px;transition:transform .1s,filter .15s;cursor:pointer}
+.disp{font-family:Unbounded,Nunito,system-ui,sans-serif;font-weight:800;letter-spacing:-.01em;line-height:1.08}
+.mini{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.suave{color:var(--gris)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- Armazón de la app ---------- */
+.app{position:relative;max-width:480px;min-height:100vh;min-height:100dvh;margin:0 auto;background:var(--papel);overflow-x:clip}
+@media (min-width:520px){.app{box-shadow:0 0 0 2px var(--tinta),0 30px 80px rgba(0,0,0,.45)}}
+.vista{padding-bottom:calc(var(--nav-h) + var(--seguro-ab) + 96px);animation:entrar .28s ease both}
+.vista.con-accion{padding-bottom:calc(var(--nav-h) + var(--seguro-ab) + 172px)}
+@keyframes entrar{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.pad{padding-left:16px;padding-right:16px}
+
+/* ---------- Cabeceras de tinta con goteo ---------- */
+.cab{background:var(--tinta);color:#fff;padding:calc(14px + var(--seguro-ar)) 16px 6px;position:relative}
+.goteo{display:block;width:100%;height:auto;aspect-ratio:400/80;margin-top:-1px;pointer-events:none}
+.goteo-sube{transform:scaleY(-1);margin-top:0;margin-bottom:-1px}
+.barra-sup{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:calc(12px + var(--seguro-ar)) 16px 8px}
+
+/* ---------- Botones ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:56px;padding:0 22px;border-radius:999px;border:var(--borde);font-weight:900;font-size:17px;letter-spacing:.01em;transition:transform .08s ease,background .15s}
 .btn:active{transform:scale(.97)}
-.btn-rojo{background:linear-gradient(180deg,#ef4444,#b91c1c);color:#fff;box-shadow:0 8px 28px -10px rgba(239,68,68,.9),inset 0 1px 0 rgba(255,255,255,.25)}
-.btn-oro{background:linear-gradient(180deg,#f5d76e,#b8901f);color:#0a0a0c}
-.btn-fantasma{background:#111115;border:1px solid var(--linea);color:var(--texto)}
-.btn-fantasma:hover{border-color:#3f3f46}
-.btn-mini{min-height:38px;border-radius:10px;font-size:11.5px;padding:0 11px}
-select.sel{appearance:none;-webkit-appearance:none;background:#0e0e11 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23ef4444' stroke-width='3'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center;border:1px solid rgba(239,68,68,.45);border-radius:14px;padding:14px 40px 14px 14px;width:100%;color:#fff;font-weight:600;font-size:14.5px;line-height:1.3}
-select.sel:focus{outline:2px solid var(--neon);outline-offset:2px}
-input.campo{background:#0e0e11;border:1px solid var(--linea);border-radius:12px;padding:10px 12px;color:#fff;font-family:'JetBrains Mono',monospace;width:100%}
-input.campo:focus{outline:2px solid var(--oro);outline-offset:1px}
-.barra{height:8px;border-radius:999px;background:#1f1f25;overflow:hidden}
-.barra>span{display:block;height:100%;background:linear-gradient(90deg,#b91c1c,#ef4444,#f5d76e);border-radius:999px;transition:width .35s ease}
-.dato{background:#0e0e11;border:1px solid var(--linea);border-radius:14px;padding:10px 12px}
-.dato b{font-family:'JetBrains Mono',monospace;color:#fff;font-size:18px}
-.vac{width:44px;height:44px;border-radius:50%;border:2px solid #3f3f46;display:grid;place-items:center;font-family:'JetBrains Mono',monospace;font-size:12px;color:#71717a;cursor:pointer;background:#0e0e11}
-.vac.hecha{background:var(--oro);border-color:var(--oro2);color:#0a0a0c;font-weight:800}
-#dock{position:fixed;left:0;right:0;bottom:0;z-index:50;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:rgba(10,10,12,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid rgba(239,68,68,.35)}
-.t-btn{min-height:46px;border-radius:12px;background:#141418;border:1px solid #2c2c33;color:#fff;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:14px;cursor:pointer}
-.t-btn:active{transform:scale(.95)}
-.t-btn.iso{border-color:rgba(212,175,55,.5);color:var(--oro2)}
-.t-btn.fascia{border-color:rgba(239,68,68,.5);color:#fca5a5}
-#reloj{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
-#dock.corriendo{border-top-color:var(--neon);box-shadow:0 -10px 40px -12px rgba(239,68,68,.7)}
-#dock.ultimos #reloj{color:var(--neon);animation:latido .5s infinite alternate}
-@keyframes latido{from{transform:scale(1)}to{transform:scale(1.08)}}
-#flash{position:fixed;inset:0;z-index:80;display:grid;place-items:center;background:rgba(127,29,29,.94);animation:alerta .45s infinite alternate;cursor:pointer;padding:24px;text-align:center}
-@keyframes alerta{from{background:rgba(127,29,29,.94)}to{background:rgba(220,38,38,.97)}}
-.modal-fondo{position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.78);backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center}
-@media (min-width:640px){.modal-fondo{align-items:center}}
-.modal{background:var(--panel);border:1px solid rgba(239,68,68,.35);border-radius:22px 22px 0 0;width:100%;max-width:720px;max-height:88vh;display:flex;flex-direction:column}
-@media (min-width:640px){.modal{border-radius:22px}}
-#toast{position:fixed;left:50%;top:18px;transform:translateX(-50%) translateY(-140%);z-index:90;background:#111;border:1px solid var(--oro);color:var(--oro2);padding:10px 16px;border-radius:12px;font-weight:700;font-size:13px;transition:transform .3s;max-width:calc(100% - 32px);text-align:center}
-#toast.ver{transform:translateX(-50%) translateY(0)}
-.ruido{background-image:radial-gradient(ellipse at top,rgba(220,38,38,.18),transparent 60%),radial-gradient(ellipse at bottom right,rgba(212,175,55,.06),transparent 55%)}
-.glitch{text-shadow:2px 0 rgba(239,68,68,.55),-2px 0 rgba(212,175,55,.25)}
-.aparecer{animation:aparecer .45s ease both}
-@keyframes aparecer{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-details>summary{list-style:none;cursor:pointer}
-details>summary::-webkit-details-marker{display:none}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.btn-durazno{background:var(--durazno);color:var(--tinta)}
+.btn-durazno:active{background:var(--durazno2)}
+.btn-tinta{background:var(--tinta);color:#fff}
+.btn-blanco{background:#fff;color:var(--tinta)}
+.btn-fantasma{background:transparent;color:#fff;border-color:rgba(255,255,255,.85)}
+.btn-peligro{background:#fff;color:var(--rojo);border-color:var(--rojo)}
+.btn-chico{min-height:44px;font-size:14.5px;padding:0 16px}
+.btn-ancho{width:100%}
+.btn-circ{width:56px;min-width:56px;padding:0}
+.btn svg{width:22px;height:22px;flex-shrink:0}
+.latir{animation:latir 1.1s ease-in-out infinite}
+@keyframes latir{0%,100%{box-shadow:0 0 0 0 rgba(255,178,127,.9)}50%{box-shadow:0 0 0 10px rgba(255,178,127,0)}}
+
+/* ---------- Filas tipo píldora (como “Встречи рядом с вами”) ---------- */
+.fila{display:flex;align-items:center;gap:12px;width:100%;min-height:68px;padding:10px 12px;border:var(--borde);border-radius:20px;background:#fff;text-align:left;transition:background .15s,transform .08s}
+.fila:active{transform:scale(.985)}
+.fila.sel{background:var(--durazno)}
+.fila .t{font-weight:900;font-size:16.5px;line-height:1.2}
+.fila .s{font-size:13px;color:var(--gris);line-height:1.25;margin-top:2px}
+.fila.sel .s{color:var(--tinta)}
+.ico{width:46px;height:46px;border-radius:50%;background:var(--tinta);color:#fff;display:grid;place-items:center;flex-shrink:0}
+.ico svg{width:26px;height:26px}
+.fila.sel .ico{background:#fff;color:var(--tinta);box-shadow:inset 0 0 0 2px var(--tinta)}
+.chulo{width:34px;height:34px;border-radius:50%;border:var(--borde);display:grid;place-items:center;flex-shrink:0;font-weight:900;font-size:13px;background:#fff}
+.fila.sel .chulo{background:var(--tinta);color:var(--durazno)}
+.chulo svg{width:18px;height:18px}
+
+/* ---------- Tarjetas y datos ---------- */
+.tarjeta{border:var(--borde);border-radius:var(--r-lg);background:#fff;padding:16px}
+.tarjeta.crema{background:var(--crema)}
+.tarjeta.tinta{background:var(--tinta);color:#fff;border-color:var(--tinta)}
+.datos{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.datos.dos{grid-template-columns:repeat(2,1fr)}
+.dato{border:var(--borde);border-radius:16px;padding:9px 6px;text-align:center;background:#fff;min-width:0}
+.dato b{display:block;font-size:18px;font-weight:900;line-height:1.15;overflow-wrap:anywhere}
+.dato span{display:block;font-size:12px;color:var(--gris);font-weight:700;margin-top:2px}
+.etiqueta{display:inline-flex;align-items:center;gap:6px;border:var(--borde);border-radius:999px;padding:4px 12px;font-weight:800;font-size:13px;background:#fff;white-space:nowrap}
+.etiqueta.durazno{background:var(--durazno)}
+.etiqueta.vacia{background:transparent;color:#fff;border-color:rgba(255,255,255,.8)}
+.paso-titulo{display:flex;align-items:center;gap:10px;font-weight:900;font-size:15px;margin:22px 0 10px}
+.paso-titulo i{font-style:normal;width:28px;height:28px;border-radius:50%;background:var(--tinta);color:var(--durazno);display:grid;place-items:center;font-size:14px;flex-shrink:0}
+.barra{height:12px;border-radius:999px;border:var(--borde);background:#fff;overflow:hidden}
+.barra>span{display:block;height:100%;background:var(--durazno);transition:width .35s ease}
+.cab .barra{border-color:#fff}
+.aviso{display:flex;gap:10px;align-items:flex-start;background:var(--crema);border:var(--borde);border-radius:16px;padding:10px 12px;font-size:14px;font-weight:700;line-height:1.35}
+.aviso svg{width:22px;height:22px;flex-shrink:0;margin-top:1px}
+
+/* ---------- Círculos de serie / días / pasos ---------- */
+.series{display:flex;flex-wrap:wrap;gap:12px}
+.serie{width:68px;height:68px;border-radius:50%;border:3px solid var(--tinta);background:#fff;display:grid;place-items:center;font-weight:900;font-size:22px;transition:transform .1s,background .15s}
+.serie:active{transform:scale(.9)}
+.serie.hecha{background:var(--tinta);color:var(--durazno)}
+.serie svg{width:30px;height:30px}
+.pasos{display:flex;justify-content:space-between;gap:4px}
+.paso{width:38px;height:38px;border-radius:50%;border:2px solid #fff;color:#fff;display:grid;place-items:center;font-weight:900;font-size:15px;flex-shrink:0}
+.paso.hecho{background:#fff;color:var(--tinta)}
+.paso.actual{background:var(--durazno);border-color:var(--durazno);color:var(--tinta);transform:scale(1.12)}
+.paso svg{width:18px;height:18px}
+.vacs{display:flex;gap:8px;flex-wrap:wrap}
+.vac{width:48px;height:48px;border-radius:50%;border:var(--borde);background:#fff;font-weight:900;display:grid;place-items:center}
+.vac.hecha{background:var(--tinta);color:var(--durazno)}
+.vac svg{width:22px;height:22px}
+
+/* ---------- Acordeón ---------- */
+details.acord{border:var(--borde);border-radius:18px;background:#fff;overflow:hidden}
+details.acord+details.acord{margin-top:10px}
+details.acord>summary{list-style:none;display:flex;align-items:center;gap:10px;min-height:56px;padding:8px 14px;font-weight:900;font-size:16px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+details.acord>summary::-webkit-details-marker{display:none}
+details.acord>summary .flecha{margin-left:auto;transition:transform .2s;width:22px;height:22px;flex-shrink:0}
+details.acord[open]>summary .flecha{transform:rotate(90deg)}
+details.acord>summary .ico{width:34px;height:34px}
+details.acord>summary .ico svg{width:19px;height:19px}
+details.acord .cuerpo{padding:0 14px 14px;font-size:15.5px;line-height:1.55}
+details.acord.crema{background:var(--crema)}
+
+/* ---------- Barra de acción fija (Anterior / Siguiente) ---------- */
+.accion{position:fixed;left:50%;transform:translateX(-50%);width:100%;max-width:480px;bottom:calc(var(--nav-h) + var(--seguro-ab));padding:12px 16px 12px;display:flex;gap:10px;background:linear-gradient(to top,#fff 72%,rgba(255,255,255,0));z-index:30}
+.accion .btn{flex:1}
+.accion .btn-circ{flex:0 0 56px}
+
+/* ---------- Barra de pestañas ---------- */
+.nav{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:480px;z-index:40;background:var(--tinta);border-radius:26px 26px 0 0;padding:8px 6px calc(8px + var(--seguro-ab));display:grid;grid-template-columns:repeat(5,1fr);align-items:end}
+.tab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:56px;color:#b9b6d3;font-size:11.5px;font-weight:800;position:relative}
+.tab svg{width:25px;height:25px}
+.tab.activa{color:#fff}
+.tab.activa svg{color:var(--durazno)}
+.tab.activa::after{content:"";position:absolute;bottom:-4px;width:6px;height:6px;border-radius:50%;background:var(--durazno)}
+.tab-centro .bola{width:62px;height:62px;margin-top:-30px;border-radius:50%;background:var(--durazno);border:3px solid var(--tinta);box-shadow:0 0 0 4px #fff;display:grid;place-items:center;color:var(--tinta)}
+.tab-centro .bola svg{width:30px;height:30px}
+.tab-centro.activa::after{display:none}
+.tab-centro.corriendo .bola{animation:latir 1.1s ease-in-out infinite}
+
+/* ---------- Píldora del reloj en marcha ---------- */
+.pildora{position:fixed;z-index:35;right:max(16px,calc(50% - 224px));bottom:calc(var(--nav-h) + var(--seguro-ab) + 14px);display:flex;align-items:center;gap:8px;background:var(--tinta);color:#fff;border:2px solid var(--durazno);border-radius:999px;padding:8px 14px 8px 10px;font-weight:900;font-size:18px;font-variant-numeric:tabular-nums;box-shadow:0 10px 26px rgba(30,27,58,.35)}
+.pildora svg{width:22px;height:22px;color:var(--durazno)}
+.pildora small{font-size:11px;font-weight:800;color:#c9c6e2;display:block;line-height:1}
+.chip-reloj{flex:0 0 auto;display:flex;align-items:center;gap:6px;min-height:56px;padding:0 12px 0 10px;border-radius:999px;background:var(--tinta);color:#fff;border:2px solid var(--durazno);font-weight:900;font-size:18px;font-variant-numeric:tabular-nums;text-align:left}
+.chip-reloj svg{width:22px;height:22px;color:var(--durazno)}
+.chip-reloj small{display:block;font-size:10.5px;font-weight:800;color:#c9c6e2;line-height:1}
+.con-accion-visible .pildora{bottom:calc(var(--nav-h) + var(--seguro-ab) + 90px)}
+
+/* ---------- Hojas inferiores, diálogos y alarmas ---------- */
+.fondo-hoja{position:fixed;inset:0;z-index:60;background:rgba(20,18,40,.55);display:flex;align-items:flex-end;justify-content:center;animation:aparecer .2s ease both}
+@keyframes aparecer{from{opacity:0}to{opacity:1}}
+.hoja{width:100%;max-width:480px;max-height:92dvh;overflow-y:auto;background:#fff;border-radius:28px 28px 0 0;border:var(--borde);border-bottom:0;padding:10px 16px calc(18px + var(--seguro-ab));animation:subir .26s cubic-bezier(.2,.9,.3,1.1) both}
+@keyframes subir{from{transform:translateY(100%)}to{transform:none}}
+.asa{width:46px;height:5px;border-radius:9px;background:#cfcde0;margin:0 auto 10px}
+.anillo{position:relative;width:min(230px,62vw);aspect-ratio:1;margin:6px auto 4px}
+.anillo svg{width:100%;height:100%;transform:rotate(-90deg)}
+.anillo .num{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.anillo .num b{font-family:Unbounded,Nunito,sans-serif;font-size:clamp(40px,13vw,54px);font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
+.presets{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.preset{min-height:58px;border:var(--borde);border-radius:18px;background:#fff;font-weight:900;font-size:17px;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.05}
+.preset small{font-size:10.5px;font-weight:800;color:var(--gris);margin-top:2px}
+.preset.esp{background:var(--crema)}
+.preset:active{background:var(--durazno)}
+.alarma{position:fixed;inset:0;z-index:90;background:var(--tinta);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;gap:18px;animation:alarma .5s ease-in-out infinite alternate}
+@keyframes alarma{from{background:var(--tinta)}to{background:#2f2a5c}}
+.alarma .gran{font-family:Unbounded,Nunito,sans-serif;font-weight:800;font-size:clamp(56px,20vw,92px);color:var(--durazno);line-height:.95}
+.alarma .goteo{position:absolute;top:0;left:0;right:0}
+.dialogo{position:fixed;inset:0;z-index:95;background:rgba(20,18,40,.6);display:flex;align-items:flex-end;justify-content:center;padding:0}
+.dialogo .hoja{border-bottom:0}
+.toast{position:fixed;left:50%;top:calc(12px + var(--seguro-ar));transform:translate(-50%,-160%);z-index:99;background:var(--tinta);color:#fff;border:2px solid var(--durazno);border-radius:999px;padding:10px 18px;font-weight:800;font-size:15px;transition:transform .3s ease;max-width:calc(100% - 32px);text-align:center}
+.toast.ver{transform:translate(-50%,0)}
+
+/* ---------- Bienvenida (onboarding) ---------- */
+.intro{position:fixed;inset:0;z-index:80;background:#fff;display:flex;flex-direction:column;max-width:480px;margin:0 auto;padding:calc(12px + var(--seguro-ar)) 20px calc(22px + var(--seguro-ab))}
+.intro .saltar{align-self:flex-end;font-weight:800;color:var(--gris);min-height:44px;padding:0 6px}
+.intro .ilus{flex:1;display:grid;place-items:center;min-height:0}
+.intro .ilus svg{width:min(300px,78vw);height:auto}
+.intro h2{font-size:clamp(24px,7.4vw,30px);font-weight:900;line-height:1.12}
+.intro h2 b{font-family:Unbounded,Nunito,sans-serif;font-weight:900;text-transform:uppercase}
+.puntos{display:flex;gap:8px}
+.puntos i{width:9px;height:9px;border-radius:50%;background:#d4d2e2}
+.puntos i.on{background:var(--tinta);width:24px;border-radius:9px}
+.btn-sig{width:76px;height:76px;border-radius:50%;background:var(--durazno);border:var(--borde);font-weight:900;font-size:13px;display:grid;place-items:center}
+
+/* ---------- Calendario ---------- */
+.seg{display:grid;grid-template-columns:1fr 1fr;border:var(--borde);border-radius:999px;padding:3px;background:#fff}
+.seg button{min-height:44px;border-radius:999px;font-weight:900;font-size:15px;color:var(--tinta)}
+.seg button.on{background:var(--tinta);color:#fff}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;text-align:center}
+.cal .dsem{font-size:12px;font-weight:800;color:var(--gris)}
+.dia{aspect-ratio:1;border-radius:50%;border:2px solid var(--tinta);background:#fff;font-weight:800;font-size:14px;display:grid;place-items:center;max-width:46px;width:100%;margin:0 auto}
+.dia.vacio{border-color:transparent;background:transparent}
+.dia.fuera{border-color:#d9d7e6;color:#a3a1b6}
+.dia.entreno{background:var(--durazno)}
+.dia.completo{background:var(--tinta);color:var(--durazno)}
+.dia.hoy{box-shadow:0 0 0 3px var(--durazno2)}
+.dia.sel{outline:3px solid var(--tinta);outline-offset:2px}
+
+/* ---------- Varios ---------- */
+.interruptor{position:relative;width:58px;height:34px;border-radius:999px;border:var(--borde);background:#fff;flex-shrink:0;transition:background .15s}
+.interruptor::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:var(--tinta);transition:transform .18s}
+.interruptor[aria-checked="true"]{background:var(--durazno)}
+.interruptor[aria-checked="true"]::after{transform:translateX(24px)}
+.stepper{display:flex;align-items:center;gap:10px}
+.stepper input{flex:1;min-width:0;height:56px;border:var(--borde);border-radius:18px;text-align:center;font-weight:900;font-size:24px;background:#fff}
+.lista-poses .pose{border-top:2px dashed #d5d3e3;padding:14px 0}
+.lista-poses .pose:first-child{border-top:0;padding-top:4px}
+.dia.generado{border-style:dashed;border-color:#a9a6c0}
+.fila>svg{width:22px;height:22px;flex-shrink:0}
+.ilus-svg{display:block;width:min(260px,70vw);height:auto;margin:0 auto}
+.gota{display:inline-block;width:10px;height:10px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--tinta)}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+@media (max-width:360px){.serie{width:60px;height:60px;font-size:20px}.paso{width:33px;height:33px;font-size:13px}.btn{font-size:16px}.presets{grid-template-columns:repeat(4,1fr);gap:6px}.preset{font-size:15px}}
 </style>
 </head>
-<body class="ruido min-h-screen">
+<body>
+<div class="app" id="app">
+  <main>
+    <section id="v-inicio" class="vista" data-vista="inicio" aria-label="Inicio"></section>
+    <section id="v-entreno" class="vista" data-vista="entreno" aria-label="Entreno" hidden></section>
+    <section id="v-historial" class="vista" data-vista="historial" aria-label="Historial" hidden></section>
+    <section id="v-perfil" class="vista" data-vista="perfil" aria-label="Perfil" hidden></section>
+  </main>
 
-<header class="sticky top-0 z-40 bg-fondo/90 backdrop-blur border-b border-linea">
-  <div class="max-w-3xl mx-auto px-4 pt-3 pb-2">
-    <div class="flex items-center justify-between gap-3">
-      <div class="min-w-0">
-        <p class="etq text-neon">Classic Physique · Competencia</p>
-        <h1 class="font-display text-[clamp(20px,6.4vw,30px)] leading-none text-white glitch">TORTURA BIOMECÁNICA</h1>
-      </div>
-      <button id="btnHistorial" class="btn btn-fantasma btn-mini shrink-0" aria-label="Abrir historial">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/></svg>
-        Historial
-      </button>
-    </div>
-    <div class="mt-2 flex items-center gap-3">
-      <div class="barra flex-1"><span id="barraSesion" style="width:0%"></span></div>
-      <span id="txtSesion" class="font-mono text-[11px] text-zinc-400 whitespace-nowrap">Sin rutina activa</span>
-    </div>
-  </div>
-</header>
+  <div id="accion" class="accion" hidden></div>
 
-<main class="max-w-3xl mx-auto px-4 pb-56 pt-4 space-y-4">
+  <button id="pildora" class="pildora" data-acc="abrirReloj" hidden aria-label="Abrir cronómetro">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 13.5V10M9.5 2.5h5M12 2.5V6"/></svg>
+    <span><small id="pildoraEtq">Descanso</small><span id="pildoraTxt">00:00</span></span>
+  </button>
 
-  <!-- DASHBOARD BIOMÉTRICO -->
-  <section class="tarjeta tarjeta-oro p-4 aparecer" aria-labelledby="tDash">
-    <div class="flex items-start justify-between gap-3">
-      <div>
-        <p class="etq text-oro">Perfil biométrico del atleta</p>
-        <h2 id="tDash" class="font-display text-2xl text-white mt-1">RUMBO A TARIMA</h2>
-      </div>
-      <span class="chip chip-oro">Recomposición agresiva</span>
-    </div>
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-3">
-      <div class="dato"><p class="etq text-zinc-500">Estatura</p><b>1.83 m</b><p class="text-[11px] text-zinc-500 mt-0.5">Palancas y fémures largos</p></div>
-      <div class="dato"><p class="etq text-zinc-500">Peso actual</p><b id="dPeso">90 kg</b><p class="text-[11px] text-zinc-500 mt-0.5">Desde 93 kg</p></div>
-      <div class="dato"><p class="etq text-zinc-500">Grasa corporal</p><b id="dGrasa">22%</b><p class="text-[11px] text-zinc-500 mt-0.5" id="dMagra">≈70.2 kg magros</p></div>
-      <div class="dato"><p class="etq text-zinc-500">Meta tarima</p><b>80–82 kg</b><p class="text-[11px] text-zinc-500 mt-0.5">al 10–12% de grasa</p></div>
-    </div>
-    <div class="mt-3">
-      <div class="flex justify-between text-[11px] font-mono text-zinc-400"><span>93 kg</span><span id="txtMeta">Avance al corte</span><span>81 kg</span></div>
-      <div class="barra mt-1"><span id="barraPeso" style="width:25%"></span></div>
-    </div>
-    <div class="grid grid-cols-3 gap-2 mt-3">
-      <div class="dato text-center"><p class="etq text-zinc-500">Hack Squat</p><b>160</b><p class="text-[10.5px] text-zinc-500">4×20 kg/lado</p></div>
-      <div class="dato text-center"><p class="etq text-zinc-500">Péndulo</p><b>100</b><p class="text-[10.5px] text-zinc-500">50 kg/lado</p></div>
-      <div class="dato text-center"><p class="etq text-zinc-500">Peso Muerto</p><b>140+</b><p class="text-[10.5px] text-zinc-500">3×20 kg/lado</p></div>
-    </div>
-    <details class="mt-3 group">
-      <summary class="flex items-center justify-between text-[12px] font-bold text-zinc-300 py-1">
-        <span>Registrar peso de hoy · Diagnóstico del juez · Equipo</span>
-        <span class="text-neon group-open:rotate-180 transition">▾</span>
-      </summary>
-      <div class="mt-2 space-y-3">
-        <div class="flex gap-2 items-end">
-          <label class="flex-1 text-[12px] text-zinc-400">Peso en ayunas (kg)
-            <input id="inPeso" class="campo mt-1" type="number" inputmode="decimal" step="0.1" min="60" max="130" value="90">
-          </label>
-          <button id="btnPeso" class="btn btn-oro btn-mini">Guardar</button>
-        </div>
-        <p id="txtProyeccion" class="text-[12px] text-zinc-400 leading-relaxed"></p>
-        <ul class="text-[12.5px] leading-relaxed text-zinc-300 space-y-1.5">
-          <li><span class="text-neon font-bold">P1 · Cintura de avispa:</span> cero peso muerto convencional desde el piso. Cadena posterior con pecho apoyado, Smith, Hack invertida o rumano con straps sin bloquear. Vacuums diarios.</li>
-          <li><span class="text-neon font-bold">P2 · Pantorrillas rezagadas:</span> en todo día de pierna el ejercicio #1 son gemelos en frío, 3 s de pausa muerta abajo y 2 s de contracción arriba.</li>
-          <li><span class="text-neon font-bold">P3 · Cadena posterior antes que cuádriceps:</span> femoral y glúteo se destruyen primero; cuádriceps con rango 100% y rodillas sin valgo.</li>
-          <li><span class="text-neon font-bold">P4 · Forma en X:</span> dorsal bajo ilíaco, deltoide lateral y posterior en 3D.</li>
-          <li><span class="text-neon font-bold">P5 · Formato letal:</span> 7 ejercicios exactos, 16–19 series efectivas, 55–65 min, cada serie al fallo real.</li>
-          <li><span class="text-neon font-bold">P6 · Posing isométrico:</span> 5 poses obligatorias de Classic al final, 20 s apretando.</li>
-        </ul>
-        <p class="text-[12px] text-zinc-500"><span class="text-oro font-bold">Equipo:</span> Smith pesada · Hack Squat · Sentadilla Péndulo · Prensa · Poleas dobles ajustables · Mancuernas pesadas · Banco predicador · Cojín de Hip Thrust · <span class="text-white">Straps obligatorios en tirones</span>.</p>
-      </div>
-    </details>
-  </section>
-
-  <!-- RECORDATORIO VACUUM -->
-  <section class="tarjeta p-4 aparecer" aria-labelledby="tVac">
-    <div class="flex items-center justify-between gap-3">
-      <div>
-        <p class="etq text-neon">Recordatorio diario · En ayunas</p>
-        <h2 id="tVac" class="font-display text-xl text-white mt-0.5">STOMACH VACUUMS 5 × 25 s</h2>
-      </div>
-      <button class="t-btn iso px-3" data-timer="25" data-etq="Vacuum 25 s">25s</button>
-    </div>
-    <p class="text-[12.5px] text-zinc-400 mt-1.5">Exhala TODO el aire, succiona el ombligo hacia la columna y sube las costillas. Sostén 25 s sin respirar por el pecho. Así se encoge el transverso y se dibuja la cintura de avispa que el juez compara contra tus hombros.</p>
-    <div id="vacuums" class="flex gap-2 mt-3"></div>
-  </section>
-
-  <!-- GENERADOR -->
-  <section class="tarjeta tarjeta-brillo p-4 aparecer" aria-labelledby="tGen">
-    <p class="etq text-neon">Motor combinatorio anti-duplicación</p>
-    <h2 id="tGen" class="font-display text-2xl text-white mt-1">¿QUÉ ME TOCA DESTRUIR HOY?</h2>
-    <label for="selGrupo" class="sr-only">Grupo muscular</label>
-    <select id="selGrupo" class="sel mt-3">
-      <option value="1">Pierna Completa (Enfoque Gemelos + Femoral/Glúteo -&gt; Remate Cuádriceps)</option>
-      <option value="2">Pecho + Hombros (Enfoque Clavicular + Anchura Lateral/Posterior 3D)</option>
-      <option value="3">Espalda Brutal (Enfoque Dorsal Bajo Ilíaco + Densidad sin Lumbar)</option>
-      <option value="4">Brazos al 100% + Hombro (Primero Bíceps/Tríceps -&gt; Al final Deltoides)</option>
-      <option value="5">Hombros + Brazos (Primero Deltoides 3D -&gt; Al final Bíceps/Tríceps)</option>
-      <option value="6">Pecho + Bíceps (Especialización de Torso y Picos de Brazo)</option>
-      <option value="7">Pierna Especialización "X-Frame" (Gemelos + Barrido Externo Cuádriceps + Aductores + Glúteo)</option>
-    </select>
-    <div class="flex items-center justify-between mt-3 text-[12px]">
-      <span class="text-zinc-400">Versiones generadas para este músculo:</span>
-      <span id="txtVersionesGrupo" class="font-mono text-oro2 font-bold">0</span>
-    </div>
-    <button id="btnGenerar" class="btn btn-rojo w-full mt-3 text-[15px]">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg>
-      Generar Nueva Rutina Brutal
+  <nav class="nav" aria-label="Menú principal">
+    <button class="tab activa" data-ir="inicio" aria-label="Inicio">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v8.5a1.5 1.5 0 0 1-1.5 1.5H15v-6H9v6H4.5A1.5 1.5 0 0 1 3 19.5z"/></svg>Inicio
     </button>
-    <div class="grid grid-cols-2 gap-2 mt-2">
-      <button id="btnRotar" class="btn btn-fantasma btn-mini">⟳ Rotar variante ya</button>
-      <button id="btnReiniciarPool" class="btn btn-fantasma btn-mini">♻ Reiniciar pool</button>
-    </div>
-    <p class="text-[11.5px] text-zinc-500 mt-2 leading-relaxed">Cada rutina se guarda en este dispositivo. El motor excluye los ejercicios y combinaciones de la sesión inmediata anterior de ese músculo y nunca repite una firma exacta ya generada.</p>
-  </section>
-
-  <!-- RUTINA -->
-  <section id="zonaRutina" aria-live="polite"></section>
-
-</main>
-
-<!-- DOCK DEL CRONÓMETRO -->
-<div id="dock" role="region" aria-label="Cronómetro de torturas">
-  <div class="max-w-3xl mx-auto">
-    <div class="flex items-center gap-3">
-      <div class="flex-1 min-w-0">
-        <p id="relojEtq" class="etq text-zinc-500 truncate">Cronómetro de tortura</p>
-        <div id="reloj" class="text-[30px] leading-none font-bold text-white">00:00</div>
-      </div>
-      <button id="tMas" class="t-btn px-3" aria-label="Sumar 10 segundos">+10</button>
-      <button id="tPausa" class="t-btn px-3" aria-label="Pausar o reanudar">❚❚</button>
-      <button id="tStop" class="t-btn px-3 text-neon" aria-label="Detener">✕</button>
-    </div>
-    <div class="barra mt-2" style="height:5px"><span id="relojBarra" style="width:0%"></span></div>
-    <div class="grid grid-cols-6 gap-1.5 mt-2">
-      <button class="t-btn" data-timer="15" data-etq="Rest-Pause 15 s">15s</button>
-      <button class="t-btn" data-timer="20" data-etq="Rest-Pause 20 s">20s</button>
-      <button class="t-btn" data-timer="30" data-etq="Descanso 30 s">30s</button>
-      <button class="t-btn" data-timer="60" data-etq="Descanso 60 s">60s</button>
-      <button class="t-btn iso" data-timer="10" data-etq="Muro isométrico 10 s">ISO10</button>
-      <button class="t-btn fascia" data-timer="25" data-etq="Estiramiento fascial 25 s">FAS25</button>
-    </div>
-  </div>
+    <button class="tab" data-ir="entreno" aria-label="Entreno">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6.5 6.5v11M3.5 9v6M17.5 6.5v11M20.5 9v6M6.5 12h11"/></svg>Entreno
+    </button>
+    <button class="tab tab-centro" id="tabReloj" data-acc="abrirReloj" aria-label="Cronómetro">
+      <span class="bola"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 13.5V10M9.5 2.5h5M12 2.5V6M18.5 6.5l1.5-1.5"/></svg></span>Reloj
+    </button>
+    <button class="tab" data-ir="historial" aria-label="Historial">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Historial
+    </button>
+    <button class="tab" data-ir="perfil" aria-label="Perfil">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.2 3.6-7 8-7s8 2.8 8 7"/></svg>Perfil
+    </button>
+  </nav>
 </div>
 
-<div id="flash" hidden role="alertdialog" aria-live="assertive">
-  <div>
-    <p class="etq text-white/80">Tiempo cumplido</p>
-    <p id="flashTxt" class="font-display text-[54px] leading-none text-white mt-2">¡AL HIERRO!</p>
-    <p id="flashSub" class="text-white/90 font-semibold mt-3">Toca la pantalla para cerrar</p>
-  </div>
-</div>
-
-<div id="modalHist" class="modal-fondo" hidden>
-  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="tHist">
-    <div class="p-4 border-b border-linea flex items-center justify-between gap-3">
-      <div>
-        <p class="etq text-neon">Archivo de sesiones</p>
-        <h2 id="tHist" class="font-display text-2xl text-white">HISTORIAL DE TORTURAS</h2>
-      </div>
-      <button id="cerrarHist" class="t-btn px-4" aria-label="Cerrar historial">✕</button>
-    </div>
-    <div class="px-4 pt-3 flex flex-wrap gap-2">
-      <select id="filtroHist" class="sel !py-2.5 !text-[13px] flex-1 min-w-[180px]"></select>
-    </div>
-    <div class="px-4 pt-2 grid grid-cols-3 gap-2">
-      <button id="btnExportar" class="btn btn-oro btn-mini">⤓ JSON</button>
-      <button id="btnCopiar" class="btn btn-fantasma btn-mini">⧉ Copiar actual</button>
-      <button id="btnBorrarHist" class="btn btn-fantasma btn-mini text-neon">Borrar todo</button>
-    </div>
-    <div id="listaHist" class="p-4 overflow-y-auto space-y-2 flex-1"></div>
-  </div>
-</div>
-
-<div id="toast" role="status"></div>
+<div id="capaReloj" class="fondo-hoja" hidden></div>
+<div id="capaDialogo" class="dialogo" hidden></div>
+<div id="capaAlarma" class="alarma" hidden role="alertdialog" aria-live="assertive"></div>
+<div id="capaIntro" class="intro" hidden></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
 
 <script>
 'use strict';
-/* =====================================================================
-   BANCO DE EJERCICIOS
-   Campos: id · n (nombre) · eq (equipo) · t (etiquetas biomecánicas)
-   r (rango de reps) · tor (La Tortura: ejecución) · cue (clave del juez)
-   ref (opcional: carga sugerida a partir de tus marcas reales)
-   ===================================================================== */
 const BANCO = {};
 
 /* ---------------------------- GEMELOS ---------------------------- */
@@ -1194,184 +1189,145 @@ function guardarActual(r) {
   if (i >= 0) { hist[i] = r; guardar(LS.hist, hist); }
 }
 
+
 /* =====================================================================
-   RENDER DE LA RUTINA
+   INTERFAZ · ICONOS, GOTEOS E ILUSTRACIONES (estilo tinta líquida)
    ===================================================================== */
-let actual = leer(LS.act, null);
-if (actual && (!PLANTILLAS[actual.gid] || !actual.items || actual.items.some(i => !INDICE[i.ex] || !PROT[i.pr]))) actual = null;
-
-function botonesTimer(p) {
-  return (p.timers || []).map(t =>
-    '<button class="t-btn px-3 !min-h-[40px] text-[12.5px] ' + (t.s === 25 || t.s === 30 ? 'fascia' : 'iso') + '" data-timer="' + t.s + '" data-etq="' + esc(t.e) + '">⏱ ' + esc(t.e) + '</button>'
-  ).join('');
+const ICO = {
+  inicio:'<path d="M3 11l9-7 9 7v8.5a1.5 1.5 0 0 1-1.5 1.5H15v-6H9v6H4.5A1.5 1.5 0 0 1 3 19.5z"/>',
+  pesa:'<path d="M6.5 6.5v11M3.5 9v6M17.5 6.5v11M20.5 9v6M6.5 12h11"/>',
+  reloj:'<circle cx="12" cy="13.5" r="7.5"/><path d="M12 13.5V10M9.5 2.5h5M12 2.5V6"/>',
+  cal:'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+  usuario:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.2 3.6-7 8-7s8 2.8 8 7"/>',
+  check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  der:'<path d="M9 5l7 7-7 7"/>',
+  izq:'<path d="M15 5l-7 7 7 7"/>',
+  cambiar:'<path d="M4 8h14l-3.5-3.5M20 16H6l3.5 3.5"/>',
+  otra:'<path d="M20 12a8 8 0 1 1-2.4-5.7M20 4v5h-5"/>',
+  play:'<path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/>',
+  pausa:'<path d="M8.5 5.5v13M15.5 5.5v13"/>',
+  cerrar:'<path d="M6 6l12 12M18 6L6 18"/>',
+  mas:'<path d="M12 5v14M5 12h14"/>',
+  menos:'<path d="M5 12h14"/>',
+  alerta:'<circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.5v.3"/>',
+  libro:'<path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5zM5 19.5A1.5 1.5 0 0 0 6.5 21H19v-3"/>',
+  fuego:'<path d="M12 3c.5 3.5 5 5.5 5 10.5a5 5 0 0 1-10 0c0-2.6 1.5-4 2.3-5.8.9 1.3 1.7 2.3 1.7 3.8 1.3-1.7 1.6-5 1-8.5z"/>',
+  ojo:'<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/>',
+  trofeo:'<path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H5.5a2.5 2.5 0 0 0 3 3.6M16 6h2.5a2.5 2.5 0 0 1-3 3.6M12 13v4M8.5 21h7M10 17h4"/>',
+  copiar:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5.5A1.5 1.5 0 0 0 14.5 4h-9A1.5 1.5 0 0 0 4 5.5v9A1.5 1.5 0 0 0 5.5 16H8"/>',
+  bajar:'<path d="M12 4v11M7 10.5l5 5 5-5M5 20h14"/>',
+  basura:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 12.5A1.5 1.5 0 0 0 8.5 21h7a1.5 1.5 0 0 0 1.5-1.5L18 7M9 7V4.5h6V7"/>',
+  gota:'<path d="M12 3.5c3.5 4.5 6 8 6 11a6 6 0 0 1-12 0c0-3 2.5-6.5 6-11z"/>',
+  pose:'<circle cx="12" cy="4.5" r="2"/><path d="M4.5 9c2 1.8 4.2 1.8 5.5.5h4c1.3 1.3 3.5 1.3 5.5-.5M10 9.5v4.5l-2 7M14 9.5v4.5l2 7M10 14h4"/>',
+  rayo:'<path d="M13 3L5 13.5h6L10 21l8-10.5h-6z"/>',
+  ayuda:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 16.8v.2"/>',
+  pierna:'<path d="M8.5 2.5c-.3 3.5.4 6.6 1.6 9.2.5 1 .5 2 .2 3.1l-1.1 4.2c-.2.7.3 1.5 1.1 1.5H16M15 2.5c.3 3-.3 5.8-.9 8.2-.4 1.6-.3 3.2.1 4.8l.4 1.5"/>',
+  pecho:'<path d="M12 6.5c-2.5-2-6.5-2-8.5.5L4.5 14c2.5 2 6 1.8 7.5-.8 1.5 2.6 5 2.8 7.5.8l1-7c-2-2.5-6-2.5-8.5-.5zM12 6.5v6.7"/>',
+  espalda:'<path d="M4 4.5c2.5 1.5 5 2 8 2s5.5-.5 8-2l-3 9.5-1.5 6.5h-7L7 14z"/><path d="M12 8v10"/>',
+  brazo:'<path d="M4 19.5c0-4 1-7 3.5-8.5l2-5.5 3-1 .5 3-2 3c3-1.5 7.5-.5 8.5 3 .8 3-1.2 6-5 6z"/>',
+  hombro:'<path d="M3.5 19c0-6.5 3.5-11 8.5-11s8.5 4.5 8.5 11"/><path d="M8 19v-4.5M16 19v-4.5M9 8.5c.5-2.5 1.5-4 3-4s2.5 1.5 3 4"/>',
+  equis:'<path d="M5 3.5c2.5 3 4.5 5.5 7 8.5 2.5-3 4.5-5.5 7-8.5M5 20.5c2.5-3 4.5-5.5 7-8.5 2.5 3 4.5 5.5 7 8.5"/>'
+};
+function ico(n, clase, estilo) {
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"' +
+    (clase ? ' class="' + clase + '"' : '') + (estilo ? ' style="' + estilo + '"' : '') + '>' + ICO[n] + '</svg>';
 }
 
-function tarjetaEjercicio(r, it, i) {
-  const ej = INDICE[it.ex], p = PROT[it.pr], slot = PLANTILLAS[r.gid].slots[i];
-  const m = slot.m;
-  const regla = REGLAS[ej.banco] || '';
-  const carga = cargaTxt(ej, p.id);
-  const series = it.done.map((d, j) =>
-    '<button class="serie' + (d ? ' hecha' : '') + '" data-serie="' + i + '-' + j + '" aria-pressed="' + d + '" aria-label="Serie ' + (j + 1) + ' de ' + esc(ej.n) + '">S' + (j + 1) + '</button>'
-  ).join('');
-  const completa = it.done.every(Boolean);
-  return '' +
-  '<article class="tarjeta p-4 aparecer' + (completa ? ' completa' : '') + '" id="ej-' + i + '" style="animation-delay:' + (i * 50) + 'ms">' +
-    '<div class="flex gap-3 items-start">' +
-      '<div class="num-ej shrink-0">' + (i + 1) + '</div>' +
-      '<div class="min-w-0 flex-1">' +
-        '<p class="etq text-neon">' + esc(slot.et) + '</p>' +
-        '<h3 class="text-white font-extrabold text-[17px] leading-snug mt-0.5">' + esc(ej.n) + '</h3>' +
-        '<div class="flex flex-wrap gap-1.5 mt-2">' +
-          '<span class="chip chip-rojo">' + it.sets + ' series × ' + esc(p.rep || ej.r) + '</span>' +
-          '<span class="chip">' + esc(ej.eq) + '</span>' +
-        '</div>' +
-      '</div>' +
-      '<button class="btn btn-fantasma btn-mini shrink-0 !px-2.5" data-cambiar="' + i + '" aria-label="Cambiar este ejercicio por otro del mismo bloque" title="Cambiar ejercicio">⇄</button>' +
-    '</div>' +
-    (regla ? '<div class="bloque bloque-gris mt-3"><p class="text-[12px] leading-relaxed text-zinc-300 font-semibold">' + esc(regla) + '</p></div>' : '') +
-    '<div class="bloque mt-2"><p class="etq text-neon mb-1">La Tortura (Ejecución)</p><p class="text-[13.5px] leading-relaxed text-zinc-200">' + esc(ej.tor) + '</p></div>' +
-    '<div class="bloque bloque-oro mt-2">' +
-      '<p class="etq text-oro mb-1">Intensificador · ' + esc(p.origen) + '</p>' +
-      '<p class="text-[14px] font-extrabold text-oro2 leading-snug">' + esc(p.n) + '</p>' +
-      '<p class="text-[13px] leading-relaxed text-zinc-300 mt-1">' + esc(p.d.split('{m}').join(m)) + '</p>' +
-    '</div>' +
-    '<p class="text-[12.5px] text-zinc-400 mt-2 leading-relaxed"><span class="text-oro2 font-bold">Clave del juez:</span> ' + esc(ej.cue) + '</p>' +
-    (carga ? '<p class="text-[12px] text-zinc-400 mt-1.5 font-mono leading-relaxed"><span class="text-white font-bold">Carga:</span> ' + esc(carga) + '</p>' : '') +
-    (p.timers && p.timers.length ? '<div class="flex flex-wrap gap-2 mt-3">' + botonesTimer(p) + '</div>' : '') +
-    '<div class="mt-3"><p class="etq text-zinc-500 mb-2">Series de supervivencia — toca al terminar cada una</p><div class="flex flex-wrap gap-2">' + series + '</div></div>' +
-  '</article>';
+/* Borde de tinta que gotea: base recta + gotas con unión cóncava y punta redonda */
+const GOTEOS = [
+  [[38,16,34],[96,12,18],[168,20,46],[246,14,24],[318,18,40],[372,12,20]],
+  [[24,14,22],[80,18,44],[150,12,16],[214,20,52],[290,14,26],[352,18,38]],
+  [[52,18,40],[130,14,24],[200,12,14],[262,20,48],[338,14,30]]
+];
+function goteo(color, variante, clase) {
+  const V = GOTEOS[variante || 0], B = 14, W = 400, r = 7;
+  let d = 'M0 0H' + W + 'V' + B;
+  V.slice().sort((a, b) => b[0] - a[0]).forEach(([x, w, len]) => {
+    const h = w / 2, xr = x + h, xl = x - h, yb = B + len - h;
+    d += 'L' + (xr + r) + ' ' + B + 'Q' + xr + ' ' + B + ' ' + xr + ' ' + (B + r) + 'V' + yb +
+         'A' + h + ' ' + h + ' 0 0 1 ' + xl + ' ' + yb + 'V' + (B + r) + 'Q' + xl + ' ' + B + ' ' + (xl - r) + ' ' + B;
+  });
+  d += 'L0 ' + B + 'Z';
+  const gotas = V.filter((_, i) => i % 2 === 0).map(([x, w, len]) => '<circle cx="' + x + '" cy="' + (B + len + 10) + '" r="' + Math.max(3, w / 4) + '"/>').join('');
+  return '<svg class="goteo ' + (clase || '') + '" viewBox="0 0 400 80" aria-hidden="true" fill="' + color + '"><path d="' + d + '"/>' + gotas + '</svg>';
 }
 
-function bloquePosing(r) {
-  const filas = POSES.map((po, k) => {
-    const cajas = [];
-    for (let j = 0; j < POSING_RONDAS; j++) {
-      const n = k * POSING_RONDAS + j, d = r.posing[n];
-      cajas.push('<button class="serie !w-[46px] !h-[46px]' + (d ? ' hecha' : '') + '" data-pose="' + n + '" aria-pressed="' + d + '" aria-label="' + esc(po.n) + ' ronda ' + (j + 1) + '">' + (j + 1) + '</button>');
-    }
-    return '<div class="py-3 border-t border-linea first:border-t-0">' +
-      '<div class="flex items-center justify-between gap-2"><p class="font-extrabold text-white text-[15px]">' + (k + 1) + '. ' + esc(po.n) + '</p>' +
-      '<button class="t-btn iso px-3 !min-h-[38px] text-[12px]" data-timer="20" data-etq="' + esc(po.n) + ' · 20 s">⏱ 20s</button></div>' +
-      '<p class="text-[12.5px] text-zinc-400 leading-relaxed mt-1">' + esc(po.cue) + '</p>' +
-      '<div class="flex gap-2 mt-2">' + cajas.join('') + '</div></div>';
-  }).join('');
-  return '<section class="tarjeta tarjeta-oro p-4 aparecer" aria-labelledby="tPose">' +
-    '<p class="etq text-oro">Bloque obligatorio · Posing isométrico intra-entreno</p>' +
-    '<h2 id="tPose" class="font-display text-2xl text-white mt-1">POSING CLASSIC PHYSIQUE</h2>' +
-    '<p class="text-[12.5px] text-zinc-400 mt-1 leading-relaxed">' + POSING_RONDAS + ' rondas de las 5 poses. Cada pose: 20 segundos apretando TODO al máximo, respirando corto con el vacuum puesto. Rota entre poses sin descanso. Con el músculo inflado de sangre es cuando mejor aprendes a mostrarlo.</p>' +
-    '<div class="mt-2">' + filas + '</div></section>';
+/* Ilustración: mancha de tinta con gotas, charco y un icono blanco dentro */
+function ilus(icono) {
+  return '<svg class="ilus-svg" viewBox="0 0 260 240" aria-hidden="true">' +
+    '<ellipse cx="130" cy="224" rx="92" ry="9" fill="#1e1b3a" opacity=".14"/>' +
+    '<path d="M130 26C182 22 222 58 220 108C218 156 182 182 130 180C78 178 40 154 40 106C40 58 78 30 130 26Z" fill="#1e1b3a"/>' +
+    '<path d="M86 160h18v36a9 9 0 0 1-18 0zM150 166h16v24a8 8 0 0 1-16 0z" fill="#1e1b3a"/>' +
+    '<circle cx="95" cy="216" r="6" fill="#1e1b3a"/><circle cx="200" cy="204" r="4" fill="#1e1b3a"/>' +
+    '<path d="M212 34c6 8 9 14 9 19a9 9 0 0 1-18 0c0-5 3-11 9-19z" fill="#1e1b3a"/>' +
+    '<path d="M42 50c4 6 6 10 6 13a6 6 0 0 1-12 0c0-3 2-7 6-13z" fill="#1e1b3a"/>' +
+    '<circle cx="232" cy="150" r="10" fill="#ffb27f" stroke="#1e1b3a" stroke-width="3"/>' +
+    '<circle cx="30" cy="140" r="6" fill="#ffb27f" stroke="#1e1b3a" stroke-width="3"/>' +
+    '<g transform="translate(82 55) scale(4)" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">' + icono + '</g></svg>';
 }
 
-function renderRutina() {
-  const zona = $('#zonaRutina');
-  if (!actual) {
-    zona.innerHTML = '<div class="tarjeta p-6 text-center"><p class="font-display text-2xl text-zinc-500">SIN RUTINA CARGADA</p><p class="text-[13px] text-zinc-500 mt-2">Elige qué vas a destruir hoy y pulsa <span class="text-neon font-bold">Generar Nueva Rutina Brutal</span>.</p></div>';
-    actualizarProgreso();
-    return;
-  }
-  const r = actual, tpl = PLANTILLAS[r.gid], pr = progresoDe(r);
-  const fecha = new Date(r.fecha);
-  const minutos = pr.total * 3 + 8;
-  zona.innerHTML =
-    '<div class="tarjeta tarjeta-brillo p-4 aparecer">' +
-      '<div class="flex items-start justify-between gap-3">' +
-        '<div class="min-w-0"><p class="etq text-neon">Sesión de hoy</p>' +
-        '<h2 class="font-display text-[28px] leading-none text-white mt-1">' + esc(tpl.nombre.toUpperCase()) + '</h2>' +
-        '<p class="text-[12.5px] text-zinc-400 mt-1">' + esc(tpl.sub) + '</p></div>' +
-        '<div class="text-right shrink-0"><p class="etq text-zinc-500">Firma</p><p class="font-mono text-oro2 font-bold">#' + hashCorto(r.firma) + '</p></div>' +
-      '</div>' +
-      '<div class="mt-3 rounded-xl border border-oro/40 bg-oro/10 px-3 py-2.5 flex items-center justify-between gap-2">' +
-        '<span class="text-[12.5px] text-oro2 font-semibold">Versión de Rutina #' + r.version + ' generada para este músculo</span>' +
-        '<span class="font-display text-2xl text-oro2">#' + r.version + '</span>' +
-      '</div>' +
-      '<div class="grid grid-cols-3 gap-2 mt-3 text-center">' +
-        '<div class="dato"><p class="etq text-zinc-500">Ejercicios</p><b>7</b></div>' +
-        '<div class="dato"><p class="etq text-zinc-500">Series</p><b>' + pr.total + '</b></div>' +
-        '<div class="dato"><p class="etq text-zinc-500">Duración</p><b>~' + minutos + '\'</b></div>' +
-      '</div>' +
-      '<p class="text-[11.5px] text-zinc-500 mt-2 font-mono">' + fecha.toLocaleDateString('es-MX', { weekday:'long', day:'numeric', month:'long' }) + ' · ' + fecha.toLocaleTimeString('es-MX', { hour:'2-digit', minute:'2-digit' }) + '</p>' +
-      '<p class="text-[12.5px] text-zinc-300 mt-2 leading-relaxed">Calentamiento: 2–3 series de aproximación en el ejercicio 1 (no cuentan). Después, <span class="text-neon font-bold">cada serie marcada es una serie efectiva al fallo muscular real</span>. Descansos de 60–120 s salvo que el protocolo diga otra cosa.</p>' +
-    '</div>' +
-    '<div class="space-y-4 mt-4">' + r.items.map((it, i) => tarjetaEjercicio(r, it, i)).join('') + '</div>' +
-    '<div class="mt-4">' + bloquePosing(r) + '</div>' +
-    '<div id="finSesion" class="mt-4"></div>';
-  actualizarProgreso();
-}
-
-function actualizarProgreso() {
-  const barra = $('#barraSesion'), txt = $('#txtSesion');
-  if (!actual) { barra.style.width = '0%'; txt.textContent = 'Sin rutina activa'; return; }
-  const p = progresoDe(actual);
-  barra.style.width = p.pct + '%';
-  txt.textContent = p.hechos + '/' + p.total + ' series · ' + p.ph + '/' + p.pt + ' poses · ' + p.pct + '%';
-  actual.items.forEach((it, i) => { const c = $('#ej-' + i); if (c) c.classList.toggle('completa', it.done.every(Boolean)); });
-  const fin = $('#finSesion');
-  if (fin) {
-    fin.innerHTML = p.pct === 100
-      ? '<div class="tarjeta tarjeta-oro p-5 text-center aparecer"><p class="etq text-oro">Sesión completada</p><p class="font-display text-[34px] leading-none text-oro2 mt-1">MÚSCULO DESTRUIDO</p><p class="text-[13px] text-zinc-300 mt-2">Batido, carbohidrato y a dormir 8 horas. Mañana el motor te entrega otra combinación que no has visto.</p></div>'
-      : '';
-  }
-}
-
-$('#zonaRutina').addEventListener('click', ev => {
-  const s = ev.target.closest('[data-serie]');
-  if (s && actual) {
-    const [i, j] = s.dataset.serie.split('-').map(Number);
-    actual.items[i].done[j] = !actual.items[i].done[j];
-    s.classList.toggle('hecha', actual.items[i].done[j]);
-    s.setAttribute('aria-pressed', actual.items[i].done[j]);
-    guardarActual(actual);
-    actualizarProgreso();
-    if (actual.items[i].done[j]) {
-      vibrar(40);
-      if (actual.items[i].done.every(Boolean)) aviso('Ejercicio ' + (i + 1) + ' aniquilado');
-    }
-    return;
-  }
-  const po = ev.target.closest('[data-pose]');
-  if (po && actual) {
-    const n = Number(po.dataset.pose);
-    actual.posing[n] = !actual.posing[n];
-    po.classList.toggle('hecha', actual.posing[n]);
-    po.setAttribute('aria-pressed', actual.posing[n]);
-    guardarActual(actual);
-    actualizarProgreso();
-    return;
-  }
-  const c = ev.target.closest('[data-cambiar]');
-  if (c && actual) {
-    const i = Number(c.dataset.cambiar);
-    if (actual.items[i].done.some(Boolean) && !confirm('Este ejercicio ya tiene series marcadas. ¿Cambiarlo de todos modos?')) return;
-    if (cambiarEjercicio(actual, i)) {
-      guardarActual(actual);
-      const tmp = document.createElement('div');
-      tmp.innerHTML = tarjetaEjercicio(actual, actual.items[i], i);
-      $('#ej-' + i).replaceWith(tmp.firstElementChild);
-      actualizarProgreso();
-      aviso('Ejercicio ' + (i + 1) + ' mutado');
-    } else {
-      aviso('No quedan alternativas libres en este bloque');
-    }
-  }
-});
+/* Nombres cortos para gente con prisa */
+const GRUPOS_UI = {
+  '1': { c:'Pierna completa',  s:'Gemelos, femoral, glúteo y al final cuádriceps', i:'pierna' },
+  '2': { c:'Pecho + Hombros',  s:'Pecho de arriba y hombro ancho en 3D', i:'pecho' },
+  '3': { c:'Espalda',          s:'Dorsal bajo y grosor sin cargar la lumbar', i:'espalda' },
+  '4': { c:'Brazos + Hombro',  s:'Primero bíceps y tríceps, al final hombro', i:'brazo' },
+  '5': { c:'Hombros + Brazos', s:'Primero hombro, al final bíceps y tríceps', i:'hombro' },
+  '6': { c:'Pecho + Bíceps',   s:'Pecho completo y pico del brazo', i:'pecho' },
+  '7': { c:'Pierna X-Frame',   s:'Gemelos, muslo por fuera, aductores y glúteo', i:'equis' }
+};
 
 /* =====================================================================
-   AVISOS, VIBRACIÓN Y SONIDO
+   ESTADO
+   ===================================================================== */
+LS.ajustes = 'tb_ajustes_v1';
+LS.intro = 'tb_intro_v2';
+const AJ = Object.assign({ descanso: true, vibrar: true, sonido: true }, leer(LS.ajustes, {}));
+let actual = leer(LS.act, null);
+if (actual && (!PLANTILLAS[actual.gid] || !Array.isArray(actual.items) || actual.items.length !== 7 ||
+    actual.items.some(i => !INDICE[i.ex] || !PROT[i.pr]))) actual = null;
+let grupoSel = (actual && actual.gid) || leer(LS.grupo, '1');
+if (!PLANTILLAS[grupoSel]) grupoSel = '1';
+let vista = 'inicio';
+const H = { modo: 'cal', mes: new Date(new Date().getFullYear(), new Date().getMonth(), 1), dia: null };
+
+function primerPendiente(r) {
+  const i = r.items.findIndex(it => it.done.some(d => !d));
+  if (i >= 0) return i;
+  return r.posing.some(d => !d) ? 7 : 8;
+}
+function pesoActual() { const p = Number(leer(LS.peso, 90)); return p >= 60 && p <= 130 ? p : 90; }
+function fmtKg(n) { return (Math.round(n * 10) / 10).toString(); }
+function claveDia(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+function cargaNums(ej, prId) {
+  if (!ej.ref) return null;
+  const f = FACTOR_CARGA[prId] || 1, base = MARCAS[ej.ref.b];
+  const lo = Math.round(base * ej.ref.p[0] * f / 5) * 5, hi = Math.round(base * ej.ref.p[1] * f / 5) * 5;
+  return { lo, hi, lado: (lo / 2) + '–' + (hi / 2),
+    base: { hack: 'Hack Squat de 160 kg', pendulo: 'Péndulo de 100 kg', pm: 'Peso Muerto de 140 kg' }[ej.ref.b] };
+}
+function descansoDe(i) {
+  const it = actual.items[i], ej = INDICE[it.ex];
+  if (it.pr === 'yates') return 120;
+  return ej.t.includes('compuesto') ? 90 : 60;
+}
+
+/* =====================================================================
+   AYUDANTES: AVISOS, VIBRACIÓN, SONIDO, PREGUNTAS
    ===================================================================== */
 let toastT = null;
 function aviso(txt) {
   const t = $('#toast');
   t.textContent = txt; t.classList.add('ver');
-  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('ver'), 2200);
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('ver'), 2300);
 }
-function vibrar(p) { try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) {} }
+function vibrar(p) { if (!AJ.vibrar) return; try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) {} }
 let audioCtx = null;
 function desbloquearAudio() {
   try { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if (audioCtx.state === 'suspended') audioCtx.resume(); } catch (e) {}
 }
 function pitido(freq, dur, vol) {
-  if (!audioCtx) return;
+  if (!AJ.sonido || !audioCtx) return;
   try {
     const o = audioCtx.createOscillator(), g = audioCtx.createGain(), t0 = audioCtx.currentTime;
     o.type = 'square'; o.frequency.value = freq;
@@ -1379,241 +1335,641 @@ function pitido(freq, dur, vol) {
     o.connect(g); g.connect(audioCtx.destination); o.start(t0); o.stop(t0 + dur);
   } catch (e) {}
 }
+function preguntar(titulo, texto, si, no, peligro) {
+  return new Promise(res => {
+    const capa = $('#capaDialogo');
+    capa.innerHTML = '<div class="hoja" role="dialog" aria-modal="true" aria-labelledby="dlgT"><div class="asa"></div>' +
+      '<h2 id="dlgT" class="disp" style="font-size:22px">' + esc(titulo) + '</h2>' +
+      '<p class="suave" style="margin-top:8px;font-size:16px;font-weight:700">' + esc(texto) + '</p>' +
+      '<div style="display:grid;gap:10px;margin-top:18px">' +
+      '<button class="btn ' + (peligro ? 'btn-peligro' : 'btn-durazno') + ' btn-ancho" data-r="1">' + esc(si) + '</button>' +
+      '<button class="btn btn-blanco btn-ancho" data-r="0">' + esc(no) + '</button></div></div>';
+    capa.hidden = false;
+    const fin = v => { capa.hidden = true; capa.innerHTML = ''; capa.onclick = null; capa.onkeydown = null; res(v); };
+    capa.onclick = e => { e.stopPropagation(); const b = e.target.closest('[data-r]'); if (b) fin(b.dataset.r === '1'); else if (e.target === capa) fin(false); };
+    capa.onkeydown = e => { if (e.key === 'Escape') fin(false); };
+    capa.querySelector('[data-r="1"]').focus();
+  });
+}
 
 /* =====================================================================
-   CRONÓMETRO FLOTANTE DE TORTURAS
+   NAVEGACIÓN ENTRE PESTAÑAS
    ===================================================================== */
-const T = { fin: 0, total: 0, restante: 0, corriendo: false, pausado: false, etq: '', iv: null, ultimoSeg: -1 };
+function ir(v, sinScroll) {
+  vista = v;
+  document.querySelectorAll('[data-vista]').forEach(s => { s.hidden = s.dataset.vista !== v; });
+  document.querySelectorAll('.tab[data-ir]').forEach(t => {
+    const on = t.dataset.ir === v;
+    t.classList.toggle('activa', on);
+    if (on) t.setAttribute('aria-current', 'page'); else t.removeAttribute('aria-current');
+  });
+  render();
+  if (!sinScroll) window.scrollTo(0, 0);
+}
+function render() {
+  if (vista === 'inicio') renderInicio();
+  else if (vista === 'entreno') renderEntreno();
+  else if (vista === 'historial') renderHistorial();
+  else renderPerfil();
+  actualizarAccion();
+}
+
+/* =====================================================================
+   PESTAÑA INICIO: elegir músculo + un solo botón
+   ===================================================================== */
+function vacHoy() { const v = leer(LS.vac, {}); return v[claveDia(new Date())] || [false, false, false, false, false]; }
+
+function tarjetaVacuum() {
+  const hoy = vacHoy(), listo = hoy.every(Boolean);
+  return '<div class="tarjeta crema" style="margin-top:24px">' +
+    '<div style="display:flex;align-items:center;gap:12px"><div class="ico">' + ico('gota') + '</div>' +
+    '<div style="flex:1;min-width:0"><p style="font-weight:900;font-size:16.5px">Vacío abdominal de hoy</p>' +
+    '<p style="font-size:13.5px;font-weight:700">En ayunas · 5 veces de 25 segundos</p></div></div>' +
+    '<p style="font-size:14.5px;margin-top:10px;line-height:1.45">Saca todo el aire, mete el ombligo hacia la espalda y aguanta. <b>Toca un círculo y empieza el reloj.</b></p>' +
+    '<div class="vacs" style="margin-top:12px">' + hoy.map((d, i) =>
+      '<button class="vac' + (d ? ' hecha' : '') + '" data-acc="vac" data-i="' + i + '" aria-pressed="' + d + '" aria-label="Vacío ' + (i + 1) + '">' + (d ? ico('check') : (i + 1)) + '</button>').join('') + '</div>' +
+    (listo ? '<p style="margin-top:12px;font-weight:900">¡Cintura blindada hoy!</p>' : '') + '</div>';
+}
+
+function renderInicio() {
+  const v = $('#v-inicio'), vers = leer(LS.ver, {});
+  const pr = actual ? progresoDe(actual) : null;
+  const aMedias = actual && actual.paso !== 8 && pr.pct < 100;
+  const h = new Date().getHours();
+  const saludo = h < 12 ? 'Buenos días' : h < 19 ? 'Buenas tardes' : 'Buenas noches';
+  v.innerHTML =
+    '<div class="cab">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px">' +
+        '<div><p class="mini" style="color:var(--durazno)">' + saludo + ', campeón</p>' +
+        '<h1 class="disp" style="font-size:clamp(26px,8vw,32px);margin-top:8px">¿Qué toca<br>destruir hoy?</h1></div>' +
+        '<button class="ico" style="width:58px;height:58px;background:#fff;color:var(--tinta);box-shadow:0 0 0 3px var(--durazno)" data-ir="perfil" aria-label="Mi perfil">' + ico('usuario') + '</button>' +
+      '</div>' +
+      (aMedias
+        ? '<div class="tarjeta crema" style="margin-top:16px;color:var(--tinta);display:flex;align-items:center;gap:12px;padding:12px">' +
+            '<div class="ico">' + ico(GRUPOS_UI[actual.gid].i) + '</div>' +
+            '<div style="flex:1;min-width:0"><p style="font-weight:900;line-height:1.2">Tienes una rutina a medias</p>' +
+            '<p style="font-size:13.5px;font-weight:700">' + esc(GRUPOS_UI[actual.gid].c) + ' · ' + pr.hechos + '/' + pr.total + ' series</p></div>' +
+            '<button class="btn btn-tinta btn-chico" data-ir="entreno">Seguir</button></div>'
+        : '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px"><span class="etiqueta vacia">' + fmtKg(pesoActual()) + ' kg → meta 81 kg</span><span class="etiqueta vacia">7 ejercicios · ~1 hora</span></div>') +
+    '</div>' + goteo('#1e1b3a', 0) +
+    '<div class="pad">' +
+      '<p class="paso-titulo" style="margin-top:4px"><i>1</i>Toca lo que vas a entrenar</p>' +
+      '<div style="display:grid;gap:10px" role="radiogroup" aria-label="Grupo muscular">' +
+      Object.keys(PLANTILLAS).map(g => {
+        const on = g === grupoSel;
+        return '<button class="fila' + (on ? ' sel' : '') + '" role="radio" aria-checked="' + on + '" data-acc="grupo" data-g="' + g + '">' +
+          '<span class="ico">' + ico(GRUPOS_UI[g].i) + '</span>' +
+          '<span style="flex:1;min-width:0"><span class="t" style="display:block">' + esc(GRUPOS_UI[g].c) + '</span>' +
+          '<span class="s" style="display:block">' + esc(GRUPOS_UI[g].s) + '</span></span>' +
+          '<span class="chulo">' + (on ? ico('check') : '') + '</span></button>';
+      }).join('') + '</div>' +
+      '<p class="paso-titulo"><i>2</i>Pulsa el botón</p>' +
+      '<button class="btn btn-durazno btn-ancho" style="min-height:66px;font-size:19px" data-acc="crear">' + ico('rayo') + 'Crear mi rutina</button>' +
+      '<p class="suave" style="text-align:center;font-size:13.5px;font-weight:700;margin-top:10px">Nunca sale igual a la última. Llevas ' + (vers[grupoSel] || 0) + ' versiones de ' + esc(GRUPOS_UI[grupoSel].c) + '.</p>' +
+      tarjetaVacuum() +
+    '</div>';
+}
+
+/* =====================================================================
+   PESTAÑA ENTRENO: un ejercicio a la vez
+   ===================================================================== */
+function vacioEntreno() {
+  return '<div class="cab"><h1 class="disp" style="font-size:clamp(26px,8vw,32px)">Entreno</h1></div>' + goteo('#1e1b3a', 1) +
+    '<div class="pad" style="text-align:center">' + ilus(ICO.pesa) +
+    '<h2 style="font-size:22px;font-weight:900;margin-top:6px">Aún no tienes rutina</h2>' +
+    '<p class="suave" style="font-weight:700;margin-top:6px">Ve a Inicio, toca un músculo y pulsa “Crear mi rutina”.</p>' +
+    '<button class="btn btn-durazno btn-ancho" style="margin-top:18px" data-ir="inicio">' + ico('inicio') + 'Ir a elegir</button></div>';
+}
+
+function vistaEjercicio(i) {
+  const r = actual, it = r.items[i], ej = INDICE[it.ex], p = PROT[it.pr], slot = PLANTILLAS[r.gid].slots[i];
+  const reps = p.rep || ej.r, carga = cargaNums(ej, p.id), regla = REGLAS[ej.banco], listo = it.done.every(Boolean);
+  const timers = p.timers && p.timers.length
+    ? '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px">' + p.timers.map(t =>
+        '<button class="btn btn-tinta btn-chico" data-timer="' + t.s + '" data-etq="' + esc(t.e) + '">' + ico('reloj') + esc(t.e) + '</button>').join('') + '</div>'
+    : '';
+  return '' +
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span class="etiqueta durazno">Ejercicio ' + (i + 1) + ' de 7</span>' +
+    '<span class="etiqueta">' + esc(ej.eq.split('+')[0].trim()) + '</span></div>' +
+    '<p class="mini suave" style="margin-top:14px">' + esc(slot.et) + '</p>' +
+    '<h2 style="font-size:clamp(22px,6.6vw,27px);font-weight:900;line-height:1.15;margin-top:4px">' + esc(ej.n) + '</h2>' +
+    '<div class="datos' + (carga ? '' : ' dos') + '" style="margin-top:14px">' +
+      '<div class="dato"><b>' + it.sets + '</b><span>series</span></div>' +
+      '<div class="dato"><b style="font-size:' + (reps.length > 9 ? '14px' : '18px') + '">' + esc(reps) + '</b><span>repeticiones</span></div>' +
+      (carga ? '<div class="dato"><b>' + carga.lado + '</b><span>kg por lado</span></div>' : '') +
+    '</div>' +
+    '<div class="tarjeta" style="margin-top:14px' + (listo ? ';background:var(--crema)' : '') + '">' +
+      '<p style="font-weight:900;font-size:16.5px">' + (listo ? '¡Terminado! Pulsa “Siguiente”.' : 'Toca un círculo al acabar cada serie') + '</p>' +
+      '<p class="suave" style="font-size:13.5px;font-weight:700;margin-top:2px">' + (AJ.descanso ? 'Cada serie al fallo real. El descanso empieza solo.' : 'Cada serie al fallo real.') + '</p>' +
+      '<div class="series" style="margin-top:14px">' + it.done.map((d, j) =>
+        '<button class="serie' + (d ? ' hecha' : '') + '" data-acc="serie" data-i="' + i + '" data-j="' + j + '" aria-pressed="' + d + '" aria-label="Serie ' + (j + 1) + (d ? ' hecha' : '') + '">' + (d ? ico('check') : (j + 1)) + '</button>').join('') + '</div>' +
+    '</div>' +
+    (regla ? '<div class="aviso" style="margin-top:12px">' + ico('alerta') + '<span>' + esc(regla.replace(/^REGLA[^:]*:\s*/, '')) + '</span></div>' : '') +
+    '<div style="margin-top:12px">' +
+      '<details class="acord" open><summary><span class="ico">' + ico('libro') + '</span>Cómo se hace' + ico('der', 'flecha') + '</summary><div class="cuerpo">' + esc(ej.tor) + '</div></details>' +
+      '<details class="acord crema"><summary><span class="ico">' + ico('fuego') + '</span><span style="min-width:0;line-height:1.2">Técnica: ' + esc(p.n) + '</span>' + ico('der', 'flecha') + '</summary>' +
+        '<div class="cuerpo">' + esc(p.d.split('{m}').join(slot.m)) + timers +
+        '<p class="suave" style="font-size:12.5px;font-weight:800;margin-top:10px">Método: ' + esc(p.origen) + '</p></div></details>' +
+      '<details class="acord"><summary><span class="ico">' + ico('ojo') + '</span>Consejo del juez' + ico('der', 'flecha') + '</summary><div class="cuerpo">' + esc(ej.cue) +
+        (carga ? '<p style="margin-top:10px;font-weight:800">Peso para empezar: ' + carga.lo + '–' + carga.hi + ' kg en total (' + carga.lado + ' kg por lado). Sale de tu ' + carga.base + '.</p>' : '') +
+      '</div></details>' +
+    '</div>' +
+    '<button class="btn btn-blanco btn-ancho btn-chico" style="margin-top:14px" data-acc="cambiar" data-i="' + i + '">' + ico('cambiar') + 'Máquina ocupada: cambiar ejercicio</button>';
+}
+
+function vistaPosing() {
+  const r = actual;
+  return '<span class="etiqueta durazno">Último paso</span>' +
+    '<h2 style="font-size:clamp(22px,6.6vw,27px);font-weight:900;line-height:1.15;margin-top:12px">Posing de Classic Physique</h2>' +
+    '<p style="font-size:15.5px;margin-top:8px;line-height:1.45">Haz <b>' + POSING_RONDAS + ' vueltas</b> de las 5 poses. <b>Toca un círculo</b> y empieza un reloj de 20 segundos: aprieta TODO hasta que suene.</p>' +
+    '<div class="tarjeta lista-poses" style="margin-top:14px">' + POSES.map((po, k) =>
+      '<div class="pose"><p style="font-weight:900;font-size:17px">' + (k + 1) + '. ' + esc(po.n) + '</p>' +
+      '<p style="font-size:14px;line-height:1.45;margin-top:4px">' + esc(po.cue) + '</p>' +
+      '<div style="display:flex;gap:10px;margin-top:10px">' + Array.from({ length: POSING_RONDAS }, (_, j) => {
+        const n = k * POSING_RONDAS + j, d = r.posing[n];
+        return '<button class="vac' + (d ? ' hecha' : '') + '" style="width:56px;height:56px" data-acc="pose" data-n="' + n + '" aria-pressed="' + d + '" aria-label="' + esc(po.n) + ', vuelta ' + (j + 1) + '">' + (d ? ico('check') : (j + 1)) + '</button>';
+      }).join('') + '</div></div>').join('') + '</div>';
+}
+
+function vistaFin() {
+  const pr = progresoDe(actual);
+  return '<div style="text-align:center">' + ilus(ICO.trofeo) +
+    '<h2 class="disp" style="font-size:clamp(26px,8vw,34px);margin-top:4px">¡MÚSCULO<br>DESTRUIDO!</h2>' +
+    '<p style="font-size:16.5px;margin-top:12px">Hiciste <b>' + pr.hechos + ' de ' + pr.total + '</b> series y <b>' + pr.ph + ' de ' + pr.pt + '</b> poses.</p>' +
+    '<p class="suave" style="font-weight:700;margin-top:6px">Ahora: proteína, carbohidrato y a dormir 8 horas.</p>' +
+    '<div style="display:grid;gap:10px;margin-top:22px">' +
+      '<button class="btn btn-durazno btn-ancho" data-ir="inicio">' + ico('inicio') + 'Volver al inicio</button>' +
+      '<button class="btn btn-blanco btn-ancho" data-ir="historial">' + ico('cal') + 'Ver mi historial</button>' +
+      '<button class="btn btn-blanco btn-ancho btn-chico" data-acc="irPaso" data-p="0">Revisar la rutina</button>' +
+    '</div></div>';
+}
+
+function renderEntreno() {
+  const v = $('#v-entreno');
+  if (!actual) { v.innerHTML = vacioEntreno(); return; }
+  if (typeof actual.paso !== 'number') actual.paso = primerPendiente(actual);
+  const r = actual, pr = progresoDe(r), p = r.paso;
+  const pasos = r.items.map((it, i) => {
+    const hecho = it.done.every(Boolean) && i !== p;
+    return '<button class="paso' + (i === p ? ' actual' : '') + (hecho ? ' hecho' : '') + '" data-acc="irPaso" data-p="' + i + '" aria-label="Ejercicio ' + (i + 1) + (hecho ? ', hecho' : '') + '">' + (hecho ? ico('check') : (i + 1)) + '</button>';
+  }).join('') +
+    '<button class="paso' + (p === 7 ? ' actual' : '') + (r.posing.every(Boolean) && p !== 7 ? ' hecho' : '') + '" data-acc="irPaso" data-p="7" aria-label="Posing">' + ico('pose') + '</button>';
+  v.innerHTML =
+    '<div class="cab">' +
+      '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">' +
+        '<div style="min-width:0"><p class="mini" style="color:var(--durazno)">Versión #' + r.version + ' de este músculo</p>' +
+        '<h1 class="disp" style="font-size:clamp(22px,6.8vw,28px);margin-top:8px">' + esc(GRUPOS_UI[r.gid].c) + '</h1></div>' +
+        '<button class="btn btn-fantasma btn-chico" style="flex-shrink:0" data-acc="otra">' + ico('otra') + 'Otra</button>' +
+      '</div>' +
+      '<div style="display:flex;align-items:center;gap:10px;margin-top:14px"><div class="barra" style="flex:1"><span style="width:' + pr.pct + '%"></span></div><b style="font-size:15px">' + pr.pct + '%</b></div>' +
+      '<p style="font-size:13.5px;color:#d6d3ea;font-weight:700;margin-top:6px">' + pr.hechos + ' de ' + pr.total + ' series · ' + pr.ph + ' de ' + pr.pt + ' poses</p>' +
+      (p < 8 ? '<div class="pasos" style="margin-top:14px" role="group" aria-label="Pasos de la rutina">' + pasos + '</div>' : '') +
+    '</div>' + goteo('#1e1b3a', 1) +
+    '<div class="pad">' + (p === 8 ? vistaFin() : p === 7 ? vistaPosing() : vistaEjercicio(p)) + '</div>';
+}
+
+/* Repinta el entreno sin cerrar los desplegables que el usuario abrió */
+function repintarEntreno() {
+  const abiertos = Array.from(document.querySelectorAll('#v-entreno details')).map(d => d.open);
+  renderEntreno(); actualizarAccion();
+  document.querySelectorAll('#v-entreno details').forEach((d, k) => { if (k < abiertos.length) d.open = abiertos[k]; });
+}
+
+function actualizarAccion() {
+  const a = $('#accion');
+  const mostrar = vista === 'entreno' && !!actual && actual.paso !== 8;
+  a.hidden = !mostrar;
+  $('#v-entreno').classList.toggle('con-accion', mostrar);
+  document.body.classList.toggle('con-accion-visible', mostrar);
+  if (!mostrar) { a.innerHTML = ''; return; }
+  const p = actual.paso, listo = p < 7 ? actual.items[p].done.every(Boolean) : actual.posing.every(Boolean), reloj = T.corriendo;
+  a.innerHTML =
+    '<button class="btn btn-blanco btn-circ" data-acc="ant" aria-label="Anterior"' + (p === 0 ? ' disabled style="opacity:.35"' : '') + '>' + ico('izq') + '</button>' +
+    (reloj ? '<button class="chip-reloj" data-acc="abrirReloj" aria-label="Abrir cronómetro">' + ico('reloj') +
+      '<span><small id="accEtq">' + (T.pausado ? 'En pausa' : 'Tiempo') + '</small><span id="accTxt">' + fmt(restanteMs()) + '</span></span></button>' : '') +
+    '<button class="btn btn-durazno' + (listo ? ' latir' : '') + '" data-acc="sig"' + (reloj ? ' style="padding:0 10px"' : '') + '>' +
+      (p === 7 ? 'Terminar' : 'Siguiente') + (reloj ? '' : ico(p === 7 ? 'check' : 'der')) + '</button>';
+  actualizarRelojUI();
+}
+
+/* =====================================================================
+   CRONÓMETRO (hoja inferior + píldora flotante + alarma)
+   ===================================================================== */
+const T = { fin: 0, total: 1, restante: 0, corriendo: false, pausado: false, etq: '', iv: null, ultimoSeg: -1 };
 let wakeLock = null;
 async function pedirWakeLock() { try { if ('wakeLock' in navigator && !wakeLock) { wakeLock = await navigator.wakeLock.request('screen'); wakeLock.addEventListener('release', () => { wakeLock = null; }); } } catch (e) {} }
 function fmt(ms) { const s = Math.ceil(ms / 1000), m = Math.floor(s / 60); return String(m).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); }
+function restanteMs() { return !T.corriendo ? 0 : T.pausado ? T.restante : Math.max(0, T.fin - Date.now()); }
 
 function iniciarTimer(seg, etq) {
   desbloquearAudio(); pedirWakeLock();
   T.total = seg * 1000; T.fin = Date.now() + T.total; T.corriendo = true; T.pausado = false; T.etq = etq || (seg + ' s'); T.ultimoSeg = -1;
-  $('#relojEtq').textContent = T.etq; $('#tPausa').textContent = '❚❚';
-  $('#dock').classList.add('corriendo');
-  clearInterval(T.iv); T.iv = setInterval(tick, 100); tick();
+  clearInterval(T.iv); T.iv = setInterval(tick, 200); tick();
+  if (vista === 'entreno') actualizarAccion();
 }
 function tick() {
-  if (!T.corriendo || T.pausado) return;
-  const rest = Math.max(0, T.fin - Date.now());
-  $('#reloj').textContent = fmt(rest);
-  $('#relojBarra').style.width = (100 * (1 - rest / T.total)) + '%';
-  const s = Math.ceil(rest / 1000);
-  $('#dock').classList.toggle('ultimos', s <= 3 && rest > 0);
-  if (s !== T.ultimoSeg && s <= 3 && s > 0) { pitido(880, 0.12); vibrar(60); }
+  if (!T.corriendo) return;
+  const rest = restanteMs(), s = Math.ceil(rest / 1000);
+  if (!T.pausado && s !== T.ultimoSeg && s <= 3 && s > 0) { pitido(880, 0.12); vibrar(60); }
   T.ultimoSeg = s;
-  if (rest <= 0) terminarTimer();
+  actualizarRelojUI();
+  if (!T.pausado && rest <= 0) terminarTimer();
 }
 function terminarTimer() {
-  clearInterval(T.iv); T.corriendo = false;
-  $('#dock').classList.remove('corriendo', 'ultimos');
-  $('#reloj').textContent = '00:00'; $('#relojBarra').style.width = '100%';
-  $('#flashTxt').textContent = /iso|muro|pausa|fascia|negativa|vacuum|20 s/i.test(T.etq) ? '¡SUELTA!' : '¡AL HIERRO!';
-  $('#flashSub').textContent = T.etq + ' cumplido · toca para cerrar';
-  $('#flash').hidden = false;
+  clearInterval(T.iv); T.corriendo = false; actualizarRelojUI();
+  if (vista === 'entreno') actualizarAccion();
   vibrar([300, 120, 300, 120, 600]);
   pitido(660, 0.25, 0.2); setTimeout(() => pitido(990, 0.25, 0.2), 280); setTimeout(() => pitido(1320, 0.45, 0.22), 560);
+  const suelta = /isom|estir|vac|pose|front|side|rear|abdominal|muro|negativa|fascia|pausa/i.test(T.etq);
+  const c = $('#capaAlarma');
+  c.innerHTML = goteo('#ffb27f', 2) + '<p class="mini" style="color:#d6d3ea">' + esc(T.etq) + ' · terminado</p>' +
+    '<p class="gran">' + (suelta ? '¡SUELTA!' : '¡YA!') + '</p>' +
+    '<p style="font-size:19px;font-weight:800">' + (suelta ? 'Respira. Buen trabajo.' : 'Vuelve a la máquina.') + '</p>' +
+    '<button class="btn btn-durazno" style="min-width:210px;min-height:66px;font-size:21px" data-acc="cerrarAlarma">OK</button>';
+  c.hidden = false; c.querySelector('button').focus();
 }
-function detenerTimer() {
-  clearInterval(T.iv); T.corriendo = false; T.pausado = false;
-  $('#dock').classList.remove('corriendo', 'ultimos');
-  $('#reloj').textContent = '00:00'; $('#relojBarra').style.width = '0%';
-  $('#relojEtq').textContent = 'Cronómetro de tortura'; $('#tPausa').textContent = '❚❚';
+function pararTimer() { clearInterval(T.iv); T.corriendo = false; T.pausado = false; actualizarRelojUI(); if (vista === 'entreno') actualizarAccion(); }
+function actualizarRelojUI() {
+  const activo = T.corriendo, rest = restanteMs(), hojaAbierta = !$('#capaReloj').hidden;
+  const enBarra = !$('#accion').hidden;
+  $('#pildora').hidden = !activo || hojaAbierta || enBarra;
+  const accTxt = $('#accTxt');
+  if (accTxt) { accTxt.textContent = fmt(rest); $('#accEtq').textContent = T.pausado ? 'En pausa' : 'Tiempo'; }
+  $('#tabReloj').classList.toggle('corriendo', activo && !T.pausado);
+  if (activo) { $('#pildoraTxt').textContent = fmt(rest); $('#pildoraEtq').textContent = T.pausado ? 'En pausa' : T.etq; }
+  const num = $('#relNum');
+  if (!num) return;
+  num.textContent = fmt(rest);
+  $('#relEtq').textContent = activo ? (T.pausado ? 'En pausa · ' : '') + T.etq : 'Elige un tiempo abajo';
+  $('#anilloArco').style.strokeDashoffset = activo ? 326.73 * (1 - rest / T.total) : 326.73;
+  $('#relPausa').innerHTML = T.pausado ? ico('play') + 'Seguir' : ico('pausa') + 'Pausa';
+  $('#relPausa').disabled = !activo;
 }
-$('#tPausa').addEventListener('click', () => {
-  if (!T.corriendo) return;
-  if (!T.pausado) { T.restante = T.fin - Date.now(); T.pausado = true; $('#tPausa').textContent = '▶'; $('#dock').classList.remove('ultimos'); }
-  else { T.fin = Date.now() + T.restante; T.pausado = false; $('#tPausa').textContent = '❚❚'; }
-});
-$('#tMas').addEventListener('click', () => {
-  if (!T.corriendo) { iniciarTimer(10, '+10 s'); return; }
-  if (T.pausado) T.restante += 10000; else T.fin += 10000;
-  T.total += 10000; tick();
-});
-$('#tStop').addEventListener('click', detenerTimer);
-$('#flash').addEventListener('click', () => { $('#flash').hidden = true; $('#relojBarra').style.width = '0%'; $('#relojEtq').textContent = 'Cronómetro de tortura'; });
-document.addEventListener('click', ev => {
-  const b = ev.target.closest('[data-timer]');
-  if (b) iniciarTimer(Number(b.dataset.timer), b.dataset.etq);
-});
-document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && T.corriendo) { pedirWakeLock(); tick(); } });
+function abrirReloj() {
+  const c = $('#capaReloj');
+  const etqT = s => s < 60 ? s + ' s' : Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+  c.innerHTML = '<div class="hoja" role="dialog" aria-modal="true" aria-labelledby="relT"><div class="asa"></div>' +
+    '<div style="display:flex;align-items:center;justify-content:space-between"><h2 id="relT" class="disp" style="font-size:22px">Cronómetro</h2>' +
+    '<button class="btn btn-blanco btn-circ" style="min-height:48px;width:48px;min-width:48px" data-acc="cerrarReloj" aria-label="Cerrar">' + ico('cerrar') + '</button></div>' +
+    '<div class="anillo"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" fill="none" stroke="#ece9f6" stroke-width="12"/>' +
+    '<circle id="anilloArco" cx="60" cy="60" r="52" fill="none" stroke="#ffb27f" stroke-width="12" stroke-linecap="round" stroke-dasharray="326.73" stroke-dashoffset="326.73"/></svg>' +
+    '<div class="num"><div><b id="relNum">00:00</b><p id="relEtq" class="mini suave" style="margin-top:8px;max-width:170px">Elige un tiempo abajo</p></div></div></div>' +
+    '<div style="display:flex;justify-content:center;gap:10px;margin:8px 0 18px">' +
+      '<button class="btn btn-blanco btn-circ" data-acc="tMenos" aria-label="Quitar 10 segundos" style="font-size:15px">−10</button>' +
+      '<button class="btn btn-tinta" id="relPausa" data-acc="tPausa" style="min-width:136px">' + ico('pausa') + 'Pausa</button>' +
+      '<button class="btn btn-blanco btn-circ" data-acc="tMas" aria-label="Sumar 10 segundos" style="font-size:15px">+10</button></div>' +
+    '<p class="mini suave" style="margin-bottom:8px">Toca un tiempo y empieza solo</p>' +
+    '<div class="presets">' + [[15, 'Rest-pause'], [20, 'Rest-pause'], [30, 'Descanso'], [60, 'Descanso'], [90, 'Descanso'], [120, 'Descanso'], [10, 'Isometría'], [25, 'Estirar']].map(([s, e], k) =>
+      '<button class="preset' + (k >= 6 ? ' esp' : '') + '" data-timer="' + s + '" data-etq="' + e + ' ' + etqT(s) + '">' + etqT(s) + '<small>' + e + '</small></button>').join('') + '</div>' +
+    '<button class="btn btn-peligro btn-ancho btn-chico" style="margin-top:14px" data-acc="tParar">' + ico('cerrar') + 'Parar reloj</button></div>';
+  c.hidden = false; actualizarRelojUI();
+}
+function cerrarReloj() { const c = $('#capaReloj'); c.hidden = true; c.innerHTML = ''; actualizarRelojUI(); }
 
 /* =====================================================================
-   GENERADOR: BOTONES
+   PESTAÑA HISTORIAL: calendario + lista
    ===================================================================== */
-const sel = $('#selGrupo');
-function refrescarContadorGrupo() { $('#txtVersionesGrupo').textContent = (leer(LS.ver, {}))[sel.value] || 0; }
-sel.addEventListener('change', () => { guardar(LS.grupo, sel.value); refrescarContadorGrupo(); });
-
-function lanzar(rotar) {
-  desbloquearAudio();
-  const gid = sel.value;
-  if (!rotar && actual) {
-    const p = progresoDe(actual);
-    if (p.hechos > 0 && p.pct < 100 && !confirm('Tu rutina actual va al ' + p.pct + '%. Queda guardada en el historial. ¿Generar una nueva?')) return;
-  }
-  const esRotacion = rotar && actual && actual.gid === gid;
-  actual = generarRutina(gid, esRotacion);
-  guardar(LS.grupo, gid);
-  refrescarContadorGrupo();
-  renderRutina();
-  vibrar([30, 40, 80]);
-  aviso((esRotacion ? 'Variante rotada' : 'Rutina generada') + ' · Versión #' + actual.version + ' · Firma #' + hashCorto(actual.firma));
-  $('#zonaRutina').scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-$('#btnGenerar').addEventListener('click', () => lanzar(false));
-$('#btnRotar').addEventListener('click', () => {
-  if (actual && actual.gid === sel.value && progresoDe(actual).hechos > 0 && !confirm('Ya marcaste series en esta variante. ¿Rotarla igualmente?')) return;
-  lanzar(true);
-});
-$('#btnReiniciarPool').addEventListener('click', () => {
-  const tpl = PLANTILLAS[sel.value];
-  if (!confirm('¿Reiniciar la memoria anti-repetición de "' + tpl.nombre + '"? El historial y el contador de versiones se conservan.')) return;
-  reiniciarPool(sel.value);
-  aviso('Pool de ' + tpl.nombre + ' reiniciado');
-});
-
-/* =====================================================================
-   HISTORIAL Y EXPORTACIÓN
-   ===================================================================== */
-const filtro = $('#filtroHist');
-filtro.innerHTML = '<option value="">Todos los grupos</option>' + Object.keys(PLANTILLAS).map(k => '<option value="' + k + '">' + esc(PLANTILLAS[k].nombre) + '</option>').join('');
-
-function renderHistorial() {
-  const hist = leer(LS.hist, []).filter(h => PLANTILLAS[h.gid] && (!filtro.value || h.gid === filtro.value));
-  const lista = $('#listaHist');
-  if (!hist.length) { lista.innerHTML = '<p class="text-center text-zinc-500 py-8">Aún no hay sesiones guardadas.</p>'; return; }
-  lista.innerHTML = hist.map(h => {
-    const p = progresoDe(h), f = new Date(h.fecha), esActual = actual && actual.id === h.id;
-    const ejercicios = h.items.map((it, i) => {
+function tarjetaSesion(h) {
+  const p = progresoDe(h), f = new Date(h.fecha), esActual = actual && actual.id === h.id;
+  const lleno = p.pct === 100;
+  return '<details class="acord" style="margin-top:10px"><summary><span class="ico">' + ico(GRUPOS_UI[h.gid].i) + '</span>' +
+    '<span style="flex:1;min-width:0;line-height:1.2"><span style="display:block">' + esc(GRUPOS_UI[h.gid].c) + ' · v#' + h.version + '</span>' +
+    '<span class="suave" style="display:block;font-size:13px;font-weight:700;margin-top:2px">' + f.toLocaleDateString('es-MX', { day: 'numeric', month: 'short' }) + ' · ' + p.hechos + '/' + p.total + ' series' + (esActual ? ' · en curso' : '') + '</span></span>' +
+    '<span class="chulo" style="width:50px;height:50px;font-size:13px' + (lleno ? ';background:var(--tinta);color:var(--durazno)' : '') + '">' + p.pct + '%</span></summary>' +
+    '<div class="cuerpo"><ol style="margin:0;padding-left:20px">' + h.items.map(it => {
       const ej = INDICE[it.ex], pr = PROT[it.pr];
-      return '<li class="py-1"><span class="text-white font-semibold">' + (i + 1) + '. ' + esc(ej ? ej.n : it.ex) + '</span> <span class="text-zinc-500">· ' + it.sets + ' series</span><br><span class="text-oro2 text-[11.5px]">' + esc(pr ? pr.n : it.pr) + '</span></li>';
-    }).join('');
-    return '<details class="tarjeta p-3' + (esActual ? ' tarjeta-brillo' : '') + '">' +
-      '<summary class="flex items-center justify-between gap-3">' +
-        '<div class="min-w-0"><p class="font-bold text-white text-[14px] truncate">' + esc(PLANTILLAS[h.gid].nombre) + ' · v#' + h.version + (esActual ? ' <span class="text-neon">(activa)</span>' : '') + '</p>' +
-        '<p class="text-[11.5px] text-zinc-500 font-mono">' + f.toLocaleDateString('es-MX', { day:'2-digit', month:'short', year:'numeric' }) + ' · #' + hashCorto(h.firma) + '</p></div>' +
-        '<div class="text-right shrink-0"><p class="font-mono font-bold ' + (p.pct === 100 ? 'text-oro2' : 'text-zinc-300') + '">' + p.pct + '%</p><p class="text-[10.5px] text-zinc-500">' + p.hechos + '/' + p.total + ' series</p></div>' +
-      '</summary>' +
-      '<ol class="mt-2 text-[12.5px] leading-snug border-t border-linea pt-2">' + ejercicios + '</ol>' +
-      (esActual ? '' : '<button class="btn btn-fantasma btn-mini w-full mt-2" data-cargar="' + esc(h.id) + '">Cargar como sesión activa</button>') +
-    '</details>';
-  }).join('');
+      return '<li style="margin:7px 0"><b>' + esc(ej ? ej.n : it.ex) + '</b><br><span class="suave" style="font-size:13.5px;font-weight:700">' + it.sets + ' series · ' + esc(pr ? pr.n : it.pr) + '</span></li>';
+    }).join('') + '</ol>' +
+    (esActual ? '<button class="btn btn-durazno btn-ancho btn-chico" style="margin-top:10px" data-ir="entreno">Seguir con esta</button>'
+      : !lleno ? '<button class="btn btn-tinta btn-ancho btn-chico" style="margin-top:10px" data-acc="hCargar" data-id="' + esc(h.id) + '">Retomar esta rutina</button>' : '') +
+    '</div></details>';
 }
-filtro.addEventListener('change', renderHistorial);
-$('#listaHist').addEventListener('click', ev => {
-  const b = ev.target.closest('[data-cargar]');
-  if (!b) return;
-  const h = leer(LS.hist, []).find(x => x.id === b.dataset.cargar);
-  if (!h) return;
-  actual = h; guardar(LS.act, h);
-  sel.value = h.gid; guardar(LS.grupo, h.gid); refrescarContadorGrupo();
-  cerrarHistorial(); renderRutina();
-  aviso('Sesión v#' + h.version + ' cargada');
-});
-function abrirHistorial() { renderHistorial(); $('#modalHist').hidden = false; document.body.style.overflow = 'hidden'; }
-function cerrarHistorial() { $('#modalHist').hidden = true; document.body.style.overflow = ''; }
-$('#btnHistorial').addEventListener('click', abrirHistorial);
-$('#cerrarHist').addEventListener('click', cerrarHistorial);
-$('#modalHist').addEventListener('click', ev => { if (ev.target.id === 'modalHist') cerrarHistorial(); });
-document.addEventListener('keydown', ev => { if (ev.key === 'Escape') { if (!$('#modalHist').hidden) cerrarHistorial(); if (!$('#flash').hidden) $('#flash').click(); } });
+function calendarioHtml(hist) {
+  const porDia = {};
+  hist.forEach(h => { const k = claveDia(new Date(h.fecha)); (porDia[k] = porDia[k] || []).push(h); });
+  const y = H.mes.getFullYear(), m = H.mes.getMonth(), dias = new Date(y, m + 1, 0).getDate();
+  const offset = (new Date(y, m, 1).getDay() + 6) % 7, hoyK = claveDia(new Date());
+  let celdas = '', diasMes = 0, seriesMes = 0;
+  for (let i = 0; i < offset; i++) celdas += '<span class="dia vacio"></span>';
+  for (let d = 1; d <= dias; d++) {
+    const k = claveDia(new Date(y, m, d)), ses = porDia[k] || [], prog = ses.map(progresoDe);
+    const trabajo = prog.some(p => p.hechos > 0), completo = prog.some(p => p.pct === 100);
+    if (trabajo) diasMes++;
+    prog.forEach(p => { seriesMes += p.hechos; });
+    const cls = completo ? ' completo' : trabajo ? ' entreno' : ses.length ? ' generado' : '';
+    celdas += '<button class="dia' + cls + (k === hoyK ? ' hoy' : '') + (H.dia === k ? ' sel' : '') + '" data-acc="hDia" data-k="' + k + '" aria-label="' + d + (ses.length ? ', ' + ses.length + ' rutina(s)' : '') + '">' + d + '</button>';
+  }
+  const leyenda = (cls, t) => '<span style="display:flex;align-items:center;gap:6px"><span class="dia ' + cls + '" style="width:18px;height:18px;margin:0"></span>' + t + '</span>';
+  const sel = H.dia ? (porDia[H.dia] || []) : [];
+  const fechaSel = H.dia ? new Date(H.dia + 'T12:00:00').toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' }) : '';
+  return '<div class="tarjeta crema">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">' +
+        '<button class="btn btn-blanco btn-circ" style="min-height:44px;width:44px;min-width:44px" data-acc="hMes" data-d="-1" aria-label="Mes anterior">' + ico('izq') + '</button>' +
+        '<p style="font-weight:900;font-size:18px">' + mayus(H.mes.toLocaleDateString('es-MX', { month: 'long', year: 'numeric' })) + '</p>' +
+        '<button class="btn btn-blanco btn-circ" style="min-height:44px;width:44px;min-width:44px" data-acc="hMes" data-d="1" aria-label="Mes siguiente">' + ico('der') + '</button></div>' +
+      '<div class="cal">' + ['lu', 'ma', 'mi', 'ju', 'vi', 'sá', 'do'].map(x => '<span class="dsem">' + x + '</span>').join('') + celdas + '</div>' +
+      '<div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:14px;font-size:12.5px;font-weight:800">' + leyenda('completo', 'Completa') + leyenda('entreno', 'A medias') + leyenda('generado', 'Sin empezar') + '</div>' +
+    '</div>' +
+    '<div class="datos dos" style="margin-top:12px"><div class="dato"><b>' + diasMes + '</b><span>días entrenados</span></div><div class="dato"><b>' + seriesMes + '</b><span>series este mes</span></div></div>' +
+    (H.dia ? '<p class="paso-titulo">' + mayus(fechaSel) + '</p>' + (sel.length ? sel.map(tarjetaSesion).join('') : '<p class="suave" style="font-weight:700">Ese día no hay rutinas.</p>')
+           : '<p class="suave" style="font-weight:700;margin-top:16px;text-align:center">Toca un día para ver qué hiciste.</p>');
+}
+function renderHistorial() {
+  const hist = leer(LS.hist, []).filter(h => PLANTILLAS[h.gid] && Array.isArray(h.items));
+  $('#v-historial').innerHTML =
+    '<div class="cab"><h1 class="disp" style="font-size:clamp(26px,8vw,32px)">Historial</h1>' +
+      '<p style="color:#d6d3ea;font-weight:700;margin-top:6px">' + hist.length + ' rutinas guardadas en este celular</p>' +
+      '<div class="seg" style="margin-top:14px" role="tablist"><button role="tab" aria-selected="' + (H.modo === 'cal') + '" class="' + (H.modo === 'cal' ? 'on' : '') + '" data-acc="hModo" data-m="cal">Calendario</button>' +
+      '<button role="tab" aria-selected="' + (H.modo === 'lista') + '" class="' + (H.modo === 'lista' ? 'on' : '') + '" data-acc="hModo" data-m="lista">Lista</button></div></div>' +
+    goteo('#1e1b3a', 2) +
+    '<div class="pad">' + (H.modo === 'cal' ? calendarioHtml(hist)
+      : hist.length ? hist.slice(0, 80).map(tarjetaSesion).join('')
+      : '<div style="text-align:center">' + ilus(ICO.cal) + '<p style="font-weight:900;font-size:20px">Aún no hay rutinas</p><p class="suave" style="font-weight:700;margin-top:6px">Crea la primera en Inicio.</p></div>') + '</div>';
+}
 
+/* =====================================================================
+   PESTAÑA PERFIL
+   ===================================================================== */
+const MAGRA = 70.2;
+function mayus(t) { return t.charAt(0).toUpperCase() + t.slice(1); }
+function filaAjuste(k, t, s) {
+  return '<div style="display:flex;align-items:center;gap:12px"><div style="flex:1;min-width:0"><p style="font-weight:900">' + t + '</p>' +
+    '<p class="suave" style="font-size:13px;font-weight:700">' + s + '</p></div>' +
+    '<button class="interruptor" role="switch" aria-checked="' + AJ[k] + '" data-acc="ajuste" data-k="' + k + '" aria-label="' + t + '"></button></div>';
+}
+function filaBoton(acc, icono, t, s, peligro) {
+  return '<button class="fila" data-acc="' + acc + '"' + (peligro ? ' style="border-color:var(--rojo);color:var(--rojo)"' : '') + '>' +
+    '<span class="ico"' + (peligro ? ' style="background:var(--rojo)"' : '') + '>' + ico(icono) + '</span>' +
+    '<span style="flex:1;min-width:0"><span class="t" style="display:block">' + t + '</span>' + (s ? '<span class="s" style="display:block">' + s + '</span>' : '') + '</span>' + ico('der') + '</button>';
+}
+function renderPerfil() {
+  const peso = pesoActual(), es90 = Math.abs(peso - 90) < 0.05;
+  const grasa = es90 ? '22' : Math.max(0, (1 - MAGRA / peso) * 100).toFixed(1);
+  const avance = Math.min(100, Math.max(0, (93 - peso) / (93 - 81) * 100));
+  const reglas = ['Cintura de avispa: nada de peso muerto desde el piso. Espalda baja siempre apoyada o en Smith, con straps y sin bloquear arriba. Vacíos todos los días.',
+    'Pantorrillas: en día de pierna, los gemelos van primero. 3 segundos quieto abajo y 2 apretando arriba.',
+    'Primero femoral y glúteo, después cuádriceps. Bajar hasta el fondo y las rodillas nunca hacia adentro.',
+    'Forma en X: dorsal bajo (tirar hacia la cadera) y hombro lateral y trasero.',
+    '7 ejercicios, 16 a 19 series, 55 a 65 minutos. Cada serie al fallo de verdad.',
+    'Al final, posing: 5 poses apretando 20 segundos.'];
+  $('#v-perfil').innerHTML =
+    '<div class="cab" style="text-align:center">' +
+      '<div style="width:116px;height:116px;border-radius:50%;background:#fff;color:var(--tinta);display:grid;place-items:center;margin:6px auto 0;box-shadow:0 0 0 4px var(--durazno)">' + ico('trofeo', '', 'width:60px;height:60px') + '</div>' +
+      '<h1 class="disp" style="font-size:26px;margin-top:14px">Mi perfil</h1>' +
+      '<p style="color:#d6d3ea;font-weight:700;margin-top:4px">Classic Physique · rumbo a tarima</p></div>' +
+    goteo('#1e1b3a', 0) +
+    '<div class="pad">' +
+      '<div class="datos"><div class="dato"><b>1.83 m</b><span>Estatura</span></div><div class="dato"><b>' + fmtKg(peso) + ' kg</b><span>Peso</span></div><div class="dato"><b>' + grasa + '%</b><span>Grasa' + (es90 ? '' : ' (aprox.)') + '</span></div></div>' +
+      '<p class="paso-titulo">Peso de hoy (en ayunas)</p>' +
+      '<div class="tarjeta">' +
+        '<div class="stepper"><button class="btn btn-blanco btn-circ" data-acc="pMenos" aria-label="Bajar 0.1 kilos">' + ico('menos') + '</button>' +
+        '<input id="inPeso" type="number" inputmode="decimal" step="0.1" min="60" max="130" value="' + fmtKg(peso) + '" aria-label="Peso en kilos">' +
+        '<button class="btn btn-blanco btn-circ" data-acc="pMas" aria-label="Subir 0.1 kilos">' + ico('mas') + '</button></div>' +
+        '<button class="btn btn-durazno btn-ancho" style="margin-top:12px" data-acc="pGuardar">' + ico('check') + 'Guardar peso</button>' +
+        '<div style="display:flex;justify-content:space-between;font-weight:800;font-size:13px;margin-top:18px"><span>Empezaste: 93 kg</span><span>Meta: 81 kg</span></div>' +
+        '<div class="barra" style="margin-top:6px"><span style="width:' + avance + '%"></span></div>' +
+        '<p style="font-size:14.5px;font-weight:800;margin-top:8px">Llevas ' + Math.round(avance) + '% del corte. Faltan ' + fmtKg(Math.max(0, peso - 81)) + ' kg.</p>' +
+        '<p class="suave" style="font-size:13.5px;margin-top:6px;line-height:1.45;font-weight:600">Si conservas 70.2 kg de músculo, el 11% de grasa llega en ' + (MAGRA / 0.89).toFixed(1) + ' kg. Para estar en 81 kg al 11% necesitas ganar unos ' + (81 * 0.89 - MAGRA).toFixed(1) + ' kg de músculo mientras bajas.</p>' +
+      '</div>' +
+      '<p class="paso-titulo">Tus marcas</p>' +
+      '<div class="datos"><div class="dato"><b>160</b><span>Hack Squat</span></div><div class="dato"><b>100</b><span>Péndulo</span></div><div class="dato"><b>140+</b><span>Peso Muerto</span></div></div>' +
+      '<p class="suave" style="font-size:13px;font-weight:700;margin-top:8px">Con estas marcas la app calcula el peso para empezar cada ejercicio.</p>' +
+      '<p class="paso-titulo">Ajustes</p>' +
+      '<div class="tarjeta" style="display:grid;gap:16px">' +
+        filaAjuste('descanso', 'Descanso automático', 'Al tocar una serie, el reloj empieza solo') +
+        filaAjuste('vibrar', 'Vibración', 'El celular vibra cuando se acaba el tiempo') +
+        filaAjuste('sonido', 'Sonido', 'Pitido cuando se acaba el tiempo') +
+      '</div>' +
+      '<p class="paso-titulo">Reglas del juez</p>' +
+      '<details class="acord crema"><summary><span class="ico">' + ico('alerta') + '</span>Ver las 6 reglas' + ico('der', 'flecha') + '</summary><div class="cuerpo">' +
+        '<ol style="margin:0;padding-left:20px">' + reglas.map(t => '<li style="margin:6px 0">' + t + '</li>').join('') + '</ol>' +
+        '<p style="margin-top:10px;font-weight:700">Equipo: Smith, Hack Squat, Péndulo, Prensa, poleas dobles, mancuernas, banco predicador, cojín de Hip Thrust y straps.</p></div></details>' +
+      '<p class="paso-titulo">Mis datos</p>' +
+      '<div style="display:grid;gap:10px">' +
+        filaBoton('copiar', 'copiar', 'Copiar rutina de hoy', 'Para mandarla por WhatsApp') +
+        filaBoton('exportar', 'bajar', 'Descargar copia de seguridad', 'Tu historial en un archivo') +
+        filaBoton('tutorial', 'ayuda', 'Ver el tutorial otra vez', '') +
+        filaBoton('reiniciar', 'otra', 'Olvidar rutinas de ' + esc(GRUPOS_UI[grupoSel].c), 'Vuelve a usar todos los ejercicios') +
+        filaBoton('borrar', 'basura', 'Borrar todo', 'Historial, versiones y memoria', true) +
+      '</div>' +
+      '<p class="suave" style="text-align:center;font-size:12.5px;font-weight:700;margin-top:18px">Todo se guarda solo en este celular.</p>' +
+    '</div>';
+}
+
+/* =====================================================================
+   BIENVENIDA (3 pantallas, solo la primera vez)
+   ===================================================================== */
+const INTRO = [
+  { i: ICO.pesa, t: '<b>Elige</b> qué músculo vas a destruir hoy', s: 'Tocas uno, pulsas “Crear mi rutina” y listo. Nunca te sale la misma de la vez pasada.' },
+  { i: ICO.check, t: '<b>Toca</b> un círculo cada vez que acabes una serie', s: 'La app te lleva ejercicio por ejercicio. Tú solo entrenas, tocas y pulsas “Siguiente”.' },
+  { i: ICO.reloj, t: '<b>El reloj</b> te avisa solo', s: 'Al tocar una serie empieza el descanso. Cuando se acaba, el celular suena y vibra.' }
+];
+let introPaso = 0;
+function mostrarIntro(i) {
+  introPaso = i;
+  const d = INTRO[i], c = $('#capaIntro');
+  c.innerHTML = '<button class="saltar" data-acc="introFin">Saltar</button>' +
+    '<div class="ilus">' + ilus(d.i) + '</div>' +
+    '<h2>' + d.t + '</h2><p class="suave" style="font-size:16.5px;font-weight:700;margin-top:10px;line-height:1.45">' + d.s + '</p>' +
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-top:24px">' +
+    '<div class="puntos" aria-hidden="true">' + INTRO.map((_, k) => '<i class="' + (k === i ? 'on' : '') + '"></i>').join('') + '</div>' +
+    '<button class="btn-sig" data-acc="introSig">' + (i === INTRO.length - 1 ? '¡Vamos!' : 'Siguiente') + '</button></div>';
+  c.hidden = false;
+}
+function cerrarIntro() { $('#capaIntro').hidden = true; $('#capaIntro').innerHTML = ''; guardar(LS.intro, true); }
+
+/* =====================================================================
+   ACCIONES (un solo escuchador para toda la app)
+   ===================================================================== */
 function rutinaComoTexto(r) {
-  const tpl = PLANTILLAS[r.gid];
-  const l = ['TORTURA BIOMECÁNICA · ' + tpl.nombre.toUpperCase(), tpl.sub, 'Versión #' + r.version + ' · Firma #' + hashCorto(r.firma) + ' · ' + new Date(r.fecha).toLocaleDateString('es-MX'), ''];
+  const l = ['TORTURA BIOMECÁNICA · ' + GRUPOS_UI[r.gid].c.toUpperCase(), 'Versión #' + r.version + ' · ' + new Date(r.fecha).toLocaleDateString('es-MX'), ''];
   r.items.forEach((it, i) => {
     const ej = INDICE[it.ex], p = PROT[it.pr];
     l.push((i + 1) + '. ' + ej.n + ' — ' + it.sets + ' × ' + (p.rep || ej.r));
-    l.push('   ⚡ ' + p.n);
+    l.push('   Técnica: ' + p.n);
   });
-  l.push('', 'POSING: ' + POSES.map(p => p.n).join(' · ') + ' (' + POSING_RONDAS + ' rondas × 20 s)');
-  l.push('VACUUMS: 5 × 25 s en ayunas');
+  l.push('', 'POSING: ' + POSES.map(p => p.n).join(' · ') + ' (' + POSING_RONDAS + ' vueltas × 20 s)', 'VACÍOS: 5 × 25 s en ayunas');
   return l.join('\n');
 }
-$('#btnCopiar').addEventListener('click', async () => {
-  if (!actual) { aviso('No hay rutina activa'); return; }
-  const txt = rutinaComoTexto(actual);
-  try { await navigator.clipboard.writeText(txt); aviso('Rutina copiada al portapapeles'); }
-  catch (e) { prompt('Copia la rutina:', txt); }
-});
-$('#btnExportar').addEventListener('click', () => {
-  const datos = {
-    app: 'Tortura Biomecánica', exportado: new Date().toISOString(),
-    atleta: { estatura_m: 1.83, peso_kg: leer(LS.peso, 90), grasa_inicial: 0.22, meta: '80-82 kg al 10-12%', marcas_kg: MARCAS },
-    historial: leer(LS.hist, []).map(h => Object.assign({}, h, {
-      grupo: PLANTILLAS[h.gid] ? PLANTILLAS[h.gid].nombre : h.gid,
-      detalle: h.items.map(it => ({ ejercicio: INDICE[it.ex] ? INDICE[it.ex].n : it.ex, protocolo: PROT[it.pr] ? PROT[it.pr].n : it.pr, series: it.sets, completadas: it.done.filter(Boolean).length }))
-    }))
-  };
-  const blob = new Blob([JSON.stringify(datos, null, 2)], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'tortura-biomecanica-historial-' + new Date().toISOString().slice(0, 10) + '.json';
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-  aviso('Historial exportado');
-});
-$('#btnBorrarHist').addEventListener('click', () => {
-  if (!confirm('¿Borrar TODO: historial, versiones y memoria anti-repetición de todos los grupos? No se puede deshacer.')) return;
-  [LS.hist, LS.ult, LS.ver, LS.firmas, LS.uso, LS.act].forEach(k => { try { localStorage.removeItem(k); } catch (e) {} });
-  actual = null; renderHistorial(); renderRutina(); refrescarContadorGrupo();
-  aviso('Todo borrado. Lienzo en blanco.');
-});
 
-/* =====================================================================
-   VACUUMS DIARIOS
-   ===================================================================== */
-function hoyClave() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
-function renderVacuums() {
-  const v = leer(LS.vac, {}), hoy = v[hoyClave()] || [false, false, false, false, false];
-  const caja = $('#vacuums');
-  caja.innerHTML = hoy.map((d, i) => '<button class="vac' + (d ? ' hecha' : '') + '" data-vac="' + i + '" aria-pressed="' + d + '" aria-label="Vacuum ' + (i + 1) + '">' + (d ? '✓' : (i + 1)) + '</button>').join('') +
-    (hoy.every(Boolean) ? '<span class="self-center text-[12px] font-bold text-oro2 ml-1">Cintura blindada hoy</span>' : '');
+async function crearRutina() {
+  if (actual && actual.paso !== 8) {
+    const pr = progresoDe(actual);
+    if (pr.hechos > 0 && pr.pct < 100) {
+      const ok = await preguntar('Tienes una rutina a medias', 'Llevas ' + pr.hechos + ' de ' + pr.total + ' series de ' + GRUPOS_UI[actual.gid].c + '. Se queda guardada en tu historial.', 'Crear una nueva', 'Seguir con la mía');
+      if (!ok) { ir('entreno'); return; }
+    }
+  }
+  desbloquearAudio();
+  actual = generarRutina(grupoSel, false);
+  actual.paso = 0; guardarActual(actual);
+  guardar(LS.grupo, grupoSel);
+  vibrar([30, 40, 80]);
+  ir('entreno');
+  aviso('Rutina nueva lista · Versión #' + actual.version);
 }
-$('#vacuums').addEventListener('click', ev => {
-  const b = ev.target.closest('[data-vac]');
-  if (!b) return;
-  const v = leer(LS.vac, {}), k = hoyClave(), hoy = v[k] || [false, false, false, false, false];
-  hoy[Number(b.dataset.vac)] = !hoy[Number(b.dataset.vac)];
-  const limpio = {}; limpio[k] = hoy;                         // solo se conserva el día en curso
-  guardar(LS.vac, limpio); renderVacuums();
-});
 
-/* =====================================================================
-   PESO Y PROYECCIÓN DE CORTE
-   ===================================================================== */
-const MAGRA = 70.2;                                            // 90 kg × (1 − 0.22)
-function renderPeso() {
-  const peso = Number(leer(LS.peso, 90)) || 90;
-  $('#inPeso').value = peso;
-  $('#dPeso').textContent = peso.toFixed(1).replace('.0', '') + ' kg';
-  const grasa = Math.max(0, (1 - MAGRA / peso) * 100);
-  $('#dGrasa').textContent = (Math.abs(peso - 90) < 0.05 ? 22 : grasa.toFixed(1)) + '%';
-  $('#dMagra').textContent = Math.abs(peso - 90) < 0.05 ? '≈70.2 kg magros' : 'estimada con 70.2 kg magros';
-  const avance = Math.min(100, Math.max(0, (93 - peso) / (93 - 81) * 100));
-  $('#barraPeso').style.width = avance + '%';
-  $('#txtMeta').textContent = Math.round(avance) + '% del corte · faltan ' + Math.max(0, peso - 81).toFixed(1) + ' kg';
-  const a11 = (MAGRA / 0.89).toFixed(1), musculo = (81 * 0.89 - MAGRA).toFixed(1);
-  $('#txtProyeccion').innerHTML = 'Conservando <b class="text-white">70.2 kg magros</b>, el 11% de grasa llega en <b class="text-oro2">' + a11 + ' kg</b>. Para pisar tarima en <b class="text-oro2">81 kg al 11%</b> necesitas sumar ≈<b class="text-white">' + musculo + ' kg de músculo</b> durante el corte: por eso cada serie va al fallo real y la proteína no se negocia.';
+async function accion(b) {
+  const a = b.dataset.acc;
+  switch (a) {
+    case 'grupo':
+      grupoSel = b.dataset.g; guardar(LS.grupo, grupoSel); vibrar(15); renderInicio(); break;
+    case 'crear':
+      crearRutina(); break;
+    case 'vac': {
+      const v = leer(LS.vac, {}), k = claveDia(new Date()), hoy = v[k] || [false, false, false, false, false], i = +b.dataset.i;
+      hoy[i] = !hoy[i];
+      const limpio = {}; limpio[k] = hoy; guardar(LS.vac, limpio);
+      if (hoy[i]) iniciarTimer(25, 'Vacío abdominal ' + (i + 1) + ' de 5');
+      renderInicio(); break;
+    }
+    case 'serie': {
+      const i = +b.dataset.i, j = +b.dataset.j, it = actual.items[i];
+      it.done[j] = !it.done[j]; guardarActual(actual);
+      if (it.done[j]) {
+        vibrar(40);
+        const todo = it.done.every(Boolean);
+        if (AJ.descanso) iniciarTimer(descansoDe(i), todo ? 'Descanso, luego Siguiente' : 'Descanso');
+        if (todo) aviso('¡Ejercicio ' + (i + 1) + ' terminado!');
+      }
+      repintarEntreno(); break;
+    }
+    case 'pose': {
+      const n = +b.dataset.n;
+      actual.posing[n] = !actual.posing[n]; guardarActual(actual);
+      if (actual.posing[n]) iniciarTimer(20, POSES[Math.floor(n / POSING_RONDAS)].n);
+      repintarEntreno(); break;
+    }
+    case 'irPaso':
+      actual.paso = +b.dataset.p; guardarActual(actual); renderEntreno(); actualizarAccion(); window.scrollTo(0, 0); break;
+    case 'ant':
+      if (actual.paso > 0) { actual.paso--; guardarActual(actual); renderEntreno(); actualizarAccion(); window.scrollTo(0, 0); }
+      break;
+    case 'sig':
+      if (actual.paso < 7) { actual.paso++; }
+      else {
+        const pr = progresoDe(actual);
+        if (pr.pct < 100) {
+          const ok = await preguntar('¿Terminar ya?', 'Te faltan ' + (pr.total - pr.hechos) + ' series y ' + (pr.pt - pr.ph) + ' poses. Puedes terminar igual.', 'Sí, terminar', 'Seguir entrenando');
+          if (!ok) return;
+        }
+        actual.paso = 8; vibrar([60, 60, 200]);
+      }
+      guardarActual(actual); renderEntreno(); actualizarAccion(); window.scrollTo(0, 0); break;
+    case 'cambiar': {
+      const i = +b.dataset.i;
+      if (actual.items[i].done.some(Boolean)) {
+        const ok = await preguntar('¿Cambiar este ejercicio?', 'Ya marcaste series en él. Se borran y te doy otro del mismo tipo.', 'Sí, cambiar', 'No');
+        if (!ok) return;
+      }
+      if (cambiarEjercicio(actual, i)) { guardarActual(actual); renderEntreno(); actualizarAccion(); aviso('Ejercicio cambiado'); }
+      else aviso('No hay más opciones para este ejercicio');
+      break;
+    }
+    case 'otra': {
+      const ok = await preguntar('¿Quieres otra rutina?', 'Te doy otra versión distinta de ' + GRUPOS_UI[actual.gid].c + '. Lo que marcaste en esta se pierde.', 'Sí, dame otra', 'No, me quedo con esta');
+      if (!ok) return;
+      actual = generarRutina(actual.gid, true); actual.paso = 0; guardarActual(actual);
+      renderEntreno(); actualizarAccion(); window.scrollTo(0, 0); aviso('Nueva versión #' + actual.version); break;
+    }
+    case 'abrirReloj': abrirReloj(); break;
+    case 'cerrarReloj': cerrarReloj(); break;
+    case 'tPausa':
+      if (!T.corriendo) return;
+      if (!T.pausado) { T.restante = T.fin - Date.now(); T.pausado = true; }
+      else { T.fin = Date.now() + T.restante; T.pausado = false; }
+      actualizarRelojUI(); break;
+    case 'tMas':
+      if (!T.corriendo) { iniciarTimer(10, '10 s'); return; }
+      if (T.pausado) T.restante += 10000; else T.fin += 10000;
+      T.total += 10000; tick(); break;
+    case 'tMenos':
+      if (!T.corriendo) return;
+      if (T.pausado) T.restante = Math.max(1000, T.restante - 10000); else T.fin = Math.max(Date.now() + 1000, T.fin - 10000);
+      tick(); break;
+    case 'tParar': pararTimer(); break;
+    case 'cerrarAlarma': $('#capaAlarma').hidden = true; $('#capaAlarma').innerHTML = ''; break;
+    case 'hModo': H.modo = b.dataset.m; renderHistorial(); break;
+    case 'hMes': H.mes = new Date(H.mes.getFullYear(), H.mes.getMonth() + Number(b.dataset.d), 1); H.dia = null; renderHistorial(); break;
+    case 'hDia': H.dia = H.dia === b.dataset.k ? null : b.dataset.k; renderHistorial(); break;
+    case 'hCargar': {
+      const h = leer(LS.hist, []).find(x => x.id === b.dataset.id);
+      if (!h) return;
+      actual = h; actual.paso = primerPendiente(h); guardarActual(actual);
+      grupoSel = h.gid; guardar(LS.grupo, grupoSel);
+      ir('entreno'); aviso('Rutina retomada'); break;
+    }
+    case 'pMas': case 'pMenos': {
+      const inp = $('#inPeso'), v = parseFloat(inp.value) || pesoActual();
+      inp.value = fmtKg(Math.min(130, Math.max(60, v + (a === 'pMas' ? 0.1 : -0.1)))); break;
+    }
+    case 'pGuardar': {
+      const v = parseFloat($('#inPeso').value);
+      if (!(v >= 60 && v <= 130)) { aviso('Escribe un peso entre 60 y 130 kg'); return; }
+      guardar(LS.peso, Math.round(v * 10) / 10); renderPerfil(); aviso('Peso guardado: ' + fmtKg(v) + ' kg'); break;
+    }
+    case 'ajuste':
+      AJ[b.dataset.k] = !AJ[b.dataset.k]; guardar(LS.ajustes, AJ); b.setAttribute('aria-checked', AJ[b.dataset.k]); vibrar(15); break;
+    case 'copiar': {
+      if (!actual) { aviso('Primero crea una rutina'); return; }
+      const txt = rutinaComoTexto(actual);
+      try { await navigator.clipboard.writeText(txt); aviso('Rutina copiada'); } catch (e) { prompt('Copia tu rutina:', txt); }
+      break;
+    }
+    case 'exportar': {
+      const datos = { app: 'Tortura Biomecánica', exportado: new Date().toISOString(),
+        atleta: { estatura_m: 1.83, peso_kg: pesoActual(), grasa_inicial: 0.22, meta: '80-82 kg al 10-12%', marcas_kg: MARCAS },
+        historial: leer(LS.hist, []).map(h => Object.assign({}, h, {
+          grupo: PLANTILLAS[h.gid] ? PLANTILLAS[h.gid].nombre : h.gid,
+          detalle: h.items.map(it => ({ ejercicio: INDICE[it.ex] ? INDICE[it.ex].n : it.ex, protocolo: PROT[it.pr] ? PROT[it.pr].n : it.pr, series: it.sets, completadas: it.done.filter(Boolean).length }))
+        })) };
+      const blob = new Blob([JSON.stringify(datos, null, 2)], { type: 'application/json' });
+      const el = document.createElement('a');
+      el.href = URL.createObjectURL(blob); el.download = 'tortura-biomecanica-' + claveDia(new Date()) + '.json';
+      document.body.appendChild(el); el.click(); el.remove();
+      setTimeout(() => URL.revokeObjectURL(el.href), 1000);
+      aviso('Copia descargada'); break;
+    }
+    case 'tutorial': mostrarIntro(0); break;
+    case 'reiniciar': {
+      const ok = await preguntar('¿Olvidar rutinas de ' + GRUPOS_UI[grupoSel].c + '?', 'La app vuelve a poder usar todos los ejercicios de ese grupo. Tu historial no se borra.', 'Sí, olvidar', 'No');
+      if (ok) { reiniciarPool(grupoSel); aviso('Listo, memoria reiniciada'); }
+      break;
+    }
+    case 'borrar': {
+      const ok = await preguntar('¿Borrar TODO?', 'Se borran tu historial, las versiones y la memoria de rutinas. No se puede deshacer.', 'Sí, borrar todo', 'No, cancelar', true);
+      if (!ok) return;
+      [LS.hist, LS.ult, LS.ver, LS.firmas, LS.uso, LS.act].forEach(k => { try { localStorage.removeItem(k); } catch (e) {} });
+      actual = null; renderPerfil(); aviso('Todo borrado'); break;
+    }
+    case 'introSig': if (introPaso < INTRO.length - 1) mostrarIntro(introPaso + 1); else cerrarIntro(); break;
+    case 'introFin': cerrarIntro(); break;
+  }
 }
-$('#btnPeso').addEventListener('click', () => {
-  const v = parseFloat($('#inPeso').value);
-  if (!(v >= 60 && v <= 130)) { aviso('Peso fuera de rango (60–130 kg)'); return; }
-  guardar(LS.peso, Math.round(v * 10) / 10); renderPeso(); aviso('Peso registrado: ' + v + ' kg');
+
+document.addEventListener('click', ev => {
+  const t = ev.target;
+  if (t.id === 'capaReloj') { cerrarReloj(); return; }
+  const tim = t.closest('[data-timer]');
+  if (tim) { iniciarTimer(Number(tim.dataset.timer), tim.dataset.etq); return; }
+  const irB = t.closest('[data-ir]');
+  if (irB) { ir(irB.dataset.ir); return; }
+  const b = t.closest('[data-acc]');
+  if (b && !b.disabled) accion(b);
 });
+document.addEventListener('keydown', ev => {
+  if (ev.key !== 'Escape') return;
+  if (!$('#capaAlarma').hidden) { $('#capaAlarma').hidden = true; return; }
+  if (!$('#capaReloj').hidden) cerrarReloj();
+});
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && T.corriendo) { pedirWakeLock(); tick(); } });
 
 /* =====================================================================
    ARRANQUE
    ===================================================================== */
 (function init() {
-  const g = leer(LS.grupo, null);
-  if (actual) sel.value = actual.gid; else if (g && PLANTILLAS[g]) sel.value = g;
-  refrescarContadorGrupo();
-  renderPeso();
-  renderVacuums();
-  renderRutina();
+  ir(actual && actual.paso !== 8 && progresoDe(actual).hechos > 0 ? 'entreno' : 'inicio', true);
+  if (!leer(LS.intro, false)) mostrarIntro(0);
 })();
 </script>
 </body>
